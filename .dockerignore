@@ -1,0 +1,8 @@
+.next
+.pnpm-store
+.wrangler
+node_modules
+
+# playwright
+playwright-report/
+test-results/

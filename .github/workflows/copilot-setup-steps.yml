@@ -1,0 +1,104 @@
+name: 'Copilot Setup Steps'
+
+# IMPORTANT: When making changes to this workflow, update the conventions documentation:
+# docs/conventions/copilot-agent.md
+
+# Automatically run the setup steps when they are changed to allow for easy validation, and
+# allow manual testing through the repository's "Actions" tab
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    # Note: Environment variables defined here are only available during the setup steps.
+    # They do NOT automatically transfer to the Copilot environment.
+    # To make them available to Copilot, append them to .env file in the steps below.
+    #
+    # GitHub Actions context variable (automatically set by GitHub Actions):
+    # - github.job = "copilot-setup-steps" when running via PR or workflow_dispatch
+    # - github.job = "copilot" when running during Copilot agent execution
+    #
+    # We use github.job in conditionals to control execution:
+    # - Setup mode (github.job=copilot-setup-steps): Run make up + make ci
+    #   to verify the environment is working correctly before Copilot uses it
+    # - Copilot mode (github.job=copilot): Skip setup/verification since the
+    #   environment was already verified during setup steps
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    # Set the permissions to the lowest permissions possible needed for your steps.
+    # Copilot will be given its own token for its operations.
+    permissions:
+      # If you want to clone the repository as part of your setup steps, for example to install dependencies, you'll need the `contents: read` permission. If you don't clone the repository in your setup steps, Copilot will do this for you automatically after the steps complete.
+      contents: read
+
+    # You can define any steps you want, and they will run before the agent starts.
+    # If you do not check out your code, Copilot will do this for you.
+    steps:
+      - name: Validate GITHUB_JOB
+        run: |
+          echo "GITHUB_JOB=$GITHUB_JOB"
+          echo "github.job=${{ github.job }}"
+          echo "github.event_name=${{ github.event_name }}"
+
+          # Validate GITHUB_JOB value
+          if [[ "$GITHUB_JOB" != "copilot-setup-steps" && "$GITHUB_JOB" != "copilot" ]]; then
+            echo "ERROR: Unexpected GITHUB_JOB value: $GITHUB_JOB"
+            echo "Expected: 'copilot-setup-steps' or 'copilot'"
+            exit 1
+          fi
+
+          echo "✓ GITHUB_JOB validation passed: $GITHUB_JOB"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env file
+        run: |
+          cp .env.example .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+      - name: Install Node.js (for npm cache)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cache npm dependencies
+        run: npm ci
+        # Note: Always cache npm dependencies since both setup and copilot modes
+        # will use the cached node_modules (mounted as a volume in Docker)
+
+      # The following steps only run during setup verification (github.job=copilot-setup-steps)
+      # They are skipped in Copilot mode since the environment is already verified.
+      - name: Build and start services (setup mode only)
+        run: |
+          if [[ "$GITHUB_JOB" == "copilot-setup-steps" ]]; then
+            make up
+          else
+            echo "Skipping 'make up' - not in setup mode (GITHUB_JOB=$GITHUB_JOB)"
+          fi
+        # This starts all Docker services (db, web) and runs migrations.
+        # Runs when github.job=copilot-setup-steps (PR validation or workflow_dispatch).
+        # Skipped when github.job=copilot (Copilot agent execution).
+
+      - name: Verify environment (setup mode only - run full test suite)
+        run: |
+          if [[ "$GITHUB_JOB" == "copilot-setup-steps" ]]; then
+            make ci
+          else
+            echo "Skipping 'make ci' - not in setup mode (GITHUB_JOB=$GITHUB_JOB)"
+          fi
+        # Runs lint + unit + integration + e2e tests to ensure environment is working.
+        # This is expensive (~2-5 min) but ensures Copilot starts with a verified environment.
+        # Runs when github.job=copilot-setup-steps (PR validation or workflow_dispatch).
+        # Skipped when github.job=copilot (Copilot agent execution).

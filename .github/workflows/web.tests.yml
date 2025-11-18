@@ -1,0 +1,214 @@
+name: Web Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATABASE_URL: 'http://localhost:8080'
+  AUTH_SECRET: xbDll3BtBXb9nZwPvEE0K9+Cl5/SxcxSWb7OylHp5Xjx
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run typechecking
+        run: npm run typecheck
+
+      - name: Run unit and component tests with blob reporter
+        id: unit-component-tests
+        run: npx vitest run tests/unit tests/components --reporter=blob --reporter=default --coverage --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.branches=0 --coverage.thresholds.statements=0 --coverage.thresholds.autoUpdate=false
+
+      - name: Rename blob report for unit and component tests
+        if: steps.unit-component-tests.outcome == 'success' || steps.unit-component-tests.outcome == 'failure'
+        run: mv .vitest-reports/blob.json .vitest-reports/blob-unit-component.json
+
+      - name: Upload unit and component test blob report
+        uses: actions/upload-artifact@v4
+        if: steps.unit-component-tests.outcome == 'success' || steps.unit-component-tests.outcome == 'failure'
+        with:
+          name: vitest-blob-unit-component
+          path: .vitest-reports/blob-unit-component.json
+          retention-days: 1
+
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      libsql:
+        image: ghcr.io/tursodatabase/libsql-server:latest
+        ports:
+          - 8080:8080
+          - 5001:5001
+        options: --platform linux/amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Use npm run db:migrate directly instead of make migrate to avoid docker-compose dependency
+      # make migrate requires docker-compose and a .env file, but CI uses the libsql service directly
+      - name: Run Migration
+        env:
+          AUTH_SECRET: test-secret-for-ci
+        run: npm run db:migrate
+
+      - name: Run integration tests with blob reporter
+        id: integration-tests
+        env:
+          AUTH_SECRET: test-secret-for-ci
+        run: npm run test:integration -- --reporter=blob --reporter=default --coverage --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.branches=0 --coverage.thresholds.statements=0 --coverage.thresholds.autoUpdate=false
+
+      - name: Rename blob report for integration tests
+        if: steps.integration-tests.outcome == 'success' || steps.integration-tests.outcome == 'failure'
+        run: mv .vitest-reports/blob.json .vitest-reports/blob-integration.json
+
+      - name: Upload integration test blob report
+        uses: actions/upload-artifact@v4
+        if: steps.integration-tests.outcome == 'success' || steps.integration-tests.outcome == 'failure'
+        with:
+          name: vitest-blob-integration
+          path: .vitest-reports/blob-integration.json
+          retention-days: 1
+
+  playwright-tests:
+    runs-on: ubuntu-latest
+    # TODO: Add E2E coverage collection
+    # Requires instrumenting the Next.js app with babel-plugin-istanbul or @istanbuljs/nyc-config-typescript
+    # and using Playwright's page.coverage API or a Playwright coverage plugin
+    # This would need to be merged with the Vitest coverage from the coverage job above
+
+    services:
+      libsql:
+        image: ghcr.io/tursodatabase/libsql-server:latest
+        ports:
+          - 8080:8080
+          - 5001:5001
+        options: --platform linux/amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(node -p "require('./package.json').devDependencies['@playwright/test'].replace('^', '')")" >> $GITHUB_OUTPUT
+
+      - name: Cache playwright binaries
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Run Migration
+        env:
+          AUTH_SECRET: test-secret-for-ci
+        run: npm run db:migrate
+
+      - name: Run Playwright tests
+        env:
+          AUTH_SECRET: test-secret-for-ci
+        run: npm run test:e2e
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+
+  coverage-report:
+    runs-on: ubuntu-latest
+    needs: [quick, integration-tests]
+    if: github.event.pull_request.draft == false
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download unit and component test blob report
+        uses: actions/download-artifact@v4
+        with:
+          name: vitest-blob-unit-component
+          path: ./blob-reports
+
+      - name: Download integration test blob report
+        uses: actions/download-artifact@v4
+        with:
+          name: vitest-blob-integration
+          path: ./blob-reports
+
+      - name: Merge coverage reports
+        run: npx vitest run --merge-reports ./blob-reports --coverage.enabled=true --coverage.thresholds.autoUpdate=false --reporter=default
+
+      - name: Report Coverage
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: './coverage/coverage-summary.json'
+          json-final-path: './coverage/coverage-final.json'

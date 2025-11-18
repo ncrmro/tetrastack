@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""
+Claude Code Wrapper with Worktree Support
+
+IMPORTANT: Any changes to this file should be reflected in docs/conventions/AGENT_WORKTREES.md
+
+This script wraps the Claude Code CLI to provide MCP server configuration and worktree support.
+"""
+
+import json
+import os
+import subprocess
+import sys
+
+def get_project_root():
+    """Get the project root directory (parent of bin/)."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(script_dir)
+
+def sanitize_branch_name(branch_name):
+    """Convert branch name to a valid directory name by replacing slashes with hyphens."""
+    return branch_name.replace('/', '-')
+
+def parse_env_file(env_path):
+    """Parse .env file and extract service port information."""
+    if not os.path.exists(env_path):
+        return {}
+
+    env_vars = {}
+    try:
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if not line or line.startswith('#'):
+                    continue
+                # Parse KEY=VALUE pairs
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    env_vars[key.strip()] = value.strip()
+    except Exception as e:
+        print(f"Warning: Could not parse .env file: {e}", file=sys.stderr)
+
+    return env_vars
+
+def get_service_info(env_vars):
+    """Generate service availability information from environment variables."""
+    services = []
+
+    # Map environment variables to service descriptions
+    service_mappings = [
+        ('WEB_PORT', 'Web development server', 'localhost'),
+        ('DB_PORT', 'LibSQL database', 'localhost'),
+    ]
+
+    for env_key, service_name, host in service_mappings:
+        if env_key in env_vars:
+            port = env_vars[env_key]
+            services.append(f"{service_name}: {host}:{port}")
+
+    return services
+
+def create_mcp_config(workspace_path):
+    """Create the MCP server configuration."""
+    return {
+        "mcpServers": {
+            "typescript-lsp": {
+                "command": "mcp-language-server",
+                "args": [
+                    "--workspace",
+                    workspace_path,
+                    "--lsp",
+                    "typescript-language-server",
+                    "--",
+                    "--stdio"
+                ]
+            },
+            "playwright": {
+                "type": "stdio",
+                "command": "npx",
+                "env": {
+                    "PLAYWRIGHT_BROWSERS_PATH": "",
+                    "PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS": "true"
+                },
+                "args": [
+                    "@playwright/mcp@latest",
+                    "--browser=chromium",
+                    "--executable-path=/nix/store/ciwl3hnki3yvx36vjsagx2yhrcy8jb1k-playwright-browsers/chromium-1181/chrome-linux/chrome"
+                ]
+            },
+            "docker": {
+                "type": "stdio",
+                "command": "uvx",
+                "args": [
+                    "docker-mcp"
+                ],
+                "env": {}
+            }
+        }
+    }
+
+def main():
+    """Run Claude with MCP server configuration."""
+    project_root = get_project_root()
+
+    # Process arguments to handle --worktree flag
+    args = sys.argv[1:]
+    processed_args = []
+    workspace_path = project_root  # Default to project root
+    i = 0
+
+    while i < len(args):
+        if args[i] == "--worktree":
+            # Get the worktree branch name
+            if i + 1 >= len(args):
+                print("Error: --worktree requires a branch name argument", file=sys.stderr)
+                sys.exit(1)
+
+            branch_name = args[i + 1]
+
+            # Strip 'worktree/' prefix if present (for autocomplete convenience)
+            if branch_name.startswith("worktree/"):
+                branch_name = branch_name[len("worktree/"):]
+
+            # Construct the full worktree path
+            worktree_path = os.path.join(project_root, "worktree", sanitize_branch_name(branch_name))
+
+            # Check if worktree exists, create it if not
+            if not os.path.exists(worktree_path):
+                print(f"Worktree does not exist at {worktree_path}")
+                print(f"Creating worktree for branch '{branch_name}'...")
+
+                # Get the path to bin/worktree script
+                worktree_script = os.path.join(project_root, "bin", "worktree")
+
+                try:
+                    result = subprocess.run(
+                        [worktree_script, branch_name],
+                        check=True
+                    )
+                    print(f"✓ Worktree created successfully")
+                except subprocess.CalledProcessError as e:
+                    print(f"Error: Failed to create worktree: {e}", file=sys.stderr)
+                    sys.exit(1)
+                except Exception as e:
+                    print(f"Error: Could not execute worktree script: {e}", file=sys.stderr)
+                    sys.exit(1)
+
+            # Update workspace path for TypeScript LSP
+            workspace_path = worktree_path
+
+            # Add the --add-dir flag
+            processed_args.extend(["--add-dir", worktree_path])
+
+            # Skip the worktree branch name argument
+            i += 2
+        else:
+            # Pass through other arguments
+            processed_args.append(args[i])
+            i += 1
+
+    # Parse .env file from the workspace directory
+    env_path = os.path.join(workspace_path, ".env")
+    env_vars = parse_env_file(env_path)
+    services = get_service_info(env_vars)
+
+    # Build system prompt with workspace and service information
+    system_prompt_parts = []
+
+    if workspace_path != project_root:
+        system_prompt_parts.append(
+            f"You are handling work in worktree located at {workspace_path}, "
+            f"only read or edit files in that directory, all commands should be run in that directory."
+        )
+
+    if services:
+        service_list = "\n".join(f"  - {service}" for service in services)
+        system_prompt_parts.append(
+            f"Available services in this workspace:\n{service_list}"
+        )
+
+    if system_prompt_parts:
+        system_prompt = "\n\n".join(system_prompt_parts)
+        processed_args.extend(["--append-system-prompt", system_prompt])
+
+    # Create MCP config with the appropriate workspace path
+    mcp_config = create_mcp_config(workspace_path)
+    mcp_config_json = json.dumps(mcp_config)
+
+    # Set environment variable for hooks to know the workspace directory
+    os.environ['CLAUDE_WORKSPACE_DIR'] = workspace_path
+
+    # Build the command: claude --mcp-config <json> <processed args>
+    cmd = ["claude", "--mcp-config", mcp_config_json] + processed_args
+
+    # Execute the command, replacing the current process
+    try:
+        os.execvp("claude", cmd)
+    except OSError as e:
+        print(f"Error executing claude: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

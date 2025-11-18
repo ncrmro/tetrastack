@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#
+# Jobs CLI - Manage and monitor background jobs
+#
+# Usage:
+#   bin/jobs [command] [options]
+#
+# Commands:
+#   list                           List all jobs
+#   status <job-id>                Show detailed job status
+#   generate-projects [options]    Create project generation job
+#
+# Examples:
+#   bin/jobs list
+#   bin/jobs status 01234567-89ab-cdef-0123-456789abcdef
+#   bin/jobs generate-projects --param theme="AI projects" --param count=5
+#
+
+set -euo pipefail
+
+# Check if Docker is available and running
+if command -v docker &> /dev/null && docker compose ps web &> /dev/null; then
+    docker compose exec -T web npx tsx src/jobs/cli.ts "$@"
+else
+    npx tsx src/jobs/cli.ts "$@"
+fi

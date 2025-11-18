@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+#
+# Generate Project Ideas CLI
+#
+# Generates AI-powered project ideas and saves them to the database.
+# Uses the GenerateProjectIdeasJob with the fluent .now() pattern.
+#
+# Usage:
+#   bin/generate-projects [OPTIONS]
+#
+# Options:
+#   --team-id=ID      Team ID to create projects for (default: first team from database)
+#   --theme=TEXT      Theme for project generation (default: "Generate innovative software project ideas")
+#   --count=N         Number of projects to generate (default: 10)
+#   --user-id=ID      User ID for createdBy field (default: 1 - admin user)
+#   -h, --help        Show this help message
+#
+# Examples:
+#   bin/generate-projects
+#   bin/generate-projects --theme="AI and ML projects" --count=5
+#   bin/generate-projects --team-id=team-123 --user-id=1
+#
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Default values (empty means use script's defaults)
+TEAM_ID=""
+THEME=""
+COUNT=""
+USER_ID=""
+
+# Help text
+show_help() {
+    cat << EOF
+Generate Project Ideas CLI
+
+Generates AI-powered project ideas and saves them to the database.
+Uses the GenerateProjectIdeasJob with the fluent .now() pattern.
+
+Usage:
+  bin/generate-projects [OPTIONS]
+
+Options:
+  --team-id=ID      Team ID to create projects for (default: first team from database)
+  --theme=TEXT      Theme for project generation (default: "Generate innovative software project ideas")
+  --count=N         Number of projects to generate (default: 10)
+  --user-id=ID      User ID for createdBy field (default: 1 - admin user)
+  -h, --help        Show this help message
+
+Examples:
+  bin/generate-projects
+  bin/generate-projects --theme="AI and ML projects" --count=5
+  bin/generate-projects --team-id=team-123 --user-id=2
+
+Defaults:
+  If run without arguments, uses the first team from the database (typically
+  the Engineering team from fixtures) and user ID 1 (admin user).
+
+Environment:
+  The script runs inside the Docker container if available, otherwise runs locally.
+EOF
+}
+
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        --team-id=*)
+            TEAM_ID="${arg#*=}"
+            shift
+            ;;
+        --theme=*)
+            THEME="${arg#*=}"
+            shift
+            ;;
+        --count=*)
+            COUNT="${arg#*=}"
+            shift
+            ;;
+        --user-id=*)
+            USER_ID="${arg#*=}"
+            shift
+            ;;
+        *)
+            echo -e "${RED}Error: Unknown option $arg${NC}" >&2
+            echo "Use -h or --help for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Build the command with only provided arguments
+CMD="npx tsx src/jobs/run-generate-projects.ts"
+
+if [ -n "$TEAM_ID" ]; then
+    CMD="$CMD --team-id=$TEAM_ID"
+fi
+
+if [ -n "$THEME" ]; then
+    CMD="$CMD --theme=\"$THEME\""
+fi
+
+if [ -n "$COUNT" ]; then
+    CMD="$CMD --count=$COUNT"
+fi
+
+if [ -n "$USER_ID" ]; then
+    CMD="$CMD --user-id=$USER_ID"
+fi
+
+# Check if Docker is available and running
+if command -v docker &> /dev/null && docker compose ps web &> /dev/null; then
+    echo -e "${GREEN}Running job in Docker container...${NC}"
+    docker compose exec -T web bash -c "$CMD"
+else
+    echo -e "${YELLOW}Docker not available, running locally...${NC}"
+    eval "$CMD"
+fi
