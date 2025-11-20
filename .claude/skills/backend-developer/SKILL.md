@@ -6,7 +6,7 @@ allowed-tools: Read, Edit, Write, Grep, Glob, Bash, mcp__typescript-lsp__definit
 
 # Backend Developer Skill
 
-Expert backend development for the Tetraship/Meze meal prep platform using Next.js server actions, Drizzle ORM, and the many-first design pattern.
+Expert backend development for the Tetrastack/Meze meal prep platform using Next.js server actions, Drizzle ORM, and the many-first design pattern.
 
 ## Core Principles
 
