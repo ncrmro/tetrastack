@@ -31,8 +31,9 @@ export default function ProjectFormClient({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectStatus>(PROJECT_STATUS.PLANNING);
-  const [priority, setPriority] =
-    useState<ProjectPriority>(PROJECT_PRIORITY.MEDIUM);
+  const [priority, setPriority] = useState<ProjectPriority>(
+    PROJECT_PRIORITY.MEDIUM,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -177,7 +178,9 @@ export default function ProjectFormClient({
                 <Select
                   id="priority"
                   value={priority}
-                  onChange={(e) => setPriority(e.target.value as ProjectPriority)}
+                  onChange={(e) =>
+                    setPriority(e.target.value as ProjectPriority)
+                  }
                 >
                   {enumToOptions(PROJECT_PRIORITY).map((option) => (
                     <option key={option.value} value={option.value}>

@@ -155,7 +155,9 @@ export default function ProjectEditClient({ project }: ProjectEditClientProps) {
                 <Select
                   id="priority"
                   value={priority}
-                  onChange={(e) => setPriority(e.target.value as ProjectPriority)}
+                  onChange={(e) =>
+                    setPriority(e.target.value as ProjectPriority)
+                  }
                 >
                   {enumToOptions(PROJECT_PRIORITY).map((option) => (
                     <option key={option.value} value={option.value}>
