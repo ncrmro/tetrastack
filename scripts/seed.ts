@@ -116,11 +116,7 @@ async function seed() {
 }
 
 // Only run if this file is executed directly
-// Check if this module is the main module (not imported)
-if (
-  require.main === module ||
-  import.meta.url === `file://${process.argv[1]}`
-) {
+if (require.main === module) {
   seed()
     .then(() => {
       console.log('Seeding finished');
