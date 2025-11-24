@@ -84,12 +84,12 @@ test.describe('Projects', () => {
         // Team is pre-selected from fixture
       });
 
-      await test.step('Submit form', async () => {
+      await test.step('Submit form and wait for redirect', async () => {
         await projectsPage.saveButton.click();
+        await page.waitForURL(/\/projects\/my-new-project/, { timeout: 10000 });
       });
 
-      await test.step('Verify redirect to project detail page', async () => {
-        await expect(page).toHaveURL(/\/projects\/my-new-project/);
+      await test.step('Verify project details are displayed', async () => {
         await expect(projectsPage.projectTitle).toHaveText('My New Project');
       });
 
@@ -218,13 +218,12 @@ test.describe('Projects', () => {
         await projectsPage.statusSelect.selectOption(PROJECT_STATUS.COMPLETED);
       });
 
-      await test.step('Save changes', async () => {
+      await test.step('Save changes and wait for redirect', async () => {
         await projectsPage.saveButton.click();
-      });
-
-      await test.step('Verify redirect to project detail', async () => {
         // After update, slug will change to 'updated-project-title'
-        await expect(page).toHaveURL(/\/projects\/updated-project-title/);
+        await page.waitForURL(/\/projects\/updated-project-title/, {
+          timeout: 10000,
+        });
       });
 
       await test.step('Verify changes are reflected', async () => {

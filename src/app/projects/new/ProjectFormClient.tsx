@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createProject } from '@/actions/projects';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
+import {
+  PROJECT_STATUS,
+  PROJECT_PRIORITY,
+  type ProjectStatus,
+  type ProjectPriority,
+} from '@/database/schema.projects';
 import { enumToOptions } from '@/lib/enum-utils';
 import type { SelectTeam } from '@/database/schema.teams';
 import { Button, ButtonLink } from '@/components/ui/button';
@@ -25,9 +30,9 @@ export default function ProjectFormClient({
   const [teamId, setTeamId] = useState(preselectedTeamId || teams[0]?.id || '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<keyof typeof PROJECT_STATUS>('PLANNING');
+  const [status, setStatus] = useState<ProjectStatus>(PROJECT_STATUS.PLANNING);
   const [priority, setPriority] =
-    useState<keyof typeof PROJECT_PRIORITY>('MEDIUM');
+    useState<ProjectPriority>(PROJECT_PRIORITY.MEDIUM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -152,9 +157,7 @@ export default function ProjectFormClient({
                 <Select
                   id="status"
                   value={status}
-                  onChange={(e) =>
-                    setStatus(e.target.value as keyof typeof PROJECT_STATUS)
-                  }
+                  onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                 >
                   {enumToOptions(PROJECT_STATUS).map((option) => (
                     <option key={option.value} value={option.value}>
@@ -174,9 +177,7 @@ export default function ProjectFormClient({
                 <Select
                   id="priority"
                   value={priority}
-                  onChange={(e) =>
-                    setPriority(e.target.value as keyof typeof PROJECT_PRIORITY)
-                  }
+                  onChange={(e) => setPriority(e.target.value as ProjectPriority)}
                 >
                   {enumToOptions(PROJECT_PRIORITY).map((option) => (
                     <option key={option.value} value={option.value}>
