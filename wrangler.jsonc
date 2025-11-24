@@ -7,10 +7,7 @@
   "name": "tetrastack",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-01",
-  "compatibility_flags": [
-    "nodejs_compat",
-    "global_fetch_strictly_public"
-  ],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "binding": "ASSETS",
     "directory": ".open-next/assets",
@@ -24,16 +21,58 @@
    */
   // "placement": { "mode": "smart" },
   /**
-   * Environment Variables
-   * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+   * ═══════════════════════════════════════════════════════════════════════
+   * Environment Variables Configuration
+   * ═══════════════════════════════════════════════════════════════════════
+   *
+   * This section contains PUBLIC environment variables that are safe to commit.
+   * These values are visible in the Cloudflare dashboard and worker code.
+   *
+   * SECRETS (NEVER commit these - set via Cloudflare dashboard or CLI):
+   * ────────────────────────────────────────────────────────────────────────
+   * Required secrets:
+   *   • TURSO_AUTH_TOKEN       - Database authentication token
+   *                              Pairs with: TURSO_DATABASE_URL (below)
+   *                              Set with: wrangler secret put TURSO_AUTH_TOKEN
+   *
+   *   • AUTH_SECRET            - NextAuth.js encryption secret (32+ chars)
+   *                              Generate: openssl rand -base64 32
+   *                              Set with: wrangler secret put AUTH_SECRET
+   *
+   * Optional secrets (when using these features):
+   *   • AUTH_GOOGLE_SECRET     - Google OAuth client secret
+   *                              Pairs with: AUTH_GOOGLE_ID (below)
+   *                              Set with: wrangler secret put AUTH_GOOGLE_SECRET
+   *
+   *   • AUTH_MAILGUN_KEY       - Mailgun API key for transactional emails
+   *                              Set with: wrangler secret put AUTH_MAILGUN_KEY
+   *
+   *   • OPENAI_API_KEY         - OpenAI API key for AI features
+   *                              Set with: wrangler secret put OPENAI_API_KEY
+   *
+   * Documentation:
+   * ────────────────────────────────────────────────────────────────────────
+   *   • Secret templates:      .env.production.example
+   *   • Complete reference:    docs/ENVIRONMENT_VARIABLES.md
+   *   • Setup guide:           docs/GETTING_STARTED.md
+   *   • Cloudflare docs:       https://developers.cloudflare.com/workers/configuration/secrets/
+   *
+   * ═══════════════════════════════════════════════════════════════════════
    */
   "vars": {
-    "AUTH_EMAIL_FROM": "onboarding@tetrastack.example",
-    "AUTH_TRUST_HOST": "true",
+    // NextAuth configuration
+    "AUTH_EMAIL_FROM": "onboarding@tetrastack.example", // Email sender address for auth emails
+    "AUTH_TRUST_HOST": "true", // Required for edge deployments (Cloudflare Workers)
+    "AUTH_REDIRECT_PROXY_URL": "https://tetrastack.example/api/auth", // OAuth callback URL for production
+
+    // Database configuration (public URL, requires TURSO_AUTH_TOKEN secret)
     "TURSO_DATABASE_URL": "libsql://meze-production-ncrmro.aws-us-east-2.turso.io",
-    "AUTH_GOOGLE_ID": "example.apps.googleusercontent.com",
-    "NEXT_PUBLIC_POSTHOG_KEY": "phc_EXAMPLE",
-    "AUTH_REDIRECT_PROXY_URL": "https://tetrastack.example/api/auth",
+
+    // OAuth providers (requires corresponding *_SECRET in Cloudflare secrets)
+    "AUTH_GOOGLE_ID": "example.apps.googleusercontent.com", // → Needs: AUTH_GOOGLE_SECRET (wrangler secret)
+
+    // Analytics
+    "NEXT_PUBLIC_POSTHOG_KEY": "phc_EXAMPLE", // PostHog project API key (public)
   },
   /**
    * Note: Use secrets to store sensitive data.

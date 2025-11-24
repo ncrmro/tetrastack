@@ -1,10 +1,10 @@
-# Tetraship
+# Tetrastack
 
-A production-ready, full-stack TypeScript boilerplate for building modern web applications. Tetraship combines Next.js, Drizzle ORM, Auth.js, and Cloudflare Workers into a cohesive development experience designed with AI agents in mind and inspired by Ruby on Rails conventions.
+A production-ready, full-stack TypeScript boilerplate for building modern web applications. Tetrastack combines Next.js, Drizzle ORM, Auth.js, and Cloudflare Workers into a cohesive development experience designed with AI agents in mind and inspired by Ruby on Rails conventions.
 
-## Why Tetraship?
+## Why Tetrastack?
 
-Modern web development requires piecing together numerous technologies. Tetraship provides a battle-tested foundation that lets you focus on building your application, not configuring infrastructure.
+Modern web development requires piecing together numerous technologies. Tetrastack provides a battle-tested foundation that lets you focus on building your application, not configuring infrastructure.
 
 ### Key Features
 
@@ -50,7 +50,7 @@ Modern web development requires piecing together numerous technologies. Tetrashi
 
 ## Agent-First Philosophy
 
-Tetraship is designed to work seamlessly with AI coding assistants like Claude Code. Every architectural decision includes:
+Tetrastack is designed to work seamlessly with AI coding assistants like Claude Code. Every architectural decision includes:
 
 - **Comprehensive Documentation**: README files in key directories explaining patterns
 - **Clear Conventions**: Predictable structure following Rails-inspired principles
@@ -60,7 +60,7 @@ Tetraship is designed to work seamlessly with AI coding assistants like Claude C
 
 ## Rails-Inspired Architecture
 
-Tetraship borrows successful patterns from Ruby on Rails:
+Tetrastack borrows successful patterns from Ruby on Rails:
 
 ### Convention Over Configuration
 
@@ -157,7 +157,7 @@ tests/
 
 ## Testing
 
-Tetraship uses a comprehensive three-tier testing approach:
+Tetrastack uses a comprehensive three-tier testing approach:
 
 ### Test Structure
 
@@ -182,7 +182,7 @@ make ci
 
 ### Test Data Factories
 
-Tetraship uses the factory pattern (Fishery + Faker) to reduce test code by 87%:
+Tetrastack uses the factory pattern (Fishery + Faker) to reduce test code by 87%:
 
 ```typescript
 // ✅ Good - Uses all defaults
@@ -256,7 +256,7 @@ async function updateUser(id, data) { ... }  // NO!
 
 ## Styling & Theming
 
-Tetraship includes a comprehensive theme system in `src/app/globals.css`:
+Tetrastack includes a comprehensive theme system in `src/app/globals.css`:
 
 - **Material Design-inspired**: Semantic color tokens (primary, surface, etc.)
 - **Light/Dark Mode**: Built-in with `light-dark()` CSS functions
@@ -266,7 +266,7 @@ Tetraship includes a comprehensive theme system in `src/app/globals.css`:
 
 ## MCP Servers
 
-Tetraship integrates with Model Context Protocol servers for enhanced AI development:
+Tetrastack integrates with Model Context Protocol servers for enhanced AI development:
 
 - **TypeScript Language Server**: Type-aware code intelligence and refactoring
 - **Docker MCP**: Container management and debugging
@@ -283,7 +283,7 @@ See [CLAUDE.md](CLAUDE.md) for complete MCP server documentation.
 npm run deploy
 ```
 
-Tetraship uses OpenNext for Cloudflare Workers deployment, providing:
+Tetrastack uses OpenNext for Cloudflare Workers deployment, providing:
 
 - Edge computing for low latency
 - Automatic scaling
@@ -293,30 +293,44 @@ Tetraship uses OpenNext for Cloudflare Workers deployment, providing:
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` and configure:
+Tetrastack uses a three-tier configuration system:
+
+- **Development**: `.env` file (local, git-ignored)
+- **Production**: `wrangler.jsonc` (public vars) + Cloudflare Secrets (sensitive data)
+- **CI/CD**: GitHub Actions secrets and variables
+
+**Quick Start**:
+
+1. **Local Development**: Copy `.env.example` to `.env` and configure for local development
+2. **Production Deployment**:
+   - Public variables → Edit `wrangler.jsonc` (safe to commit)
+   - Secrets → Set via `wrangler secret put SECRET_NAME` (never commit)
+   - Templates in `.env.production.example`
+
+**Key Variables**:
 
 ```env
-# Database
-DATABASE_URL=         # Turso database URL
-DATABASE_AUTH_TOKEN=  # Turso auth token
+# Required for production
+TURSO_DATABASE_URL=   # In wrangler.jsonc (public)
+TURSO_AUTH_TOKEN=     # Cloudflare secret
+AUTH_SECRET=          # Cloudflare secret (generate with: openssl rand -base64 32)
 
-# Authentication
-AUTH_SECRET=          # NextAuth secret
-AUTH_URL=             # Application URL
-
-# Cloudflare R2 (File Storage)
-R2_ACCOUNT_ID=        # Cloudflare account ID
-R2_ACCESS_KEY_ID=     # R2 access key ID
-R2_SECRET_ACCESS_KEY= # R2 secret access key
-R2_BUCKET_NAME=       # R2 bucket name
-
-# Application
-NODE_ENV=production
+# Optional (when using these features)
+AUTH_GOOGLE_ID=       # In wrangler.jsonc (public)
+AUTH_GOOGLE_SECRET=   # Cloudflare secret
+OPENAI_API_KEY=       # Cloudflare secret (for AI features)
 ```
+
+📚 **Complete Reference**: See [docs/ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md) for:
+
+- Complete list of all variables
+- Required vs optional configuration
+- Setup instructions for each environment
+- Troubleshooting guide
 
 ## Contributing
 
-Tetraship is designed to be forked and customized for your needs. Key customization points:
+Tetrastack is designed to be forked and customized for your needs. Key customization points:
 
 1. **Database Schema**: Modify `src/lib/db/schema.*.ts` files
 2. **Authentication**: Configure providers in `src/lib/auth.ts`
@@ -359,6 +373,6 @@ See the [Makefile](Makefile) for all available commands.
 
 MIT
 
-## Built With Tetraship
+## Built With Tetrastack
 
-Have you built something with Tetraship? Open a PR to add it here!
+Have you built something with Tetrastack? Open a PR to add it here!
