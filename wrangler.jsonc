@@ -4,10 +4,13 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "meze",
+  "name": "tetrastack",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
   "assets": {
     "binding": "ASSETS",
     "directory": ".open-next/assets",
@@ -20,44 +23,27 @@
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
   // "placement": { "mode": "smart" },
-
-  /**
-   * Bindings
-   * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-   * databases, object storage, AI inference, real-time communication and more.
-   * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-   */
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "meze",
-      "database_id": "1c3b16c7-b511-4c5a-9827-164469a55bad",
-    },
-  ],
-
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
   "vars": {
-    "AUTH_EMAIL_FROM": "onboarding@meze.fyi",
+    "AUTH_EMAIL_FROM": "onboarding@tetrastack.example",
     "AUTH_TRUST_HOST": "true",
     "TURSO_DATABASE_URL": "libsql://meze-production-ncrmro.aws-us-east-2.turso.io",
-    "AUTH_GOOGLE_ID": "945755068554-2gsthhlt9sjq7006hm1eitg91n6sid6a.apps.googleusercontent.com",
-    "NEXT_PUBLIC_POSTHOG_KEY": "phc_2aIuVHVaTqdYEm3V6n1fOz3NKZAgruGtezvWFoPotbe",
-    "AUTH_REDIRECT_PROXY_URL": "https://meze.fyi/api/auth",
+    "AUTH_GOOGLE_ID": "example.apps.googleusercontent.com",
+    "NEXT_PUBLIC_POSTHOG_KEY": "phc_EXAMPLE",
+    "AUTH_REDIRECT_PROXY_URL": "https://tetrastack.example/api/auth",
   },
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
    */
-
   /**
    * Static Assets
    * https://developers.cloudflare.com/workers/static-assets/binding/
    */
   // "assets": { "directory": "./public/", "binding": "ASSETS" },
-
   /**
    * Service Bindings (communicate between multiple Workers)
    * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
