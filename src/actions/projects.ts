@@ -69,18 +69,24 @@ export async function createProject(
   data: InsertProject,
 ): ActionResult<SelectProject> {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Set createdBy from session
+    const projectData = {
+      ...data,
+      createdBy: parseInt(session.user.id),
+    };
+
     // Validate input data
-    const validationResult = insertProjectSchema.safeParse(data);
+    const validationResult = insertProjectSchema.safeParse(projectData);
     if (!validationResult.success) {
       return {
         success: false,
         error: `Invalid project data: ${validationResult.error.issues.map((e) => e.message).join(', ')}`,
       };
-    }
-
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: 'Unauthorized' };
     }
 
     const [project] = await insertProjects([validationResult.data]);
