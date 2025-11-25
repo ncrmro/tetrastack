@@ -149,24 +149,26 @@ tests/
 - **Migration management**: Use `make migration-reconcile` to resolve conflicts
 - See `src/lib/db/README.md` for detailed schema documentation and Drizzle patterns
 
-## Business Domain (Meze - Meal Prep Platform)
+## Example Application Domain
 
-Meze is a comprehensive meal preparation platform with six integrated phases:
+This boilerplate can be used to build any full-stack TypeScript application. The repository includes example code for a meal preparation platform to demonstrate the patterns and architecture.
 
-1. **PLAN**: Nutrition goals, meal planning, household coordination
-2. **ORDER**: Smart grocery lists, quantity calculations
-3. **PREP**: Step-by-step instructions, task coordination
-4. **COOK**: Cooking instructions and timing
-5. **STORE**: Food storage optimization
+### Example Features
+
+1. **PLAN**: User goals and planning features
+2. **ORDER**: List generation and calculations
+3. **PREP**: Step-by-step instructions and coordination
+4. **COOK**: Instructions and timing
+5. **STORE**: Data storage optimization
 6. **CLEAN**: Cleanup coordination
 
-### Key Features
+### Example Capabilities
 
-- Multi-member household meal planning
-- Personalized nutrition tracking
-- AI-powered recipe/meal generation
-- Smart grocery list generation
-- Admin interface for managing foods/recipes/meals
+- Multi-user collaboration
+- Personalized tracking
+- AI-powered content generation
+- Smart list generation
+- Admin interface for managing data
 
 ## Development Guidelines
 

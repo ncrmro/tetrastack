@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The `src/components/ui/` directory serves as the **project-specific wrapper layer** for all UI primitives used in the Meze application. This layer provides a stable, consistent API between your application code and the underlying design system components.
+The `src/components/ui/` directory serves as the **project-specific wrapper layer** for all UI primitives used in the application. This layer provides a stable, consistent API between your application code and the underlying design system components.
 
 ## Architecture
 

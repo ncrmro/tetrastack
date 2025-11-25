@@ -18,7 +18,7 @@ Previous Version History:
   v1.0.0 (2025-11-11): Initial constitution creation with 7 core principles
 -->
 
-# Meze Constitution
+# Application Constitution
 
 ## Core Principles
 

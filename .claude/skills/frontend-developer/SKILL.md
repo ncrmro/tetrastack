@@ -6,7 +6,7 @@ allowed-tools: Read, Edit, Write, Grep, Glob, mcp__typescript-lsp__definition, m
 
 # Frontend Developer Skill
 
-Expert frontend development for the Tetraship/Meze meal prep platform using Next.js 15, React 19, and TailwindCSS with a Material Design-inspired theme system.
+Expert frontend development for Tetrastack applications using Next.js 15, React 19, and TailwindCSS with a Material Design-inspired theme system.
 
 ## Core Principles
 
@@ -309,7 +309,7 @@ export default function Error({
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Meals - Meze',
+  title: 'Meals - My App',
   description: 'Browse and manage your meals',
 };
 ```
