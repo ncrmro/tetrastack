@@ -102,10 +102,6 @@ jobs:
 
   playwright-tests:
     runs-on: ubuntu-latest
-    # TODO: Add E2E coverage collection
-    # Requires instrumenting the Next.js app with babel-plugin-istanbul or @istanbuljs/nyc-config-typescript
-    # and using Playwright's page.coverage API or a Playwright coverage plugin
-    # This would need to be merged with the Vitest coverage from the coverage job above
 
     services:
       libsql:
@@ -149,10 +145,35 @@ jobs:
           AUTH_SECRET: test-secret-for-ci
         run: npm run db:migrate
 
-      - name: Run Playwright tests
+      - name: Start Next.js dev server with coverage instrumentation
         env:
           AUTH_SECRET: test-secret-for-ci
+          E2E_COVERAGE: '1'
+          BABEL_ENV: e2e
+        run: |
+          npm run dev &
+          # Wait for server to be ready
+          npx wait-on http://localhost:3000/api/health/readiness --timeout 60000
+
+      - name: Run Playwright tests with coverage
+        id: playwright-tests
+        env:
+          AUTH_SECRET: test-secret-for-ci
+          E2E_COVERAGE: '1'
+          BABEL_ENV: e2e
         run: npm run test:e2e
+
+      - name: Convert E2E coverage to Istanbul format
+        if: steps.playwright-tests.outcome == 'success' || steps.playwright-tests.outcome == 'failure'
+        run: node scripts/convert-e2e-coverage.js
+
+      - name: Upload E2E coverage
+        uses: actions/upload-artifact@v4
+        if: steps.playwright-tests.outcome == 'success' || steps.playwright-tests.outcome == 'failure'
+        with:
+          name: e2e-coverage
+          path: coverage/coverage-e2e.json
+          retention-days: 1
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
@@ -172,7 +193,7 @@ jobs:
 
   coverage-report:
     runs-on: ubuntu-latest
-    needs: [quick, integration-tests]
+    needs: [quick, integration-tests, playwright-tests]
     if: github.event.pull_request.draft == false
     permissions:
       contents: read
@@ -203,8 +224,17 @@ jobs:
           name: vitest-blob-integration
           path: ./blob-reports
 
-      - name: Merge coverage reports
+      - name: Merge Vitest coverage reports
         run: npx vitest run --merge-reports ./blob-reports --coverage.enabled=true --coverage.thresholds.autoUpdate=false --reporter=default
+
+      - name: Download E2E coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: e2e-coverage
+          path: ./coverage
+
+      - name: Merge E2E coverage with Vitest coverage
+        run: node scripts/merge-coverage.js
 
       - name: Report Coverage
         if: always()

@@ -64,6 +64,9 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH_URL=http://web:${WEB_PORT:-3000}
       - AUTH_TRUST_HOST=true
+      # Enable Istanbul instrumentation for E2E coverage
+      - E2E_COVERAGE=${E2E_COVERAGE:-0}
+      - BABEL_ENV=${BABEL_ENV:-production}
     healthcheck:
       test:
         [
@@ -98,6 +101,9 @@ services:
       # E2E tests in Docker use HTTP connection (shares db with web service)
       # For local E2E without Docker, uses DATABASE_URL from .env (file-based)
       - DATABASE_URL=http://db:${DB_PORT:-8080}
+      # Enable coverage collection if E2E_COVERAGE=1
+      - E2E_COVERAGE=${E2E_COVERAGE:-0}
+      - BABEL_ENV=${BABEL_ENV:-production}
     command: node_modules/.bin/playwright test
     depends_on:
       web:

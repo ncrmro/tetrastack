@@ -9,6 +9,7 @@
 # testing
 /coverage
 /.vitest-reports
+/.nyc_output
 
 # playwright
 /test-results/
