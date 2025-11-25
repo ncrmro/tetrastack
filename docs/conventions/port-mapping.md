@@ -116,8 +116,8 @@ $ curl http://localhost:3090
 1. Create worktree:
 
    ```bash
-   git worktree add ../meze-feature feature-branch
-   cd ../meze-feature
+   git worktree add ../my-app-feature feature-branch
+   cd ../my-app-feature
    ```
 
 2. Copy and modify `.env`:

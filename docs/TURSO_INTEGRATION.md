@@ -1,6 +1,6 @@
 # Turso Database Integration with Drizzle and AuthJS
 
-This document describes the Turso database integration with Drizzle ORM and AuthJS that has been added to the Meze application.
+This document describes the Turso database integration with Drizzle ORM and AuthJS that has been added to the application.
 
 ## Overview
 
@@ -53,13 +53,13 @@ scripts/
    curl -sSfL https://get.tur.so/install.sh | bash
 
    # Create database
-   turso db create meze
+   turso db create my-app
 
    # Get database URL
-   turso db show meze --url
+   turso db show my-app --url
 
    # Create auth token
-   turso db tokens create meze
+   turso db tokens create my-app
    ```
 
 2. **Set environment variables**:
