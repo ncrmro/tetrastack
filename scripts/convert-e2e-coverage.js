@@ -57,12 +57,24 @@ async function convertV8ToIstanbul() {
 
       try {
         // Extract file path from URL
-        // Handle both localhost and docker URLs
-        const urlPath = entry.url.replace(/^.*?\/src\//, '/src/');
-        const absolutePath = path.join(process.cwd(), urlPath);
+        // Handle various URL formats (localhost, docker, file://, etc.)
+        let filePath = entry.url;
+
+        // Remove protocol and domain if present
+        filePath = filePath.replace(/^(https?:\/\/[^/]+|file:\/\/)/, '');
+
+        // Extract path starting from /src/
+        const srcMatch = filePath.match(/\/src\/.+$/);
+        if (!srcMatch) {
+          continue;
+        }
+
+        const relativePath = srcMatch[0];
+        const absolutePath = path.join(process.cwd(), relativePath);
 
         // Only process files that exist in the filesystem
         if (!fs.existsSync(absolutePath)) {
+          console.warn(`File not found: ${absolutePath}`);
           continue;
         }
 
