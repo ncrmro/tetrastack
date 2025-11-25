@@ -11,8 +11,8 @@ module.exports = {
             exclude: [
               'node_modules',
               'tests',
-              '**/*.test.{js,ts,tsx}',
-              '**/*.spec.{js,ts,tsx}',
+              '**/*.test.{js,jsx,ts,tsx}',
+              '**/*.spec.{js,jsx,ts,tsx}',
               'coverage',
               '.next',
               'dist',

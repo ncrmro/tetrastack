@@ -91,7 +91,10 @@ async function convertV8ToIstanbul() {
           coverageMap.addFileCoverage(istanbulCoverage[key]);
         });
       } catch (error) {
-        console.warn(`Failed to convert ${entry.url}:`, error.message);
+        console.warn(
+          `Failed to convert coverage for ${entry.url}:`,
+          error.message,
+        );
       }
     }
   }

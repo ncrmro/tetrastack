@@ -44,7 +44,7 @@ async function mergeCoverage() {
   // Check if we have any coverage data
   if (Object.keys(coverageMap.data).length === 0) {
     console.log('No coverage data to merge');
-    return;
+    process.exit(0);
   }
 
   // Write merged coverage

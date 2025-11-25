@@ -38,7 +38,7 @@ export async function saveCoverage(page: Page, testName: string) {
   // Save coverage data
   const coverageFile = join(
     coverageDir,
-    `playwright-${testName.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.json`,
+    `playwright-${testName.replace(/[^a-zA-Z0-9_-]/g, '_')}-${Date.now()}.json`,
   );
 
   writeFileSync(coverageFile, JSON.stringify(coverage, null, 2));
