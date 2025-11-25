@@ -127,7 +127,7 @@ export class SendEmailJob extends Job<SendEmailParams, SendEmailResult> {
 ### Step 3: Use the Job
 
 ```typescript
-// Execute immediately
+// Execute immediately (persisted to database for audit trail)
 const result = await SendEmailJob.now({
   to: 'user@example.com',
   subject: 'Welcome!',
@@ -136,6 +136,16 @@ const result = await SendEmailJob.now({
 
 console.log(result.data.messageId); // Fully typed!
 
+// Execute without persistence (faster, no audit trail)
+const result = await SendEmailJob.now(
+  {
+    to: 'user@example.com',
+    subject: 'Welcome!',
+    body: 'Thanks for signing up',
+  },
+  { persist: false },
+);
+
 // Queue for later
 const jobId = await SendEmailJob.later({
   to: 'user@example.com',
@@ -143,11 +153,24 @@ const jobId = await SendEmailJob.later({
   body: 'Thanks for signing up',
 });
 
-// Batch execution
+// Batch execution (default concurrency: 3, persist: true)
 await SendEmailJob.batch([
   { to: 'user1@example.com', subject: 'Hi', body: 'Hello' },
   { to: 'user2@example.com', subject: 'Hi', body: 'Hello' },
 ]);
+
+// Batch with custom options
+await SendEmailJob.batch(
+  [
+    { to: 'user1@example.com', subject: 'Hi', body: 'Hello' },
+    { to: 'user2@example.com', subject: 'Hi', body: 'Hello' },
+  ],
+  {
+    concurrency: 5, // Run 5 jobs concurrently
+    persist: false, // Skip database persistence for speed
+    stopOnError: true, // Stop on first failure
+  },
+);
 ```
 
 ## Schema Best Practices

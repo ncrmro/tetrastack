@@ -402,6 +402,12 @@ bin/jobs generate-projects --param theme="AI and ML projects" --param count=5
 # Nested parameters
 bin/jobs generate-projects --param teamId=team-123 --param userId=2
 
+# Skip database persistence for faster execution (no audit trail)
+bin/jobs generate-projects --no-persist --param count=5
+
+# Control concurrency for batch operations
+bin/jobs generate-projects --concurrency=1 --param count=10
+
 # Multiple parameters
 bin/jobs generate-projects \
   --param theme="Healthcare apps" \
@@ -413,6 +419,8 @@ Parameter format:
 
 - `--param key=value` - Simple parameter
 - `--param nested.key=value` - Nested object parameter
+- `--no-persist` - Skip database persistence (faster, no audit trail)
+- `--concurrency=N` - Maximum concurrent jobs for batch mode (default: 3)
 - Automatically parses numbers and booleans
 - Strings with spaces need quotes: `--param theme="My Theme"`
 

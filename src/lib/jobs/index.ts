@@ -38,7 +38,7 @@
  * ```
  */
 
-import { db } from '@/database';
+import { db, createDatabaseClient, getResultArray } from '@/database';
 import { jobs, JOB_STATUS } from '@/lib/jobs/schema.jobs';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -122,7 +122,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
       return;
     }
 
-    await db
+    // Use fresh database client to avoid connection timeout issues
+    const progressDb = createDatabaseClient();
+    await progressDb
       .update(jobs)
       .set({
         progress,
@@ -133,24 +135,56 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
   }
 
   /**
-   * Execute job immediately (persisted to database for audit trail)
+   * Execute job immediately
    *
    * @param params - Job parameters
+   * @param options - Execution options
+   * @param options.persist - Whether to persist job to database (default: true)
    * @returns Job result with metadata including job ID
    */
   static async now<TParams, TResult>(
     this: typeof Job<TParams, TResult>,
     params: TParams,
+    options: { persist?: boolean } = {},
   ): Promise<JobResult<TResult>> {
+    const { persist = true } = options;
     const instance = new (this as unknown as new () => Job<TParams, TResult>)();
     const jobName = this.name;
     const now = new Date();
 
-    // Validate params before storing
+    // Validate params
     const validatedParams = this.validateParams<TParams>(params, jobName);
 
+    // If persist is false, execute directly without database
+    if (!persist) {
+      const metadata: JobMetadata = {
+        jobName,
+        enqueuedAt: now,
+        startedAt: now,
+        status: 'running',
+      };
+
+      try {
+        const data = await instance.perform(validatedParams);
+        const validatedResult = this.validateResult<TResult>(data, jobName);
+
+        metadata.completedAt = new Date();
+        metadata.status = 'completed';
+
+        return { data: validatedResult, metadata } as JobResult<TResult>;
+      } catch (error) {
+        metadata.completedAt = new Date();
+        metadata.status = 'failed';
+        metadata.error = error instanceof Error ? error.message : String(error);
+        throw error;
+      }
+    }
+
+    // Create fresh database client to avoid connection timeout issues
+    const freshDb = createDatabaseClient();
+
     // Create job record in database
-    const [jobRecord] = await db
+    const result = await freshDb
       .insert(jobs)
       .values({
         jobName,
@@ -161,6 +195,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         workerStartedAt: now,
       })
       .returning();
+    const [jobRecord] = getResultArray(result);
 
     instance._currentJobId = jobRecord.id;
 
@@ -180,8 +215,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
       metadata.completedAt = new Date();
       metadata.status = 'completed';
 
-      // Update job record with success
-      await db
+      // Update job record with success (use fresh client)
+      const updateDb = createDatabaseClient();
+      await updateDb
         .update(jobs)
         .set({
           status: JOB_STATUS.COMPLETED,
@@ -198,8 +234,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
       metadata.status = 'failed';
       metadata.error = error instanceof Error ? error.message : String(error);
 
-      // Update job record with failure
-      await db
+      // Update job record with failure (use fresh client)
+      const errorDb = createDatabaseClient();
+      await errorDb
         .update(jobs)
         .set({
           status: JOB_STATUS.FAILED,
@@ -347,6 +384,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
    *
    * @param paramsList - Array of job parameters
    * @param options - Batch execution options
+   * @param options.concurrency - Maximum concurrent jobs (default: 3)
+   * @param options.stopOnError - Stop on first error (default: false)
+   * @param options.persist - Whether to persist jobs to database (default: true)
    * @returns Array of job results
    */
   static async batch<TParams, TResult>(
@@ -355,9 +395,15 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     options: {
       concurrency?: number;
       stopOnError?: boolean;
+      persist?: boolean;
     } = {},
   ): Promise<JobResult<TResult>[]> {
-    const { concurrency = 5, stopOnError = false } = options;
+    const { concurrency = 3, stopOnError = false, persist = true } = options;
+
+    // Validate concurrency is a positive integer
+    if (!Number.isInteger(concurrency) || concurrency <= 0) {
+      throw new Error('Concurrency must be a positive integer');
+    }
 
     // Simple batch execution with concurrency control
     const results: JobResult<TResult>[] = [];
@@ -365,14 +411,17 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
 
     // Get reference to the constructor with proper typing
     const JobClass = this as unknown as {
-      now: (params: TParams) => Promise<JobResult<TResult>>;
+      now: (
+        params: TParams,
+        options?: { persist?: boolean },
+      ) => Promise<JobResult<TResult>>;
     };
 
     for (let i = 0; i < paramsList.length; i += concurrency) {
       const batch = paramsList.slice(i, i + concurrency);
 
       const batchPromises = batch.map((params) =>
-        JobClass.now(params).catch((error: Error) => {
+        JobClass.now(params, { persist }).catch((error: Error) => {
           if (stopOnError) throw error;
           errors.push(error);
           return null;

@@ -248,8 +248,37 @@ function parseParams(args: string[]): Record<string, unknown> {
   return params;
 }
 
+function parseFlags(args: string[]): {
+  persist: boolean;
+  concurrency: number;
+} {
+  const flags = {
+    persist: true,
+    concurrency: 3,
+  };
+
+  for (const arg of args) {
+    if (arg === '--no-persist') {
+      flags.persist = false;
+    } else if (arg.startsWith('--concurrency=')) {
+      const concurrencyStr = arg.substring('--concurrency='.length);
+      const concurrency = parseInt(concurrencyStr, 10);
+      if (isNaN(concurrency) || concurrency <= 0) {
+        console.error(
+          `${colors.red}Error: --concurrency must be a positive integer${colors.reset}`,
+        );
+        process.exit(1);
+      }
+      flags.concurrency = concurrency;
+    }
+  }
+
+  return flags;
+}
+
 async function generateProjects(args: string[]) {
   const customParams = parseParams(args);
+  const flags = parseFlags(args);
 
   // Get default team if not specified
   let teamId = customParams.teamId;
@@ -279,10 +308,18 @@ async function generateProjects(args: string[]) {
 
   console.log(`\n${colors.bold}Generating projects...${colors.reset}`);
   console.log(`Theme: ${params.theme}`);
-  console.log(`Count: ${params.count}\n`);
+  console.log(`Count: ${params.count}`);
+  if (!flags.persist) {
+    console.log(
+      `${colors.gray}Note: Job will execute without database persistence (--no-persist)${colors.reset}`,
+    );
+  }
+  console.log();
 
   try {
-    const result = await GenerateProjectIdeasJob.now(params);
+    const result = await GenerateProjectIdeasJob.now(params, {
+      persist: flags.persist,
+    });
 
     console.log(`${colors.green}✓ Job completed successfully${colors.reset}\n`);
     console.log(`Projects created: ${result.data.projectsCreated}`);
@@ -311,6 +348,8 @@ ${colors.bold}COMMANDS${colors.reset}
 
 ${colors.bold}OPTIONS (for generate-projects)${colors.reset}
   --param key=value              Set a parameter (supports nested keys)
+  --no-persist                   Skip database persistence (faster, no audit trail)
+  --concurrency=N                Maximum concurrent jobs for batch mode (default: 3)
 
 ${colors.bold}EXAMPLES${colors.reset}
   ${colors.gray}# List all jobs${colors.reset}
@@ -322,8 +361,11 @@ ${colors.bold}EXAMPLES${colors.reset}
   ${colors.gray}# Generate projects with custom parameters${colors.reset}
   bin/jobs generate-projects --param theme="AI and ML projects" --param count=5
 
-  ${colors.gray}# Generate projects with nested parameters${colors.reset}
-  bin/jobs generate-projects --param teamId=team-123 --param userId=2
+  ${colors.gray}# Generate projects without database persistence (faster)${colors.reset}
+  bin/jobs generate-projects --no-persist --param count=5
+
+  ${colors.gray}# Generate projects with specific concurrency${colors.reset}
+  bin/jobs generate-projects --concurrency=1 --param count=10
 `);
 }
 

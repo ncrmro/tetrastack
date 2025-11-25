@@ -10,10 +10,17 @@
 #   status <job-id>                Show detailed job status
 #   generate-projects [options]    Create project generation job
 #
+# Options (for generate-projects):
+#   --param key=value              Set a parameter (supports nested keys)
+#   --no-persist                   Skip database persistence (faster, no audit trail)
+#   --concurrency=N                Maximum concurrent jobs for batch mode (default: 3)
+#
 # Examples:
 #   bin/jobs list
 #   bin/jobs status 01234567-89ab-cdef-0123-456789abcdef
 #   bin/jobs generate-projects --param theme="AI projects" --param count=5
+#   bin/jobs generate-projects --no-persist --param count=5
+#   bin/jobs generate-projects --concurrency=1 --param count=10
 #
 
 set -euo pipefail
