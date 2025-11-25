@@ -80,7 +80,7 @@ Tetrastack borrows successful patterns from Ruby on Rails:
 
 ### Prerequisites
 
-- Node.js 18+ or Bun
+- Node.js 24+ or Bun
 - Docker and Docker Compose (recommended for development)
 
 ### Development with Docker (Recommended)
