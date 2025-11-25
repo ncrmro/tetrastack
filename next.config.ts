@@ -1,10 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Disable SWC when E2E_COVERAGE is enabled to use Babel for Istanbul instrumentation
-  experimental: {
-    forceSwcTransforms: process.env.E2E_COVERAGE !== '1',
-  },
   eslint: {
     dirs: ['src', 'tests', 'scripts'],
   },

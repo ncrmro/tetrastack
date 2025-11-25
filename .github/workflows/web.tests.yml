@@ -145,34 +145,28 @@ jobs:
           AUTH_SECRET: test-secret-for-ci
         run: npm run db:migrate
 
-      - name: Start Next.js dev server with coverage instrumentation
+      - name: Start Next.js dev server
         env:
           AUTH_SECRET: test-secret-for-ci
           E2E_COVERAGE: '1'
-          BABEL_ENV: e2e
         run: |
           npm run dev &
           # Wait for server to be ready
           npx wait-on http://localhost:3000/api/health/readiness --timeout 60000
 
-      - name: Run Playwright tests with coverage
+      - name: Run Playwright tests with V8 coverage
         id: playwright-tests
         env:
           AUTH_SECRET: test-secret-for-ci
           E2E_COVERAGE: '1'
-          BABEL_ENV: e2e
         run: npm run test:e2e
 
-      - name: Convert E2E coverage to Istanbul format
-        if: steps.playwright-tests.outcome == 'success' || steps.playwright-tests.outcome == 'failure'
-        run: node scripts/convert-e2e-coverage.js
-
-      - name: Upload E2E coverage
+      - name: Upload E2E V8 coverage
         uses: actions/upload-artifact@v4
         if: steps.playwright-tests.outcome == 'success' || steps.playwright-tests.outcome == 'failure'
         with:
           name: e2e-coverage
-          path: coverage/coverage-e2e.json
+          path: coverage/tmp/
           retention-days: 1
 
       - name: Upload test report
@@ -227,14 +221,20 @@ jobs:
       - name: Merge Vitest coverage reports
         run: npx vitest run --merge-reports ./blob-reports --coverage.enabled=true --coverage.thresholds.autoUpdate=false --reporter=default
 
-      - name: Download E2E coverage
+      - name: Download E2E V8 coverage
         uses: actions/download-artifact@v4
         with:
           name: e2e-coverage
-          path: ./coverage
+          path: ./coverage/tmp
 
-      - name: Merge E2E coverage with Vitest coverage
-        run: node scripts/merge-coverage.js
+      - name: Merge all V8 coverage (Vitest + E2E)
+        run: |
+          # Vitest blob reports already merged above
+          # E2E coverage in coverage/tmp/ is in V8 format
+          # Both will be combined by vitest's merge-reports
+          echo "E2E V8 coverage downloaded to coverage/tmp/"
+          echo "Vitest coverage already merged from blob reports"
+          node scripts/merge-v8-coverage.js
 
       - name: Report Coverage
         if: always()

@@ -2,8 +2,8 @@ import { Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-// Directory to store coverage data
-const coverageDir = join(process.cwd(), '.nyc_output');
+// Directory to store V8 coverage data (compatible with Vitest's coverage directory)
+const coverageDir = join(process.cwd(), 'coverage', 'tmp');
 
 /**
  * Initialize coverage collection for a page
@@ -35,7 +35,7 @@ export async function saveCoverage(page: Page, testName: string) {
   // Ensure coverage directory exists
   mkdirSync(coverageDir, { recursive: true });
 
-  // Save coverage data
+  // Save coverage data in V8 format (compatible with Vitest)
   const coverageFile = join(
     coverageDir,
     `playwright-${testName.replace(/[^a-zA-Z0-9_-]/g, '_')}-${Date.now()}.json`,
