@@ -179,6 +179,16 @@ def main():
             f"Available services in this workspace:\n{service_list}"
         )
 
+    # Include AGENTS.md content if it exists in project root
+    agents_md_path = os.path.join(project_root, "AGENTS.md")
+    if os.path.exists(agents_md_path):
+        try:
+            with open(agents_md_path, 'r') as f:
+                agents_content = f.read()
+                system_prompt_parts.append(agents_content)
+        except Exception as e:
+            print(f"Warning: Could not read AGENTS.md: {e}", file=sys.stderr)
+
     if system_prompt_parts:
         system_prompt = "\n\n".join(system_prompt_parts)
         processed_args.extend(["--append-system-prompt", system_prompt])

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -33,13 +33,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Testing
 
-See `tests/README.md` for comprehensive testing documentation including:
+See `tests/AGENTS.md` for comprehensive testing documentation including:
 
 - Three-tier testing approach (unit, integration, E2E, agents)
 - Running tests and configuration
 - Test frameworks (Vitest, Playwright)
 - Writing tests and best practices
-- **Test data factories**: See `tests/factories/README.md` for the factory pattern (fishery + faker) that reduces test code by 87%
+- **Test data factories**: See `tests/factories/AGENTS.md` for the factory pattern (fishery + faker) that reduces test code by 87%
 
 **IMPORTANT: Factory Usage Best Practice**
 
@@ -110,7 +110,7 @@ The LSP tools understand TypeScript's type system, module resolution, and langua
 
 ### Core Directory Structure
 
-**IMPORTANT**: Directories with README.md files must have those files read when working in those areas.
+**IMPORTANT**: Directories with AGENTS.md files must have those files read when working in those areas.
 
 ```
 src/
@@ -120,26 +120,26 @@ src/
 │   └── globals.css      # Theme system (always consult for styling)
 ├── lib/
 │   ├── db/              # Database schema and connection
-│   │   └── README.md    # Database patterns and migration management
+│   │   └── AGENTS.md    # Database patterns and migration management
 │   ├── admin/           # Generic admin CRUD system
 │   └── [utilities]      # Business logic, calculations, utils
 ├── models/              # Database operations and business logic
-│   └── README.md        # Models layer architecture
+│   └── AGENTS.md        # Models layer architecture
 ├── actions/             # Server actions (prefer over API routes)
-│   └── README.md        # Actions layer patterns
+│   └── AGENTS.md        # Actions layer patterns
 ├── agents/              # AI agents
-│   └── README.md        # Agent design principles
+│   └── AGENTS.md        # Agent design principles
 └── components/          # Reusable components
 
 tests/
-├── README.md            # Testing architecture and guidelines
+├── AGENTS.md            # Testing architecture and guidelines
 ├── e2e/                 # Playwright E2E tests
-│   └── README.md        # E2E testing guidelines and fixtures
+│   └── AGENTS.md        # E2E testing guidelines and fixtures
 ├── integration/         # Integration tests
 ├── unit/                # Unit tests
 ├── agents/              # Agent integration tests
 └── factories/           # Test data factories
-    └── README.md        # Factory pattern documentation
+    └── AGENTS.md        # Factory pattern documentation
 ```
 
 ### Database Architecture
@@ -147,7 +147,7 @@ tests/
 - **Core entities**: users, households, foods, recipes, meals, nutrients
 - **Schema organization**: Eight domain-specific schema files in `src/lib/db/schema.*.ts`
 - **Migration management**: Use `make migration-reconcile` to resolve conflicts
-- See `src/lib/db/README.md` for detailed schema documentation and Drizzle patterns
+- See `src/lib/db/AGENTS.md` for detailed schema documentation and Drizzle patterns
 
 ## Business Domain (Meze - Meal Prep Platform)
 
@@ -222,7 +222,7 @@ await deleteTags([eq(tags.id, id)]);
 - Easier to maintain
 - Type-safe with full inference
 
-See `src/lib/models/README.md` for complete documentation.
+See `src/lib/models/AGENTS.md` for complete documentation.
 
 ### Code Formatting
 
@@ -256,7 +256,7 @@ See `src/lib/models/README.md` for complete documentation.
 
 ### Database Operations
 
-See `src/lib/db/README.md` for detailed database commands including:
+See `src/lib/db/AGENTS.md` for detailed database commands including:
 
 - Migration management (generate, migrate, reconcile, custom migrations)
 - Data operations (seed, dataload)
