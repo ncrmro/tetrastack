@@ -75,20 +75,24 @@ export class TeamsPage extends BasePage {
     this.teamDescription = page.locator('p.text-on-surface-variant.max-w-3xl');
     this.settingsButton = page.getByRole('link', { name: /settings/i });
 
-    // Team Stats
+    // Team Stats - using Card component structure
+    // Find stats by looking for text content within the grid layout
     this.membersStat = page
-      .locator('div.bg-surface')
-      .filter({ hasText: /members/i })
+      .locator('div.text-sm.font-medium.text-on-surface-variant')
+      .filter({ hasText: /^members$/i })
+      .locator('..')
       .locator('div.text-3xl')
       .first();
     this.projectsStat = page
-      .locator('div.bg-surface')
-      .filter({ hasText: /projects/i })
+      .locator('div.text-sm.font-medium.text-on-surface-variant')
+      .filter({ hasText: /^projects$/i })
+      .locator('..')
       .locator('div.text-3xl')
       .first();
     this.activeProjectsStat = page
-      .locator('div.bg-surface')
+      .locator('div.text-sm.font-medium.text-on-surface-variant')
       .filter({ hasText: /active projects/i })
+      .locator('..')
       .locator('div.text-3xl')
       .first();
 
