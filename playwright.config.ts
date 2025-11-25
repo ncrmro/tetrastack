@@ -46,11 +46,13 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: `node_modules/.bin/next dev --port ${process.env.WEB_PORT || 3000}`,
-    url:
-      process.env.PLAYWRIGHT_BASE_URL ||
-      `http://localhost:${process.env.WEB_PORT || 3000}`,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.E2E_COVERAGE
+    ? undefined
+    : {
+        command: `node_modules/.bin/next dev --port ${process.env.WEB_PORT || 3000}`,
+        url:
+          process.env.PLAYWRIGHT_BASE_URL ||
+          `http://localhost:${process.env.WEB_PORT || 3000}`,
+        reuseExistingServer: !process.env.CI,
+      },
 });
