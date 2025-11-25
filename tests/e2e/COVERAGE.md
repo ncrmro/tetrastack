@@ -22,6 +22,7 @@ This directory contains utilities for collecting code coverage from Playwright E
 ### Local Development
 
 Run E2E tests with coverage:
+
 ```bash
 # Using npm scripts
 npm run coverage:e2e
@@ -49,5 +50,6 @@ The GitHub Actions workflow automatically collects E2E coverage and merges it wi
 ## Output
 
 Coverage data is stored in:
+
 - `coverage/tmp/` - V8 coverage data from Playwright (automatically merged with Vitest)
 - `coverage/` - Merged coverage reports from all sources
