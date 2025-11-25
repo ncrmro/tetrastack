@@ -83,6 +83,16 @@ Tetrastack borrows successful patterns from Ruby on Rails:
 - Node.js 18+ or Bun
 - Docker and Docker Compose (recommended for development)
 
+### Initial Setup
+
+**First time setup - copy environment configuration:**
+
+```bash
+cp .env.example .env
+```
+
+The `.env.example` file includes all required defaults to get started immediately.
+
 ### Development with Docker (Recommended)
 
 ```bash
@@ -99,6 +109,9 @@ make destroy
 ### Development without Docker
 
 ```bash
+# Copy environment configuration (if not already done)
+cp .env.example .env
+
 # Install dependencies
 npm install
 
