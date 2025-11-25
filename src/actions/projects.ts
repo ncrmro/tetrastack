@@ -17,6 +17,7 @@ import { projects } from '@/database/schema.projects';
 import {
   verifyProjectTeamMembership,
   verifyProjectTeamAdmin,
+  verifyTeamMembership,
 } from '@/lib/auth-helpers';
 import type {
   InsertProject,
@@ -66,7 +67,7 @@ export async function getProjects(params: {
  * Requires authentication
  */
 export async function createProject(
-  data: InsertProject,
+  data: Omit<InsertProject, 'createdBy'> & { createdBy?: number },
 ): ActionResult<SelectProject> {
   try {
     const session = await auth();
@@ -74,8 +75,20 @@ export async function createProject(
       return { success: false, error: 'Unauthorized' };
     }
 
+    // Verify user is a member of the team
+    const isMember = await verifyTeamMembership(
+      parseInt(session.user.id),
+      data.teamId,
+    );
+    if (!isMember) {
+      return {
+        success: false,
+        error: 'Forbidden: Must be a team member to create project',
+      };
+    }
+
     // Set createdBy from session
-    const projectData = {
+    const projectData: InsertProject = {
       ...data,
       createdBy: parseInt(session.user.id),
     };
