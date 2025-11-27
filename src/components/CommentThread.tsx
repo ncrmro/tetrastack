@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import type { SelectComment } from '@/database/schema.tasks';
-import { createComment } from '@/actions/comments';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
+import { createComment } from '@/actions/comments'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import type { SelectComment } from '@/database/schema.tasks'
 
 interface CommentThreadProps {
-  taskId: string;
+  taskId: string
   comments: Array<
     SelectComment & {
-      user: { id: number; name: string | null };
+      user: { id: number; name: string | null }
     }
-  >;
-  currentUserId: number;
+  >
+  currentUserId: number
 }
 
 export function CommentThread({
@@ -22,32 +22,32 @@ export function CommentThread({
   comments,
   currentUserId,
 }: CommentThreadProps) {
-  const router = useRouter();
-  const [content, setContent] = useState('');
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+  const [content, setContent] = useState('')
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
+    e.preventDefault()
+    if (!content.trim()) return
 
-    setError(null);
+    setError(null)
 
     startTransition(async () => {
       const result = await createComment({
         taskId,
         userId: currentUserId,
         content: content.trim(),
-      });
+      })
 
       if (result.success) {
-        setContent('');
-        router.refresh(); // Refresh to show new comment
+        setContent('')
+        router.refresh() // Refresh to show new comment
       } else {
-        setError(result.error);
+        setError(result.error)
       }
-    });
-  };
+    })
+  }
 
   return (
     <div className="space-y-4" data-testid="comment-thread">
@@ -103,5 +103,5 @@ export function CommentThread({
         </Button>
       </form>
     </div>
-  );
+  )
 }

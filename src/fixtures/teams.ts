@@ -1,9 +1,9 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { TEAM_ROLE } from '@/database/schema.teams';
-import type { SelectTeam, SelectTeamMembership } from '@/database/schema.teams';
+import type { SelectTeam, SelectTeamMembership } from '@/database/schema.teams'
+import { TEAM_ROLE } from '@/database/schema.teams'
+import { generateUuidV7 } from '@/lib/uuid'
 
 export interface TeamFixture extends SelectTeam {
-  memberships: SelectTeamMembership[];
+  memberships: SelectTeamMembership[]
 }
 
 export const TEAM_ENGINEERING: TeamFixture = {
@@ -13,7 +13,7 @@ export const TEAM_ENGINEERING: TeamFixture = {
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
   memberships: [],
-};
+}
 
 export const TEAM_PRODUCT: TeamFixture = {
   id: generateUuidV7(),
@@ -22,7 +22,7 @@ export const TEAM_PRODUCT: TeamFixture = {
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-02-01'),
   memberships: [],
-};
+}
 
 export const TEAM_OPERATIONS: TeamFixture = {
   id: generateUuidV7(),
@@ -31,9 +31,9 @@ export const TEAM_OPERATIONS: TeamFixture = {
   createdAt: new Date('2024-03-10'),
   updatedAt: new Date('2024-03-10'),
   memberships: [],
-};
+}
 
-export const teams = [TEAM_ENGINEERING, TEAM_PRODUCT, TEAM_OPERATIONS];
+export const teams = [TEAM_ENGINEERING, TEAM_PRODUCT, TEAM_OPERATIONS]
 
 // Team memberships will be populated after users are created
 export function createTeamMemberships(
@@ -61,5 +61,5 @@ export function createTeamMemberships(
       role: TEAM_ROLE.MEMBER,
       joinedAt: new Date('2024-02-01'),
     },
-  ];
+  ]
 }

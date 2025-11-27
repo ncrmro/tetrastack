@@ -1,6 +1,6 @@
-import { tags, insertTagSchema } from '@/database/schema.tags';
-import { inArray } from 'drizzle-orm';
-import { createModelFactory } from '@/lib/models';
+import { inArray } from 'drizzle-orm'
+import { insertTagSchema, tags } from '@/database/schema.tags'
+import { createModelFactory } from '@/lib/models'
 
 /**
  * CRUD operations for tags using many-first design pattern
@@ -13,7 +13,7 @@ export const {
   delete: deleteTags,
   buildConditions,
   takeFirst: takeFirstTag,
-} = createModelFactory('tags', tags, tags.id, insertTagSchema);
+} = createModelFactory('tags', tags, tags.id, insertTagSchema)
 
 /**
  * Get tags with flexible filtering using WHERE IN clauses
@@ -33,21 +33,21 @@ export const {
  * await getTags({ names: ['frontend', 'backend'] })
  */
 export async function getTags(params: {
-  ids?: string[];
-  teamIds?: string[];
-  names?: string[];
+  ids?: string[]
+  teamIds?: string[]
+  names?: string[]
 }) {
   const conditions = buildConditions({
     ids: params.ids ? { column: tags.id, values: params.ids } : undefined,
     teamIds: params.teamIds
       ? { column: tags.teamId, values: params.teamIds }
       : undefined,
-  });
+  })
 
   // Custom filter for names (not using buildConditions)
   if (params.names) {
-    conditions.push(inArray(tags.name, params.names));
+    conditions.push(inArray(tags.name, params.names))
   }
 
-  return await selectTags(conditions);
+  return await selectTags(conditions)
 }

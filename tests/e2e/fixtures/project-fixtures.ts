@@ -1,81 +1,82 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { test as base, expect } from './base-fixtures';
-import { BasePage } from '../page-objects/BasePage';
-import type { TeamContext } from './base-fixtures';
-import { insertProjects } from '../../../src/models/projects';
-import { insertTasks } from '../../../src/models/tasks';
+
 import {
-  PROJECT_STATUS,
-  PROJECT_PRIORITY,
   type InsertProject,
-} from '../../../src/database/schema.projects';
+  PROJECT_PRIORITY,
+  PROJECT_STATUS,
+} from '../../../src/database/schema.projects'
 import {
-  TASK_STATUS,
-  TASK_PRIORITY,
   type InsertTask,
-} from '../../../src/database/schema.tasks';
+  TASK_PRIORITY,
+  TASK_STATUS,
+} from '../../../src/database/schema.tasks'
+import { insertProjects } from '../../../src/models/projects'
+import { insertTasks } from '../../../src/models/tasks'
+import { BasePage } from '../page-objects/BasePage'
+import type { TeamContext } from './base-fixtures'
+import { test as base, expect } from './base-fixtures'
 
 // Project specific context with navigation helpers
 export interface ProjectPageContext extends TeamContext {
-  basePage: BasePage;
-  projectId?: string;
+  basePage: BasePage
+  projectId?: string
 }
 
 // Fixture types
 export type ProjectFixtures = {
   // User with team and project pre-navigated to projects page
-  projectPageUser: ProjectPageContext;
+  projectPageUser: ProjectPageContext
 
   // Admin with team and project pre-navigated to projects page
-  projectPageAdmin: ProjectPageContext;
-};
+  projectPageAdmin: ProjectPageContext
+}
 
 // Extend base fixtures with project specific setup
 export const test = base.extend<ProjectFixtures>({
   // User with team pre-navigated to projects page
   projectPageUser: async ({ userWithTeam }, use) => {
-    const basePage = new BasePage(userWithTeam.page);
+    const basePage = new BasePage(userWithTeam.page)
 
     // Navigate to projects page
-    await basePage.goto('/projects');
+    await basePage.goto('/projects')
 
     // Verify we're on the correct page (use h1 selector to be specific)
     await expect(
       userWithTeam.page.locator('h1').filter({ hasText: 'Projects' }),
-    ).toBeVisible();
+    ).toBeVisible()
 
     await use({
       ...userWithTeam,
       basePage,
-    });
+    })
   },
 
   // Admin with team pre-navigated to projects page
   projectPageAdmin: async ({ adminWithTeam }, use) => {
-    const basePage = new BasePage(adminWithTeam.page);
+    const basePage = new BasePage(adminWithTeam.page)
 
     // Navigate to projects page
-    await basePage.goto('/projects');
+    await basePage.goto('/projects')
 
     // Verify we're on the correct page (use h1 selector to be specific)
     await expect(
       adminWithTeam.page.locator('h1').filter({ hasText: 'Projects' }),
-    ).toBeVisible();
+    ).toBeVisible()
 
     await use({
       ...adminWithTeam,
       basePage,
-    });
+    })
   },
-});
+})
 
 // Helper function to create a project with tasks
 export async function createProjectWithTasks(params: {
-  teamId: string;
-  createdBy: number;
-  projectData?: Partial<InsertProject>;
-  taskCount?: number;
-  taskData?: Partial<InsertTask>[];
+  teamId: string
+  createdBy: number
+  projectData?: Partial<InsertProject>
+  taskCount?: number
+  taskData?: Partial<InsertTask>[]
 }): Promise<{ projectId: string; projectSlug: string; taskIds: string[] }> {
   const {
     teamId,
@@ -83,7 +84,7 @@ export async function createProjectWithTasks(params: {
     projectData = {},
     taskCount = 3,
     taskData = [],
-  } = params;
+  } = params
 
   // Create the project
   const [project] = await insertProjects([
@@ -96,18 +97,18 @@ export async function createProjectWithTasks(params: {
       createdBy,
       ...projectData,
     },
-  ]);
+  ])
 
   // Create tasks for the project
   const tasksToCreate: Array<{
-    title: string;
-    projectId: string;
-    description?: string | null;
-    status?: string;
-    priority?: string;
-    assigneeId?: number | null;
-    dueDate?: Date | null;
-  }> = [];
+    title: string
+    projectId: string
+    description?: string | null
+    status?: string
+    priority?: string
+    assigneeId?: number | null
+    dueDate?: Date | null
+  }> = []
 
   // If no custom task data provided, create default tasks
   if (taskData.length === 0) {
@@ -118,7 +119,7 @@ export async function createProjectWithTasks(params: {
         status: i === 0 ? TASK_STATUS.IN_PROGRESS : TASK_STATUS.TODO,
         priority: i === 0 ? TASK_PRIORITY.HIGH : TASK_PRIORITY.MEDIUM,
         projectId: project.id,
-      });
+      })
     }
   } else {
     // Map taskData to ensure required fields
@@ -131,31 +132,31 @@ export async function createProjectWithTasks(params: {
         priority: task.priority,
         assigneeId: task.assigneeId,
         dueDate: task.dueDate,
-      });
-    });
+      })
+    })
   }
 
   // Only create tasks if there are any to create
   const createdTasks =
-    tasksToCreate.length > 0 ? await insertTasks(tasksToCreate) : [];
-  const taskIds = createdTasks.map((t) => t.id);
+    tasksToCreate.length > 0 ? await insertTasks(tasksToCreate) : []
+  const taskIds = createdTasks.map((t) => t.id)
 
   return {
     projectId: project.id,
     projectSlug: project.slug,
     taskIds,
-  };
+  }
 }
 
 // Helper function to create multiple projects for testing
 export async function createMultipleProjects(params: {
-  count: number;
-  teamId: string;
-  createdBy: number;
-  withTasks?: boolean;
+  count: number
+  teamId: string
+  createdBy: number
+  withTasks?: boolean
 }): Promise<string[]> {
-  const { count, teamId, createdBy, withTasks = false } = params;
-  const projectIds: string[] = [];
+  const { count, teamId, createdBy, withTasks = false } = params
+  const projectIds: string[] = []
 
   for (let i = 0; i < count; i++) {
     const status =
@@ -163,14 +164,14 @@ export async function createMultipleProjects(params: {
         ? PROJECT_STATUS.PLANNING
         : i % 3 === 1
           ? PROJECT_STATUS.ACTIVE
-          : PROJECT_STATUS.COMPLETED;
+          : PROJECT_STATUS.COMPLETED
 
     const priority =
       i % 3 === 0
         ? PROJECT_PRIORITY.HIGH
         : i % 3 === 1
           ? PROJECT_PRIORITY.MEDIUM
-          : PROJECT_PRIORITY.LOW;
+          : PROJECT_PRIORITY.LOW
 
     const [project] = await insertProjects([
       {
@@ -181,9 +182,9 @@ export async function createMultipleProjects(params: {
         teamId,
         createdBy,
       },
-    ]);
+    ])
 
-    projectIds.push(project.id);
+    projectIds.push(project.id)
 
     // Optionally create tasks for each project
     if (withTasks) {
@@ -195,11 +196,11 @@ export async function createMultipleProjects(params: {
           priority: TASK_PRIORITY.MEDIUM,
           projectId: project.id,
         },
-      ]);
+      ])
     }
   }
 
-  return projectIds;
+  return projectIds
 }
 
-export { expect } from '@playwright/test';
+export { expect } from '@playwright/test'

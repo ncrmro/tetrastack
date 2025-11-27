@@ -1,20 +1,20 @@
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { TASK_STATUS } from '@/database/schema.tasks';
-import type { ProjectStatus } from '@/database/schema.projects';
-import type { TaskStatus } from '@/database/schema.tasks';
+import type { ProjectStatus } from '@/database/schema.projects'
+import { PROJECT_STATUS } from '@/database/schema.projects'
+import type { TaskStatus } from '@/database/schema.tasks'
+import { TASK_STATUS } from '@/database/schema.tasks'
 
-type Status = ProjectStatus | TaskStatus;
+type Status = ProjectStatus | TaskStatus
 
 interface StatusBadgeProps {
-  status: Status;
-  className?: string;
+  status: Status
+  className?: string
 }
 
 const statusConfig: Record<
   Status,
   {
-    label: string;
-    className: string;
+    label: string
+    className: string
   }
 > = {
   // Project statuses
@@ -49,13 +49,13 @@ const statusConfig: Record<
     className:
       'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
   },
-};
+}
 
 export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status]
 
   if (!config) {
-    return null;
+    return null
   }
 
   return (
@@ -65,5 +65,5 @@ export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
     >
       {config.label}
     </span>
-  );
+  )
 }

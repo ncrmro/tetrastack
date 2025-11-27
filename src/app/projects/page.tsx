@@ -1,49 +1,46 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getProjects } from '@/models/projects';
-import type {
-  ProjectStatus,
-  ProjectPriority,
-} from '@/database/schema.projects';
-import { ProjectCard } from '@/components/ProjectCard';
-import { ProjectFilters } from '@/components/ProjectFilters';
-import { ButtonLink } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { ProjectCard } from '@/components/ProjectCard'
+import { ProjectFilters } from '@/components/ProjectFilters'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import type { ProjectPriority, ProjectStatus } from '@/database/schema.projects'
+import { getProjects } from '@/models/projects'
+import { User } from '@/models/user'
+import { authRedirect } from '../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface ProjectsPageProps {
-  searchParams: Promise<{ team?: string; status?: string; priority?: string }>;
+  searchParams: Promise<{ team?: string; status?: string; priority?: string }>
 }
 
 export default async function ProjectsPage({
   searchParams,
 }: ProjectsPageProps) {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
-  const params = await searchParams;
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
+  const params = await searchParams
 
   // Get user's teams
-  const userTeams = await User.getUserTeams(userId);
-  const allTeamIds = userTeams.map((t) => t.team.id);
+  const userTeams = await User.getUserTeams(userId)
+  const allTeamIds = userTeams.map((t) => t.team.id)
 
   // Apply filters
-  const teamIds = params.team ? [params.team] : allTeamIds;
-  const status = params.status ? [params.status as ProjectStatus] : undefined;
+  const teamIds = params.team ? [params.team] : allTeamIds
+  const status = params.status ? [params.status as ProjectStatus] : undefined
   const priority = params.priority
     ? [params.priority as ProjectPriority]
-    : undefined;
+    : undefined
 
   // Get projects
   const projects =
     allTeamIds.length > 0
       ? await getProjects({ teamIds, status, priority })
-      : [];
+      : []
 
   // Sort by updated date
   const sortedProjects = [...projects].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-  );
+  )
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,5 +122,5 @@ export default async function ProjectsPage({
         )}
       </div>
     </div>
-  );
+  )
 }

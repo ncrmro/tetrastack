@@ -1,20 +1,20 @@
-import type { ProjectPriority } from '@/database/schema.projects';
-import type { TaskPriority } from '@/database/schema.tasks';
+import type { ProjectPriority } from '@/database/schema.projects'
+import type { TaskPriority } from '@/database/schema.tasks'
 
-type Priority = ProjectPriority | TaskPriority;
+type Priority = ProjectPriority | TaskPriority
 
 interface PriorityIndicatorProps {
-  priority: Priority;
-  className?: string;
-  showLabel?: boolean;
+  priority: Priority
+  className?: string
+  showLabel?: boolean
 }
 
 const priorityConfig: Record<
   Priority,
   {
-    label: string;
-    icon: string;
-    className: string;
+    label: string
+    icon: string
+    className: string
   }
 > = {
   low: {
@@ -32,17 +32,17 @@ const priorityConfig: Record<
     icon: '▲',
     className: 'text-error dark:text-error',
   },
-};
+}
 
 export function PriorityIndicator({
   priority,
   className = '',
   showLabel = true,
 }: PriorityIndicatorProps) {
-  const config = priorityConfig[priority];
+  const config = priorityConfig[priority]
 
   if (!config) {
-    return null;
+    return null
   }
 
   return (
@@ -55,5 +55,5 @@ export function PriorityIndicator({
       </span>
       {showLabel && <span>{config.label}</span>}
     </span>
-  );
+  )
 }

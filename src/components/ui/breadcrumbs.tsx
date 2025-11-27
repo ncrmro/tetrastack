@@ -1,4 +1,4 @@
 export {
-  Breadcrumbs,
   type BreadcrumbItem,
-} from '@/lib/glass-components/Breadcrumbs';
+  Breadcrumbs,
+} from '@/lib/glass-components/Breadcrumbs'

@@ -1,13 +1,13 @@
+import { relations, sql } from 'drizzle-orm'
 import {
+  check,
   integer,
+  primaryKey,
   sqliteTable,
   text,
-  primaryKey,
-  check,
-} from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { users } from './schema.auth';
-import { generateUuidV7 } from '@/lib/uuid';
+} from 'drizzle-orm/sqlite-core'
+import { generateUuidV7 } from '@/lib/uuid'
+import { users } from './schema.auth'
 
 /**
  * Team role enum - defines membership roles and access control levels
@@ -15,8 +15,8 @@ import { generateUuidV7 } from '@/lib/uuid';
 export const TEAM_ROLE = {
   MEMBER: 'member',
   ADMIN: 'admin',
-} as const;
-export type TeamRole = (typeof TEAM_ROLE)[keyof typeof TEAM_ROLE];
+} as const
+export type TeamRole = (typeof TEAM_ROLE)[keyof typeof TEAM_ROLE]
 
 export const teams = sqliteTable(
   'teams',
@@ -35,7 +35,7 @@ export const teams = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [check('name_not_empty', sql`length(${table.name}) > 0`)],
-);
+)
 
 export const teamMemberships = sqliteTable(
   'team_memberships',
@@ -60,12 +60,12 @@ export const teamMemberships = sqliteTable(
       columns: [table.teamId, table.userId],
     }),
   }),
-);
+)
 
 // Relations
 export const teamsRelations = relations(teams, ({ many }) => ({
   memberships: many(teamMemberships),
-}));
+}))
 
 export const teamMembershipsRelations = relations(
   teamMemberships,
@@ -79,23 +79,23 @@ export const teamMembershipsRelations = relations(
       references: [users.id],
     }),
   }),
-);
+)
 
 // Schema generation and types
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
+import { createAutoInsertSchema } from '@/lib/db/schema-helpers'
 
 /**
  * Base team schema for insertions (auto-generated from Drizzle table)
  * Auto-omits: id, createdAt, updatedAt
  */
-export const insertTeamSchema = createAutoInsertSchema(teams);
+export const insertTeamSchema = createAutoInsertSchema(teams)
 
 /**
  * Complete team schema including all fields (auto-generated from Drizzle table)
  */
-export const selectTeamSchema = createSelectSchema(teams);
+export const selectTeamSchema = createSelectSchema(teams)
 
 /**
  * Team membership schema for insertions (auto-generated from Drizzle table)
@@ -104,15 +104,15 @@ export const insertTeamMembershipSchema = createInsertSchema(
   teamMemberships,
 ).omit({
   joinedAt: true, // Auto-generated
-});
+})
 
 /**
  * Complete team membership schema including all fields (auto-generated from Drizzle table)
  */
-export const selectTeamMembershipSchema = createSelectSchema(teamMemberships);
+export const selectTeamMembershipSchema = createSelectSchema(teamMemberships)
 
 // Export types for TypeScript usage
-export type InsertTeam = z.infer<typeof insertTeamSchema>;
-export type SelectTeam = z.infer<typeof selectTeamSchema>;
-export type InsertTeamMembership = z.infer<typeof insertTeamMembershipSchema>;
-export type SelectTeamMembership = z.infer<typeof selectTeamMembershipSchema>;
+export type InsertTeam = z.infer<typeof insertTeamSchema>
+export type SelectTeam = z.infer<typeof selectTeamSchema>
+export type InsertTeamMembership = z.infer<typeof insertTeamMembershipSchema>
+export type SelectTeamMembership = z.infer<typeof selectTeamMembershipSchema>

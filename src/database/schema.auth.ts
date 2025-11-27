@@ -1,10 +1,5 @@
-import {
-  integer,
-  sqliteTable,
-  text,
-  primaryKey,
-} from 'drizzle-orm/sqlite-core';
-import type { AdapterAccountType } from 'next-auth/adapters';
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import type { AdapterAccountType } from 'next-auth/adapters'
 
 /**
  * Dietary preferences structure stored in users.data
@@ -22,7 +17,7 @@ export type DietaryPreferences = {
    * - 'vegetarian': Excludes animal:meat and animal:meat:* tags
    * - 'none': No preset, only use excludedTags
    */
-  dietType?: 'vegan' | 'vegetarian' | 'none';
+  dietType?: 'vegan' | 'vegetarian' | 'none'
 
   /**
    * Specific tags to exclude (in addition to diet type)
@@ -33,7 +28,7 @@ export type DietaryPreferences = {
    *
    * These are additive with dietType exclusions
    */
-  excludedTags?: string[];
+  excludedTags?: string[]
 
   /**
    * Whether filtering is currently enabled
@@ -41,8 +36,8 @@ export type DietaryPreferences = {
    * Allows users to temporarily disable filters without
    * losing their configured preferences
    */
-  filterEnabled?: boolean;
-};
+  filterEnabled?: boolean
+}
 
 export const users = sqliteTable('user', {
   id: integer('id').primaryKey(),
@@ -76,9 +71,9 @@ export const users = sqliteTable('user', {
   data: text('data', {
     mode: 'json',
   }).$type<{
-    dietaryPreferences?: DietaryPreferences;
+    dietaryPreferences?: DietaryPreferences
   }>(),
-});
+})
 
 export const accounts = sqliteTable(
   'account',
@@ -102,7 +97,7 @@ export const accounts = sqliteTable(
       columns: [account.provider, account.providerAccountId],
     }),
   }),
-);
+)
 
 export const sessions = sqliteTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
@@ -110,7 +105,7 @@ export const sessions = sqliteTable('session', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
-});
+})
 
 export const verificationTokens = sqliteTable(
   'verificationToken',
@@ -124,7 +119,7 @@ export const verificationTokens = sqliteTable(
       columns: [verificationToken.identifier, verificationToken.token],
     }),
   }),
-);
+)
 
 export const authenticators = sqliteTable(
   'authenticator',
@@ -147,22 +142,22 @@ export const authenticators = sqliteTable(
       columns: [authenticator.userId, authenticator.credentialID],
     }),
   }),
-);
+)
 
 // Schema generation and types
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
 
 /**
  * User schema for insertions (auto-generated from Drizzle table)
  */
-export const insertUserSchema = createInsertSchema(users);
+export const insertUserSchema = createInsertSchema(users)
 
 /**
  * Complete user schema for reads (auto-generated from Drizzle table)
  */
-export const selectUserSchema = createSelectSchema(users);
+export const selectUserSchema = createSelectSchema(users)
 
 // Export types for TypeScript usage
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type SelectUser = z.infer<typeof selectUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>
+export type SelectUser = z.infer<typeof selectUserSchema>

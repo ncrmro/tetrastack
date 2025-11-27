@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import {
-  updateTeam,
   removeTeamMember,
   type SelectTeam,
   type SelectTeamMembership,
-} from '@/actions/teams';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+  updateTeam,
+} from '@/actions/teams'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 type MembershipWithUser = SelectTeamMembership & {
   user: {
-    id: number;
-    name: string | null;
-    email: string | null;
-  };
-};
+    id: number
+    name: string | null
+    email: string | null
+  }
+}
 
 interface TeamSettingsClientProps {
-  team: SelectTeam;
-  memberships: MembershipWithUser[];
-  currentUserId: number;
+  team: SelectTeam
+  memberships: MembershipWithUser[]
+  currentUserId: number
 }
 
 export default function TeamSettingsClient({
@@ -32,65 +32,65 @@ export default function TeamSettingsClient({
   memberships: initialMemberships,
   currentUserId,
 }: TeamSettingsClientProps) {
-  const router = useRouter();
-  const [name, setName] = useState(team.name);
-  const [description, setDescription] = useState(team.description || '');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [memberships, setMemberships] = useState(initialMemberships);
-  const [removingUserId, setRemovingUserId] = useState<number | null>(null);
+  const router = useRouter()
+  const [name, setName] = useState(team.name)
+  const [description, setDescription] = useState(team.description || '')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [memberships, setMemberships] = useState(initialMemberships)
+  const [removingUserId, setRemovingUserId] = useState<number | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    setSuccessMessage(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
 
     const result = await updateTeam(team.id, {
       name,
       description: description || null,
-    });
+    })
 
     if (result.success) {
-      setSuccessMessage('Team updated successfully');
+      setSuccessMessage('Team updated successfully')
       setTimeout(() => {
-        router.refresh();
-      }, 500);
+        router.refresh()
+      }, 500)
     } else {
-      setError(result.error);
+      setError(result.error)
     }
 
-    setIsSubmitting(false);
-  };
+    setIsSubmitting(false)
+  }
 
   const handleRemoveMember = async (userId: number) => {
     if (userId === currentUserId) {
-      setError('You cannot remove yourself from the team');
-      return;
+      setError('You cannot remove yourself from the team')
+      return
     }
 
     if (
       !confirm('Are you sure you want to remove this member from the team?')
     ) {
-      return;
+      return
     }
 
-    setRemovingUserId(userId);
-    setError(null);
+    setRemovingUserId(userId)
+    setError(null)
 
-    const result = await removeTeamMember(team.id, userId);
+    const result = await removeTeamMember(team.id, userId)
 
     if (result.success) {
-      setMemberships((prev) => prev.filter((m) => m.userId !== userId));
-      setSuccessMessage('Member removed successfully');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      setMemberships((prev) => prev.filter((m) => m.userId !== userId))
+      setSuccessMessage('Member removed successfully')
+      setTimeout(() => setSuccessMessage(null), 3000)
     } else {
-      setError(result.error);
+      setError(result.error)
     }
 
-    setRemovingUserId(null);
-  };
+    setRemovingUserId(null)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -233,5 +233,5 @@ export default function TeamSettingsClient({
         </div>
       </div>
     </div>
-  );
+  )
 }

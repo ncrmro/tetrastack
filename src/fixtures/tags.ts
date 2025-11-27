@@ -1,6 +1,6 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import type { SelectTag } from '@/database/schema.tags';
-import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams';
+import type { SelectTag } from '@/database/schema.tags'
+import { generateUuidV7 } from '@/lib/uuid'
+import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams'
 
 export const TAG_FRONTEND: SelectTag = {
   id: generateUuidV7(),
@@ -9,7 +9,7 @@ export const TAG_FRONTEND: SelectTag = {
   teamId: TEAM_ENGINEERING.id,
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const TAG_BACKEND: SelectTag = {
   id: generateUuidV7(),
@@ -18,7 +18,7 @@ export const TAG_BACKEND: SelectTag = {
   teamId: TEAM_ENGINEERING.id,
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const TAG_INFRASTRUCTURE: SelectTag = {
   id: generateUuidV7(),
@@ -27,7 +27,7 @@ export const TAG_INFRASTRUCTURE: SelectTag = {
   teamId: TEAM_ENGINEERING.id,
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const TAG_UX: SelectTag = {
   id: generateUuidV7(),
@@ -36,7 +36,7 @@ export const TAG_UX: SelectTag = {
   teamId: TEAM_PRODUCT.id,
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-02-01'),
-};
+}
 
 export const TAG_RESEARCH: SelectTag = {
   id: generateUuidV7(),
@@ -45,7 +45,7 @@ export const TAG_RESEARCH: SelectTag = {
   teamId: TEAM_PRODUCT.id,
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-02-01'),
-};
+}
 
 export const TAG_URGENT: SelectTag = {
   id: generateUuidV7(),
@@ -54,7 +54,7 @@ export const TAG_URGENT: SelectTag = {
   teamId: TEAM_ENGINEERING.id,
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const TAG_NICE_TO_HAVE: SelectTag = {
   id: generateUuidV7(),
@@ -63,7 +63,7 @@ export const TAG_NICE_TO_HAVE: SelectTag = {
   teamId: TEAM_ENGINEERING.id,
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const tags = [
   TAG_FRONTEND,
@@ -73,4 +73,4 @@ export const tags = [
   TAG_RESEARCH,
   TAG_URGENT,
   TAG_NICE_TO_HAVE,
-];
+]

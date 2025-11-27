@@ -1,20 +1,20 @@
-import Link from 'next/link';
-import { Session } from 'next-auth';
-import { ChevronDownIcon, UserIcon } from '@heroicons/react/24/outline';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ChevronDownIcon, UserIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import type { Session } from 'next-auth'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/dropdown-menu'
 
 interface AccountDropdownProps {
-  session: Session;
-  isAdmin: boolean;
-  signOut: () => Promise<void>;
+  session: Session
+  isAdmin: boolean
+  signOut: () => Promise<void>
 }
 
 export default function AccountDropdown({
@@ -22,7 +22,7 @@ export default function AccountDropdown({
   isAdmin,
   signOut,
 }: AccountDropdownProps) {
-  const user = session.user;
+  const user = session.user
 
   return (
     <DropdownMenu>
@@ -102,5 +102,5 @@ export default function AccountDropdown({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

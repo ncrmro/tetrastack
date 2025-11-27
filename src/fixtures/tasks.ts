@@ -1,12 +1,12 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { TASK_STATUS, TASK_PRIORITY } from '@/database/schema.tasks';
-import type { SelectTask } from '@/database/schema.tasks';
+import type { SelectTask } from '@/database/schema.tasks'
+import { TASK_PRIORITY, TASK_STATUS } from '@/database/schema.tasks'
+import { generateUuidV7 } from '@/lib/uuid'
 import {
   PROJECT_API_V2,
-  PROJECT_WEBSITE_REDESIGN,
   PROJECT_CUSTOMER_PORTAL,
   PROJECT_MOBILE_APP,
-} from './projects';
+  PROJECT_WEBSITE_REDESIGN,
+} from './projects'
 
 // API v2 Tasks
 export const TASK_API_DESIGN: SelectTask = {
@@ -20,7 +20,7 @@ export const TASK_API_DESIGN: SelectTask = {
   dueDate: new Date('2024-02-15'),
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-02-14'),
-};
+}
 
 export const TASK_API_AUTHENTICATION: SelectTask = {
   id: generateUuidV7(),
@@ -33,7 +33,7 @@ export const TASK_API_AUTHENTICATION: SelectTask = {
   dueDate: new Date('2024-03-20'),
   createdAt: new Date('2024-02-10'),
   updatedAt: new Date('2024-03-12'),
-};
+}
 
 export const TASK_API_TESTS: SelectTask = {
   id: generateUuidV7(),
@@ -46,7 +46,7 @@ export const TASK_API_TESTS: SelectTask = {
   dueDate: new Date('2024-04-01'),
   createdAt: new Date('2024-03-01'),
   updatedAt: new Date('2024-03-01'),
-};
+}
 
 // Website Redesign Tasks
 export const TASK_DESIGN_MOCKUPS: SelectTask = {
@@ -60,7 +60,7 @@ export const TASK_DESIGN_MOCKUPS: SelectTask = {
   dueDate: new Date('2024-02-01'),
   createdAt: new Date('2024-01-20'),
   updatedAt: new Date('2024-01-30'),
-};
+}
 
 export const TASK_IMPLEMENT_HOMEPAGE: SelectTask = {
   id: generateUuidV7(),
@@ -73,7 +73,7 @@ export const TASK_IMPLEMENT_HOMEPAGE: SelectTask = {
   dueDate: new Date('2024-03-20'),
   createdAt: new Date('2024-02-05'),
   updatedAt: new Date('2024-03-10'),
-};
+}
 
 export const TASK_SEO_OPTIMIZATION: SelectTask = {
   id: generateUuidV7(),
@@ -86,7 +86,7 @@ export const TASK_SEO_OPTIMIZATION: SelectTask = {
   dueDate: new Date('2024-04-15'),
   createdAt: new Date('2024-03-01'),
   updatedAt: new Date('2024-03-01'),
-};
+}
 
 // Customer Portal Tasks
 export const TASK_USER_DASHBOARD: SelectTask = {
@@ -100,7 +100,7 @@ export const TASK_USER_DASHBOARD: SelectTask = {
   dueDate: new Date('2024-03-25'),
   createdAt: new Date('2024-01-15'),
   updatedAt: new Date('2024-03-11'),
-};
+}
 
 export const TASK_BILLING_INTEGRATION: SelectTask = {
   id: generateUuidV7(),
@@ -113,7 +113,7 @@ export const TASK_BILLING_INTEGRATION: SelectTask = {
   dueDate: new Date('2024-04-05'),
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-02-01'),
-};
+}
 
 export const TASK_SUPPORT_TICKETS: SelectTask = {
   id: generateUuidV7(),
@@ -126,7 +126,7 @@ export const TASK_SUPPORT_TICKETS: SelectTask = {
   dueDate: new Date('2024-04-20'),
   createdAt: new Date('2024-02-15'),
   updatedAt: new Date('2024-02-15'),
-};
+}
 
 // Mobile App Tasks
 export const TASK_MOBILE_RESEARCH: SelectTask = {
@@ -140,7 +140,7 @@ export const TASK_MOBILE_RESEARCH: SelectTask = {
   dueDate: new Date('2024-03-15'),
   createdAt: new Date('2024-03-01'),
   updatedAt: new Date('2024-03-10'),
-};
+}
 
 export const TASK_MOBILE_PROTOTYPE: SelectTask = {
   id: generateUuidV7(),
@@ -153,7 +153,7 @@ export const TASK_MOBILE_PROTOTYPE: SelectTask = {
   dueDate: new Date('2024-04-01'),
   createdAt: new Date('2024-03-01'),
   updatedAt: new Date('2024-03-01'),
-};
+}
 
 export const TASK_APP_STORE_SETUP: SelectTask = {
   id: generateUuidV7(),
@@ -166,7 +166,7 @@ export const TASK_APP_STORE_SETUP: SelectTask = {
   dueDate: null,
   createdAt: new Date('2024-03-05'),
   updatedAt: new Date('2024-03-05'),
-};
+}
 
 export const tasks = [
   TASK_API_DESIGN,
@@ -181,4 +181,4 @@ export const tasks = [
   TASK_MOBILE_RESEARCH,
   TASK_MOBILE_PROTOTYPE,
   TASK_APP_STORE_SETUP,
-];
+]

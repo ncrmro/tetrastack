@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import type { SelectTeam } from '@/database/schema.teams';
-import { Select } from '@/components/ui/select';
+import { Select } from '@/components/ui/select'
+import type { SelectTeam } from '@/database/schema.teams'
 
 interface TeamSelectorProps {
-  teams: SelectTeam[];
-  value: string;
-  onChange: (teamId: string) => void;
-  label?: string;
-  required?: boolean;
-  disabled?: boolean;
-  className?: string;
+  teams: SelectTeam[]
+  value: string
+  onChange: (teamId: string) => void
+  label?: string
+  required?: boolean
+  disabled?: boolean
+  className?: string
 }
 
 export function TeamSelector({
@@ -52,5 +52,5 @@ export function TeamSelector({
         </p>
       )}
     </div>
-  );
+  )
 }

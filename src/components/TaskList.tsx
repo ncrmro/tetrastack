@@ -1,17 +1,17 @@
-import type { SelectTask } from '@/database/schema.tasks';
-import { TASK_STATUS } from '@/database/schema.tasks';
-import { TaskCard } from './TaskCard';
+import type { SelectTask } from '@/database/schema.tasks'
+import { TASK_STATUS } from '@/database/schema.tasks'
+import { TaskCard } from './TaskCard'
 
 interface TaskListProps {
   tasks: Array<
     SelectTask & {
-      assignee?: { id: number; name: string | null } | null;
-      project?: { id: string; title: string; slug: string } | null;
+      assignee?: { id: number; name: string | null } | null
+      project?: { id: string; title: string; slug: string } | null
     }
-  >;
-  groupBy?: 'status' | 'none';
-  showProject?: boolean;
-  emptyMessage?: string;
+  >
+  groupBy?: 'status' | 'none'
+  showProject?: boolean
+  emptyMessage?: string
 }
 
 export function TaskList({
@@ -25,7 +25,7 @@ export function TaskList({
       <div className="rounded-lg border border-outline bg-surface p-8 text-center">
         <p className="text-on-surface-variant">{emptyMessage}</p>
       </div>
-    );
+    )
   }
 
   if (groupBy === 'status') {
@@ -33,24 +33,24 @@ export function TaskList({
       [TASK_STATUS.TODO]: [],
       [TASK_STATUS.IN_PROGRESS]: [],
       [TASK_STATUS.DONE]: [],
-    };
+    }
 
     tasks.forEach((task) => {
       if (statusGroups[task.status]) {
-        statusGroups[task.status].push(task);
+        statusGroups[task.status].push(task)
       }
-    });
+    })
 
     const statusLabels = {
       [TASK_STATUS.TODO]: 'To Do',
       [TASK_STATUS.IN_PROGRESS]: 'In Progress',
       [TASK_STATUS.DONE]: 'Done',
-    };
+    }
 
     return (
       <div className="space-y-6" data-testid="task-list">
         {Object.entries(statusGroups).map(([status, statusTasks]) => {
-          if (statusTasks.length === 0) return null;
+          if (statusTasks.length === 0) return null
 
           return (
             <div key={status}>
@@ -68,10 +68,10 @@ export function TaskList({
                 ))}
               </div>
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 
   return (
@@ -80,5 +80,5 @@ export function TaskList({
         <TaskCard key={task.id} task={task} showProject={showProject} />
       ))}
     </div>
-  );
+  )
 }

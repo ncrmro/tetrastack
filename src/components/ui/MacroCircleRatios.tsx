@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import { useMemo, useRef } from 'react';
-import * as d3 from 'd3';
+import * as d3 from 'd3'
+import { useMemo, useRef } from 'react'
 
 interface MacroCircleRatiosProps {
-  protein: number;
-  carbs: number;
-  fat: number;
-  calories?: number;
-  size?: 'sm' | 'md' | 'lg';
+  protein: number
+  carbs: number
+  fat: number
+  calories?: number
+  size?: 'sm' | 'md' | 'lg'
 }
 
 type DataItem = {
-  name: string;
-  value: number;
-};
+  name: string
+  value: number
+}
 
-const MARGIN_X = 150;
-const MARGIN_Y = 50;
-const INFLEXION_PADDING = 20;
+const MARGIN_X = 150
+const MARGIN_Y = 50
+const INFLEXION_PADDING = 20
 
 const colors = [
   '#8b5cf6', // purple for protein
   '#f59e0b', // amber for carbs
   '#3b82f6', // blue for fat
-];
+]
 
 export default function MacroCircleRatios({
   protein,
@@ -32,19 +32,19 @@ export default function MacroCircleRatios({
   fat,
   size = 'md',
 }: MacroCircleRatiosProps) {
-  const ref = useRef(null);
+  const ref = useRef(null)
 
   // Size configurations - using viewBox for responsive SVG
   const sizeConfig = {
     sm: { width: 500, height: 350, viewBox: '0 0 500 350' },
     md: { width: 600, height: 400, viewBox: '0 0 600 400' },
     lg: { width: 500, height: 300, viewBox: '0 0 500 300' },
-  };
+  }
 
-  const config = sizeConfig[size];
+  const config = sizeConfig[size]
   const radius =
-    Math.min(config.width - 2 * MARGIN_X, config.height - 2 * MARGIN_Y) / 2;
-  const innerRadius = radius / 2;
+    Math.min(config.width - 2 * MARGIN_X, config.height - 2 * MARGIN_Y) / 2
+  const innerRadius = radius / 2
 
   const data = useMemo(
     () => [
@@ -53,14 +53,14 @@ export default function MacroCircleRatios({
       { name: 'Fat', value: fat },
     ],
     [protein, carbs, fat],
-  );
+  )
 
   const pie = useMemo(() => {
-    const pieGenerator = d3.pie<DataItem>().value((d: DataItem) => d.value);
-    return pieGenerator(data);
-  }, [data]);
+    const pieGenerator = d3.pie<DataItem>().value((d: DataItem) => d.value)
+    return pieGenerator(data)
+  }, [data])
 
-  const arcGenerator = d3.arc();
+  const arcGenerator = d3.arc()
 
   const shapes = pie.map((grp: d3.PieArcDatum<DataItem>, i: number) => {
     // First arc is for the donut
@@ -69,9 +69,9 @@ export default function MacroCircleRatios({
       outerRadius: radius,
       startAngle: grp.startAngle,
       endAngle: grp.endAngle,
-    };
-    const centroid = arcGenerator.centroid(sliceInfo);
-    const slicePath = arcGenerator(sliceInfo);
+    }
+    const centroid = arcGenerator.centroid(sliceInfo)
+    const slicePath = arcGenerator(sliceInfo)
 
     // Second arc is for the legend inflexion point
     const inflexionInfo = {
@@ -79,26 +79,26 @@ export default function MacroCircleRatios({
       outerRadius: radius + INFLEXION_PADDING,
       startAngle: grp.startAngle,
       endAngle: grp.endAngle,
-    };
-    const inflexionPoint = arcGenerator.centroid(inflexionInfo);
+    }
+    const inflexionPoint = arcGenerator.centroid(inflexionInfo)
 
-    const isRightLabel = inflexionPoint[0] > 0;
-    const labelPosX = inflexionPoint[0] + 15 * (isRightLabel ? 1 : -1);
-    const textAnchor = isRightLabel ? 'start' : 'end';
-    const percentage = ((grp.value / (protein + carbs + fat)) * 100).toFixed(0);
-    const label = `${grp.data.name} (${Math.round(grp.value)}g, ${percentage}%)`;
+    const isRightLabel = inflexionPoint[0] > 0
+    const labelPosX = inflexionPoint[0] + 15 * (isRightLabel ? 1 : -1)
+    const textAnchor = isRightLabel ? 'start' : 'end'
+    const percentage = ((grp.value / (protein + carbs + fat)) * 100).toFixed(0)
+    const label = `${grp.data.name} (${Math.round(grp.value)}g, ${percentage}%)`
 
     return (
       <g
         key={i}
         onMouseEnter={() => {
           if (ref.current) {
-            (ref.current as HTMLElement).classList.add('opacity-50');
+            ;(ref.current as HTMLElement).classList.add('opacity-50')
           }
         }}
         onMouseLeave={() => {
           if (ref.current) {
-            (ref.current as HTMLElement).classList.remove('opacity-50');
+            ;(ref.current as HTMLElement).classList.remove('opacity-50')
           }
         }}
       >
@@ -134,8 +134,8 @@ export default function MacroCircleRatios({
           {label}
         </text>
       </g>
-    );
-  });
+    )
+  })
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -155,5 +155,5 @@ export default function MacroCircleRatios({
         </svg>
       </div>
     </div>
-  );
+  )
 }

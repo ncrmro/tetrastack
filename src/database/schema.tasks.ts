@@ -1,8 +1,8 @@
-import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { projects } from './schema.projects';
-import { users } from './schema.auth';
-import { generateUuidV7 } from '@/lib/uuid';
+import { relations, sql } from 'drizzle-orm'
+import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { generateUuidV7 } from '@/lib/uuid'
+import { users } from './schema.auth'
+import { projects } from './schema.projects'
 
 /**
  * Task status enum - defines all possible task states
@@ -11,8 +11,8 @@ export const TASK_STATUS = {
   TODO: 'todo',
   IN_PROGRESS: 'in_progress',
   DONE: 'done',
-} as const;
-export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
+} as const
+export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS]
 
 /**
  * Task priority enum - defines task priority levels
@@ -21,8 +21,8 @@ export const TASK_PRIORITY = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
-} as const;
-export type TaskPriority = (typeof TASK_PRIORITY)[keyof typeof TASK_PRIORITY];
+} as const
+export type TaskPriority = (typeof TASK_PRIORITY)[keyof typeof TASK_PRIORITY]
 
 export const tasks = sqliteTable(
   'tasks',
@@ -58,7 +58,7 @@ export const tasks = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [check('title_not_empty', sql`length(${table.title}) > 0`)],
-);
+)
 
 export const comments = sqliteTable(
   'comments',
@@ -82,7 +82,7 @@ export const comments = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [check('content_not_empty', sql`length(${table.content}) > 0`)],
-);
+)
 
 // Relations
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
@@ -95,7 +95,7 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
     references: [users.id],
   }),
   comments: many(comments),
-}));
+}))
 
 export const commentsRelations = relations(comments, ({ one }) => ({
   task: one(tasks, {
@@ -106,37 +106,37 @@ export const commentsRelations = relations(comments, ({ one }) => ({
     fields: [comments.userId],
     references: [users.id],
   }),
-}));
+}))
 
 // Schema generation and types
-import { createSelectSchema } from 'drizzle-zod';
-import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
+import { createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
+import { createAutoInsertSchema } from '@/lib/db/schema-helpers'
 
 /**
  * Base task schema for insertions (auto-generated from Drizzle table)
  * Auto-omits: id, createdAt, updatedAt
  */
-export const insertTaskSchema = createAutoInsertSchema(tasks);
+export const insertTaskSchema = createAutoInsertSchema(tasks)
 
 /**
  * Complete task schema including all fields (auto-generated from Drizzle table)
  */
-export const selectTaskSchema = createSelectSchema(tasks);
+export const selectTaskSchema = createSelectSchema(tasks)
 
 /**
  * Base comment schema for insertions (auto-generated from Drizzle table)
  * Auto-omits: id, createdAt, updatedAt
  */
-export const insertCommentSchema = createAutoInsertSchema(comments);
+export const insertCommentSchema = createAutoInsertSchema(comments)
 
 /**
  * Complete comment schema including all fields (auto-generated from Drizzle table)
  */
-export const selectCommentSchema = createSelectSchema(comments);
+export const selectCommentSchema = createSelectSchema(comments)
 
 // Export types for TypeScript usage
-export type InsertTask = z.infer<typeof insertTaskSchema>;
-export type SelectTask = z.infer<typeof selectTaskSchema>;
-export type InsertComment = z.infer<typeof insertCommentSchema>;
-export type SelectComment = z.infer<typeof selectCommentSchema>;
+export type InsertTask = z.infer<typeof insertTaskSchema>
+export type SelectTask = z.infer<typeof selectTaskSchema>
+export type InsertComment = z.infer<typeof insertCommentSchema>
+export type SelectComment = z.infer<typeof selectCommentSchema>

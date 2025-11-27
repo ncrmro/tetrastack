@@ -1,42 +1,42 @@
-import { authRedirect } from '../../auth';
-import { getTeams, getTeamMemberships } from '@/models/teams';
-import { getProjects } from '@/models/projects';
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { ProjectCard } from '@/components/ProjectCard';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { ButtonLink } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { ProjectCard } from '@/components/ProjectCard'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { PROJECT_STATUS } from '@/database/schema.projects'
+import { getProjects } from '@/models/projects'
+import { getTeamMemberships, getTeams } from '@/models/teams'
+import { authRedirect } from '../../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface TeamPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function TeamPage({ params }: TeamPageProps) {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
-  const { id } = await params;
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
+  const { id } = await params
 
   // Get team details
-  const teams = await getTeams({ ids: [id] });
+  const teams = await getTeams({ ids: [id] })
   if (teams.length === 0) {
-    notFound();
+    notFound()
   }
-  const team = teams[0];
+  const team = teams[0]
 
   // Get team memberships
-  const memberships = await getTeamMemberships({ teamIds: [id] });
+  const memberships = await getTeamMemberships({ teamIds: [id] })
 
   // Check if current user is a member
-  const currentUserMembership = memberships.find((m) => m.userId === userId);
+  const currentUserMembership = memberships.find((m) => m.userId === userId)
   if (!currentUserMembership) {
-    notFound();
+    notFound()
   }
 
   // Get team projects
-  const projects = await getProjects({ teamIds: [id] });
+  const projects = await getProjects({ teamIds: [id] })
 
   return (
     <div className="min-h-screen bg-background">
@@ -202,5 +202,5 @@ export default async function TeamPage({ params }: TeamPageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

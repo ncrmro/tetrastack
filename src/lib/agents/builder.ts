@@ -1,13 +1,13 @@
-import type { LanguageModel } from 'ai';
-import type { BaseAgent } from './base-agent';
-import type { ProgressCallback, ChatMessage } from './types';
+import type { LanguageModel } from 'ai'
+import type { BaseAgent } from './base-agent'
+import type { ChatMessage, ProgressCallback } from './types'
 
 /**
  * Configuration object for agent construction
  */
 export interface AgentConfig {
-  model?: LanguageModel;
-  progressCallback?: ProgressCallback;
+  model?: LanguageModel
+  progressCallback?: ProgressCallback
 }
 
 /**
@@ -33,7 +33,7 @@ export class AgentBuilder<
   TResult = unknown,
   TPersisted = unknown,
 > {
-  private config: AgentConfig = {};
+  private config: AgentConfig = {}
 
   constructor(
     private AgentClass: new (
@@ -48,8 +48,8 @@ export class AgentBuilder<
    * @returns This builder for chaining
    */
   withModel(model: LanguageModel): this {
-    this.config.model = model;
-    return this;
+    this.config.model = model
+    return this
   }
 
   /**
@@ -58,8 +58,8 @@ export class AgentBuilder<
    * @returns This builder for chaining
    */
   withProgress(callback: ProgressCallback): this {
-    this.config.progressCallback = callback;
-    return this;
+    this.config.progressCallback = callback
+    return this
   }
 
   /**
@@ -74,8 +74,8 @@ export class AgentBuilder<
     const agent = new this.AgentClass(
       this.config.progressCallback,
       this.config.model,
-    );
-    await agent.execute(messages, context);
-    return agent;
+    )
+    await agent.execute(messages, context)
+    return agent
   }
 }

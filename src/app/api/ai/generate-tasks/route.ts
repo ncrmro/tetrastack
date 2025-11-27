@@ -1,10 +1,10 @@
-import { NextRequest } from 'next/server';
-import { auth } from '@/app/auth';
-import { BulkTaskGeneratorAgent } from '@/agents/task-agents';
-import { insertTasks } from '@/models/tasks';
+import type { NextRequest } from 'next/server'
+import { BulkTaskGeneratorAgent } from '@/agents/task-agents'
+import { auth } from '@/app/auth'
+import { insertTasks } from '@/models/tasks'
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 /**
  * POST /api/ai/generate-tasks
@@ -18,36 +18,36 @@ export const dynamic = 'force-dynamic';
  * - event: error - Error message
  */
 export async function POST(request: NextRequest) {
-  const encoder = new TextEncoder();
+  const encoder = new TextEncoder()
 
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const session = await auth();
+        const session = await auth()
         if (!session?.user?.id) {
           controller.enqueue(
             encoder.encode(
               `event: error\ndata: ${JSON.stringify({ error: 'Unauthorized' })}\n\n`,
             ),
-          );
-          controller.close();
-          return;
+          )
+          controller.close()
+          return
         }
 
         const body = (await request.json()) as {
-          description?: string;
-          projectId?: string;
-        };
-        const { description, projectId } = body;
+          description?: string
+          projectId?: string
+        }
+        const { description, projectId } = body
 
         if (!description?.trim()) {
           controller.enqueue(
             encoder.encode(
               `event: error\ndata: ${JSON.stringify({ error: 'Description is required' })}\n\n`,
             ),
-          );
-          controller.close();
-          return;
+          )
+          controller.close()
+          return
         }
 
         if (!projectId) {
@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
             encoder.encode(
               `event: error\ndata: ${JSON.stringify({ error: 'Project ID is required' })}\n\n`,
             ),
-          );
-          controller.close();
-          return;
+          )
+          controller.close()
+          return
         }
 
         // Generate tasks with AI, streaming progress events
@@ -69,19 +69,19 @@ export async function POST(request: NextRequest) {
               encoder.encode(
                 `event: progress\ndata: ${JSON.stringify(event)}\n\n`,
               ),
-            );
+            )
           },
-        );
+        )
 
-        const result = agent.getResult();
+        const result = agent.getResult()
 
         // Create all tasks
         const tasksWithProject = result.tasks.map((task) => ({
           ...task,
           projectId,
-        }));
+        }))
 
-        const created = await insertTasks(tasksWithProject);
+        const created = await insertTasks(tasksWithProject)
 
         controller.enqueue(
           encoder.encode(
@@ -91,11 +91,11 @@ export async function POST(request: NextRequest) {
               rationale: result.rationale,
             })}\n\n`,
           ),
-        );
+        )
 
-        controller.close();
+        controller.close()
       } catch (error) {
-        console.error('Error generating tasks:', error);
+        console.error('Error generating tasks:', error)
         controller.enqueue(
           encoder.encode(
             `event: error\ndata: ${JSON.stringify({
@@ -105,11 +105,11 @@ export async function POST(request: NextRequest) {
                   : 'Failed to generate tasks',
             })}\n\n`,
           ),
-        );
-        controller.close();
+        )
+        controller.close()
       }
     },
-  });
+  })
 
   return new Response(stream, {
     headers: {
@@ -117,5 +117,5 @@ export async function POST(request: NextRequest) {
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
     },
-  });
+  })
 }

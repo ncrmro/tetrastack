@@ -31,7 +31,7 @@
  * nutritionCalculated => nutrition-calculated
  */
 function camelToKebab(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
 /**
@@ -39,7 +39,7 @@ function camelToKebab(str: string): string {
  * nutritionCalculated => NUTRITION_CALCULATED
  */
 function camelToScreamingSnake(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase();
+  return str.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase()
 }
 
 /**
@@ -47,7 +47,7 @@ function camelToScreamingSnake(str: string): string {
  */
 type CamelToSnake<S extends string> = S extends `${infer T}${infer U}`
   ? `${T extends Capitalize<T> ? '_' : ''}${Lowercase<T>}${CamelToSnake<U>}`
-  : S;
+  : S
 
 /**
  * Creates event constants (enum-style strings) for an agent
@@ -68,24 +68,24 @@ export function createEventConstants<
   TEntity extends string,
   TCustom extends readonly string[] = readonly string[],
 >(config: {
-  entity: TEntity;
-  custom?: TCustom;
+  entity: TEntity
+  custom?: TCustom
 }): {
   // Standard event constants
-  GENERATION_START: `${TEntity}.generation.start`;
-  GENERATION_COMPLETE: `${TEntity}.generation.complete`;
-  EXISTING_FOUND: `${TEntity}.existing.found`;
-  ERROR: `${TEntity}.error`;
-  TOOL_CALL: `${TEntity}.tool.call`;
-  TOOL_RESULT: `${TEntity}.tool.result`;
-  AI_FINISH: `${TEntity}.ai.finish`;
+  GENERATION_START: `${TEntity}.generation.start`
+  GENERATION_COMPLETE: `${TEntity}.generation.complete`
+  EXISTING_FOUND: `${TEntity}.existing.found`
+  ERROR: `${TEntity}.error`
+  TOOL_CALL: `${TEntity}.tool.call`
+  TOOL_RESULT: `${TEntity}.tool.result`
+  AI_FINISH: `${TEntity}.ai.finish`
 } & {
   // Custom event constants
   [K in TCustom[number] as Uppercase<
     CamelToSnake<K & string>
-  >]: `${TEntity}.${string}`;
+  >]: `${TEntity}.${string}`
 } {
-  const { entity, custom = [] as unknown as TCustom } = config;
+  const { entity, custom = [] as unknown as TCustom } = config
 
   // Standard event constants (auto-generated)
   const standardConstants = {
@@ -96,7 +96,7 @@ export function createEventConstants<
     TOOL_CALL: `${entity}.tool.call` as const,
     TOOL_RESULT: `${entity}.tool.result` as const,
     AI_FINISH: `${entity}.ai.finish` as const,
-  };
+  }
 
   // Custom event constants - auto-generated from array
   const customConstants = Object.fromEntries(
@@ -107,13 +107,13 @@ export function createEventConstants<
   ) as {
     [K in TCustom[number] as Uppercase<
       CamelToSnake<K & string>
-    >]: `${TEntity}.${string}`;
-  };
+    >]: `${TEntity}.${string}`
+  }
 
   return {
     ...standardConstants,
     ...customConstants,
-  };
+  }
 }
 
 /**
@@ -146,65 +146,65 @@ export function createEventBuilders<
     (...args: any[]) => Record<string, any>
   > = Record<string, never>,
 >(config: {
-  entity: TEntity;
-  custom?: TCustom;
+  entity: TEntity
+  custom?: TCustom
 }): {
   // Standard event builders
   generationStart: (entityName: string) => {
-    type: `${TEntity}.generation.start`;
-    data: { entityName: string };
-  };
+    type: `${TEntity}.generation.start`
+    data: { entityName: string }
+  }
   generationComplete: (
     entityName: string,
     result: TResult,
   ) => {
-    type: `${TEntity}.generation.complete`;
-    data: { entityName: string; result: TResult };
-  };
+    type: `${TEntity}.generation.complete`
+    data: { entityName: string; result: TResult }
+  }
   existingFound: (
     entityName: string,
     id: string,
   ) => {
-    type: `${TEntity}.existing.found`;
-    data: { entityName: string; id: string };
-  };
+    type: `${TEntity}.existing.found`
+    data: { entityName: string; id: string }
+  }
   error: (
     entityName: string,
     message: string,
     error?: unknown,
   ) => {
-    type: `${TEntity}.error`;
-    data: { entityName: string; message: string; error?: unknown };
-  };
+    type: `${TEntity}.error`
+    data: { entityName: string; message: string; error?: unknown }
+  }
   toolCall: (
     toolName: string,
     input: unknown,
   ) => {
-    type: `${TEntity}.tool.call`;
-    data: { toolName: string; input: unknown };
-  };
+    type: `${TEntity}.tool.call`
+    data: { toolName: string; input: unknown }
+  }
   toolResult: (
     toolName: string,
     output: unknown,
   ) => {
-    type: `${TEntity}.tool.result`;
-    data: { toolName: string; output: unknown };
-  };
+    type: `${TEntity}.tool.result`
+    data: { toolName: string; output: unknown }
+  }
   aiFinish: (
     finishReason: string,
     usage?: unknown,
   ) => {
-    type: `${TEntity}.ai.finish`;
-    data: { finishReason: string; usage?: unknown };
-  };
+    type: `${TEntity}.ai.finish`
+    data: { finishReason: string; usage?: unknown }
+  }
 } & {
   // Custom event builders
   [K in keyof TCustom]: (...args: Parameters<TCustom[K]>) => {
-    type: `${TEntity}.${string}`;
-    data: ReturnType<TCustom[K]>;
-  };
+    type: `${TEntity}.${string}`
+    data: ReturnType<TCustom[K]>
+  }
 } {
-  const { entity, custom = {} as TCustom } = config;
+  const { entity, custom = {} as TCustom } = config
 
   // Standard event builders (auto-generated)
   const standardBuilders = {
@@ -236,31 +236,31 @@ export function createEventBuilders<
       type: `${entity}.ai.finish` as const,
       data: { finishReason, usage },
     }),
-  };
+  }
 
   // Custom event builders - transform config into builders
   const customBuilders = Object.fromEntries(
     Object.entries(custom).map(([key, dataFn]) => {
-      const eventType = `${entity}.${camelToKebab(key)}` as const;
+      const eventType = `${entity}.${camelToKebab(key)}` as const
       return [
         key,
         (...args: Parameters<typeof dataFn>) => ({
           type: eventType,
           data: dataFn(...args),
         }),
-      ];
+      ]
     }),
   ) as {
     [K in keyof TCustom]: (...args: Parameters<TCustom[K]>) => {
-      type: `${TEntity}.${string}`;
-      data: ReturnType<TCustom[K]>;
-    };
-  };
+      type: `${TEntity}.${string}`
+      data: ReturnType<TCustom[K]>
+    }
+  }
 
   return {
     ...standardBuilders,
     ...customBuilders,
-  };
+  }
 }
 
 /**
@@ -269,4 +269,4 @@ export function createEventBuilders<
  */
 export type ExtractEventUnion<
   T extends ReturnType<typeof createEventBuilders>,
-> = ReturnType<T[keyof T]>;
+> = ReturnType<T[keyof T]>

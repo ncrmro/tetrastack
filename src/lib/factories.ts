@@ -24,9 +24,9 @@
  * ```
  */
 
-import { Factory as FisheryFactory } from 'fishery';
-import { faker as fakerInstance } from '@faker-js/faker';
-import { db as database } from '@/database';
+import { faker as fakerInstance } from '@faker-js/faker'
+import { Factory as FisheryFactory } from 'fishery'
+import { db as database } from '@/database'
 
 /**
  * Factory class for defining test data factories.
@@ -38,16 +38,16 @@ import { db as database } from '@/database';
  * @see https://fakerjs.dev/
  */
 export const Factory: typeof FisheryFactory & {
-  faker: typeof fakerInstance;
+  faker: typeof fakerInstance
 } = FisheryFactory as typeof FisheryFactory & {
-  faker: typeof fakerInstance;
-};
+  faker: typeof fakerInstance
+}
 
 /**
  * Faker instance for generating realistic fake data.
  * Available as static property on Factory class.
  */
-Factory.faker = fakerInstance;
+Factory.faker = fakerInstance
 
 /**
  * Database instance for factory persistence.
@@ -62,7 +62,7 @@ Factory.faker = fakerInstance;
  * }
  * ```
  */
-export const db = database;
+export const db = database
 
 /**
  * Type helper for factory transient parameters.
@@ -80,7 +80,7 @@ export const db = database;
  * }))
  * ```
  */
-export type TransientParams = Record<string, unknown>;
+export type TransientParams = Record<string, unknown>
 
 /**
  * Type helper for factory associations.
@@ -99,4 +99,4 @@ export type TransientParams = Record<string, unknown>;
  * })
  * ```
  */
-export type Associations = Record<string, unknown>;
+export type Associations = Record<string, unknown>

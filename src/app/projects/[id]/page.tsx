@@ -1,46 +1,43 @@
-import { authRedirect } from '../../auth';
-import { getProjects, getProjectWithTags } from '@/models/projects';
-import { getTasks } from '@/models/tasks';
-import { TaskList } from '@/components/TaskList';
-import { StatusBadge } from '@/components/StatusBadge';
-import { PriorityIndicator } from '@/components/PriorityIndicator';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import {
-  type ProjectStatus,
-  type ProjectPriority,
-} from '@/database/schema.projects';
-import { TASK_STATUS } from '@/database/schema.tasks';
-import { ButtonLink } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { PriorityIndicator } from '@/components/PriorityIndicator'
+import { StatusBadge } from '@/components/StatusBadge'
+import { TaskList } from '@/components/TaskList'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import type { ProjectPriority, ProjectStatus } from '@/database/schema.projects'
+import { TASK_STATUS } from '@/database/schema.tasks'
+import { getProjects, getProjectWithTags } from '@/models/projects'
+import { getTasks } from '@/models/tasks'
+import { authRedirect } from '../../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface ProjectPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  await authRedirect();
-  const { id } = await params;
+  await authRedirect()
+  const { id } = await params
 
   // Try to get project by ID first, if not found try by slug
-  let projects = await getProjects({ ids: [id] });
+  let projects = await getProjects({ ids: [id] })
   if (projects.length === 0) {
-    projects = await getProjects({ slugs: [id] });
+    projects = await getProjects({ slugs: [id] })
   }
 
   if (projects.length === 0) {
-    notFound();
+    notFound()
   }
 
-  const project = projects[0];
+  const project = projects[0]
 
   // Get project with tags
-  const projectWithTags = await getProjectWithTags(project.id);
+  const projectWithTags = await getProjectWithTags(project.id)
 
   // Get project tasks
-  const tasks = await getTasks({ projectIds: [project.id] });
+  const tasks = await getTasks({ projectIds: [project.id] })
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +84,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   key={projectTag.tag.id}
                   className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium"
                   style={{
-                    backgroundColor: projectTag.tag.color + '30',
+                    backgroundColor: `${projectTag.tag.color}30`,
                     color: projectTag.tag.color,
                   }}
                 >
@@ -181,5 +178,5 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

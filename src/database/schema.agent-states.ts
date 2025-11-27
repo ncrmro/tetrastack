@@ -1,5 +1,5 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { users } from './schema.auth';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { users } from './schema.auth'
 
 /**
  * Optional schema for storing agent states
@@ -26,7 +26,7 @@ export const agentStates = sqliteTable('agent_states', {
     .notNull()
     .$defaultFn(() => new Date()),
   expiresAt: integer('expires_at', { mode: 'timestamp' }), // Optional TTL for cleanup
-});
+})
 
-export type AgentStateRecord = typeof agentStates.$inferSelect;
-export type NewAgentStateRecord = typeof agentStates.$inferInsert;
+export type AgentStateRecord = typeof agentStates.$inferSelect
+export type NewAgentStateRecord = typeof agentStates.$inferInsert

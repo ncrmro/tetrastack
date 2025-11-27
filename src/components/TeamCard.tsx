@@ -1,15 +1,15 @@
-import Link from 'next/link';
-import type { SelectTeam } from '@/database/schema.teams';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { SelectTeam } from '@/database/schema.teams'
 
 interface TeamCardProps {
   team: SelectTeam & {
-    role: string;
-    joinedAt: Date | string;
-    memberCount?: number;
-    projectCount?: number;
-    activeProjectCount?: number;
-  };
+    role: string
+    joinedAt: Date | string
+    memberCount?: number
+    projectCount?: number
+    activeProjectCount?: number
+  }
 }
 
 export function TeamCard({ team }: TeamCardProps) {
@@ -69,5 +69,5 @@ export function TeamCard({ team }: TeamCardProps) {
         </div>
       </Card>
     </Link>
-  );
+  )
 }

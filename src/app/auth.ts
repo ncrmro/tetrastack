@@ -1,46 +1,46 @@
-import NextAuth, { DefaultSession } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { db } from '@/database';
-import { eq } from 'drizzle-orm';
-import { users } from '@/database/schema.auth';
-import PostHogClient from '@/lib/posthog-server';
-import { authConfig } from '@/lib/auth.config';
+import { eq } from 'drizzle-orm'
+import NextAuth, { type DefaultSession } from 'next-auth'
+import Credentials from 'next-auth/providers/credentials'
+import { db } from '@/database'
+import { users } from '@/database/schema.auth'
+import { authConfig } from '@/lib/auth.config'
+import PostHogClient from '@/lib/posthog-server'
 
 // Redirect URL for authenticated users
-export const AUTHENTICATED_USER_REDIRECT_URL = '/dashboard';
+export const AUTHENTICATED_USER_REDIRECT_URL = '/dashboard'
 
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string;
-      admin: boolean;
-    } & DefaultSession['user'];
+      id: string
+      admin: boolean
+    } & DefaultSession['user']
   }
 
   interface User {
-    admin: boolean;
+    admin: boolean
   }
 
   interface JWT {
-    id: string;
-    admin: boolean;
+    id: string
+    admin: boolean
   }
 }
 
 // PostHog identification helper function
 function identifyUserWithPostHog(user: {
-  id: string;
-  email: string | null | undefined;
-  name: string | null | undefined;
-  admin?: boolean | undefined;
+  id: string
+  email: string | null | undefined
+  name: string | null | undefined
+  admin?: boolean | undefined
 }) {
   // Skip PostHog identification if no API key is configured
   if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) {
-    return;
+    return
   }
 
   try {
-    const posthog = PostHogClient();
+    const posthog = PostHogClient()
     posthog.identify({
       distinctId: user.id,
       properties: {
@@ -48,10 +48,10 @@ function identifyUserWithPostHog(user: {
         name: user.name || null,
         admin: user.admin || false,
       },
-    });
-    posthog.flush();
+    })
+    posthog.flush()
   } catch (error) {
-    console.error('Failed to identify user with PostHog:', error);
+    console.error('Failed to identify user with PostHog:', error)
   }
 }
 
@@ -69,33 +69,33 @@ if (process.env.NODE_ENV === 'development') {
          * In development users can sign in with either password or admin as a password
          * Users must be seeded via `npm run db:seed` before authentication
          */
-        const password = credentials.password as string;
+        const password = credentials.password as string
 
         // Parse password to extract base type (admin or password)
-        const passwordMatch = password.match(/^(password|admin)(?:-.*)?$/);
+        const passwordMatch = password.match(/^(password|admin)(?:-.*)?$/)
         if (!passwordMatch) {
-          return null;
+          return null
         }
 
-        const [, baseType] = passwordMatch;
-        const isAdmin = baseType === 'admin';
+        const [, baseType] = passwordMatch
+        const isAdmin = baseType === 'admin'
 
         // Look up the seeded user by email
-        const email = isAdmin ? 'admin@example.com' : 'bob@alice.com';
+        const email = isAdmin ? 'admin@example.com' : 'bob@alice.com'
 
         const [user] = await db
           .select()
           .from(users)
-          .where(eq(users.email, email));
+          .where(eq(users.email, email))
 
         if (!user) {
           console.error(
             `Authentication failed: User not found in database (${email})`,
-          );
+          )
           console.error(
             'Please run `npm run db:seed` to seed development users',
-          );
-          return null;
+          )
+          return null
         }
 
         // Convert integer ID to string for NextAuth compatibility
@@ -103,10 +103,10 @@ if (process.env.NODE_ENV === 'development') {
           ...user,
           id: user.id.toString(),
           admin: user.admin ?? false,
-        };
+        }
       },
     }),
-  );
+  )
 }
 
 /**
@@ -125,28 +125,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      */
     async jwt({ token, user }) {
       // On sign-in with Credentials provider, user object is fully populated
-      if (user && user.id) {
-        token.id = user.id;
-        token.admin = user.admin;
-        return token;
+      if (user?.id) {
+        token.id = user.id
+        token.admin = user.admin
+        return token
       }
 
       // For OAuth providers (Google, Mailgun) or token refresh, look up user by email
-      const { email, name, picture: image } = token;
+      const { email, name, picture: image } = token
       if (!email) {
-        throw new Error('No email found during JWT callback');
+        throw new Error('No email found during JWT callback')
       }
 
       const [existingUser] = await db
         .select()
         .from(users)
         .where(eq(users.email, email))
-        .limit(1);
+        .limit(1)
 
       if (existingUser) {
-        token.id = existingUser.id.toString();
-        token.admin = existingUser.admin ?? false;
-        return token;
+        token.id = existingUser.id.toString()
+        token.admin = existingUser.admin ?? false
+        return token
       }
 
       // Create new user for OAuth sign-ins (production only)
@@ -160,11 +160,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           onboardingCompleted: true,
           onboardingData: null,
         })
-        .returning();
+        .returning()
 
-      token.id = newUser.id.toString();
-      token.admin = newUser.admin ?? false;
-      return token;
+      token.id = newUser.id.toString()
+      token.admin = newUser.admin ?? false
+      return token
     },
 
     /**
@@ -174,9 +174,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * Forward token data to the session object.
      */
     async session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.admin = token.admin as boolean;
-      return session;
+      session.user.id = token.id as string
+      session.user.admin = token.admin as boolean
+      return session
     },
 
     /**
@@ -186,18 +186,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * Used for PostHog identification.
      */
     signIn({ user }) {
-      if (user && user.id) {
+      if (user?.id) {
         identifyUserWithPostHog({
           id: user.id,
           email: user.email,
           name: user.name,
           admin: user.admin,
-        });
+        })
       }
-      return true;
+      return true
     },
   },
-});
+})
 
 /**
  * Wrapped auth function that throws if not authenticated
@@ -205,11 +205,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  * For server components/pages, use authRedirect() instead
  */
 export async function authRequired() {
-  const session = await auth();
+  const session = await auth()
   if (!session?.user) {
-    throw new Error('Not authenticated!');
+    throw new Error('Not authenticated!')
   }
-  return session;
+  return session
 }
 
 /**
@@ -218,9 +218,9 @@ export async function authRequired() {
  * Use this in server components/pages. For server actions, use authRequired() instead.
  */
 export async function authRedirect() {
-  const session = await auth();
+  const session = await auth()
   if (!session?.user) {
-    return signIn();
+    return signIn()
   }
-  return session;
+  return session
 }

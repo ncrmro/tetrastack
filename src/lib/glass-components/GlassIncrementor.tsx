@@ -1,18 +1,18 @@
-'use client';
-import { cn } from './utils';
-import { useState, useTransition } from 'react';
-import { GlassButton } from './GlassButton';
-import { GlassSurface } from './GlassSurface';
+'use client'
+import { useState, useTransition } from 'react'
+import { GlassButton } from './GlassButton'
+import { GlassSurface } from './GlassSurface'
+import { cn } from './utils'
 
 interface GlassIncrementorProps {
-  value: number;
-  onChange: (newValue: number) => Promise<void> | void;
-  disabled?: boolean;
-  min?: number;
-  max?: number;
-  addLabel?: string;
-  addingLabel?: string;
-  showAddButton?: boolean;
+  value: number
+  onChange: (newValue: number) => Promise<void> | void
+  disabled?: boolean
+  min?: number
+  max?: number
+  addLabel?: string
+  addingLabel?: string
+  showAddButton?: boolean
 }
 
 export default function GlassIncrementor({
@@ -25,41 +25,41 @@ export default function GlassIncrementor({
   addingLabel = 'Adding...',
   showAddButton = true,
 }: GlassIncrementorProps) {
-  const [isPending, startTransition] = useTransition();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isPending, startTransition] = useTransition()
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const handleValueChange = async (newValue: number) => {
     // Ensure value stays within min/max bounds
-    const clampedValue = Math.max(min, Math.min(max, newValue));
+    const clampedValue = Math.max(min, Math.min(max, newValue))
 
-    if (clampedValue === value) return;
+    if (clampedValue === value) return
 
-    setIsUpdating(true);
+    setIsUpdating(true)
     startTransition(async () => {
       try {
-        await onChange(clampedValue);
+        await onChange(clampedValue)
       } catch (error) {
-        console.error('Error updating value:', error);
+        console.error('Error updating value:', error)
       } finally {
-        setIsUpdating(false);
+        setIsUpdating(false)
       }
-    });
-  };
+    })
+  }
 
   const handleIncrement = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    handleValueChange(value + 1);
-  };
+    e.stopPropagation()
+    handleValueChange(value + 1)
+  }
   const handleDecrement = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    handleValueChange(value - 1);
-  };
+    e.stopPropagation()
+    handleValueChange(value - 1)
+  }
   const handleAdd = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    handleValueChange(min + 1);
-  };
+    e.stopPropagation()
+    handleValueChange(min + 1)
+  }
 
-  const isDisabled = disabled || isPending || isUpdating;
+  const isDisabled = disabled || isPending || isUpdating
 
   // If value is at minimum and showAddButton is true, show "Add" button
   if (value === min && showAddButton) {
@@ -72,7 +72,7 @@ export default function GlassIncrementor({
       >
         {isUpdating ? addingLabel : addLabel}
       </GlassButton>
-    );
+    )
   }
 
   // Show incrementor controls when value > min or showAddButton is false
@@ -140,5 +140,5 @@ export default function GlassIncrementor({
         </svg>
       </button>
     </GlassSurface>
-  );
+  )
 }

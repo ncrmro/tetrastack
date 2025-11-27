@@ -1,5 +1,5 @@
-import type { StepResult, ToolSet } from 'ai';
-import type { createEventBuilders } from './event-factory';
+import type { StepResult, ToolSet } from 'ai'
+import type { createEventBuilders } from './event-factory'
 
 /**
  * Configuration for standard onStepFinish handler
@@ -8,12 +8,12 @@ export interface OnStepFinishConfig {
   /**
    * Agent event builders object (from createEventBuilders)
    */
-  eventBuilder: ReturnType<typeof createEventBuilders>;
+  eventBuilder: ReturnType<typeof createEventBuilders>
 
   /**
    * Emit function from the agent
    */
-  emit: (event: { type: string; data: unknown; timestamp?: string }) => void;
+  emit: (event: { type: string; data: unknown; timestamp?: string }) => void
 }
 
 /**
@@ -38,7 +38,7 @@ export interface OnStepFinishConfig {
  * ```
  */
 export function createStandardOnStepFinish(config: OnStepFinishConfig) {
-  const { eventBuilder, emit } = config;
+  const { eventBuilder, emit } = config
 
   return <T extends ToolSet>({
     toolCalls,
@@ -50,19 +50,19 @@ export function createStandardOnStepFinish(config: OnStepFinishConfig) {
     if (toolCalls) {
       toolCalls.forEach((toolCall, index) => {
         // Tool call event - use 'input' property from StepResult
-        emit(eventBuilder.toolCall(toolCall.toolName, toolCall.input));
+        emit(eventBuilder.toolCall(toolCall.toolName, toolCall.input))
 
         // Tool result event - use 'output' property from StepResult
-        if (toolResults && toolResults[index]) {
-          const toolResult = toolResults[index];
-          emit(eventBuilder.toolResult(toolCall.toolName, toolResult.output));
+        if (toolResults?.[index]) {
+          const toolResult = toolResults[index]
+          emit(eventBuilder.toolResult(toolCall.toolName, toolResult.output))
         }
-      });
+      })
     }
 
     // Emit AI finish event
     if (finishReason) {
-      emit(eventBuilder.aiFinish(finishReason, usage));
+      emit(eventBuilder.aiFinish(finishReason, usage))
     }
-  };
+  }
 }

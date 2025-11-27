@@ -25,9 +25,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
-import type { InsertUser, SelectUser } from '@/database/schema.auth';
-import { users } from '@/database/schema.auth';
+import type { InsertUser, SelectUser } from '@/database/schema.auth'
+import { users } from '@/database/schema.auth'
+import { db, Factory } from '@/lib/factories'
 
 /**
  * User factory with trait methods for common user types.
@@ -37,21 +37,21 @@ class UserFactory extends Factory<InsertUser> {
    * Create an admin user
    */
   admin() {
-    return this.params({ admin: true });
+    return this.params({ admin: true })
   }
 
   /**
    * Create a regular (non-admin) user
    */
   regularUser() {
-    return this.params({ admin: false });
+    return this.params({ admin: false })
   }
 
   /**
    * Create a user with onboarding completed
    */
   onboarded() {
-    return this.params({ onboardingCompleted: true });
+    return this.params({ onboardingCompleted: true })
   }
 
   /**
@@ -59,7 +59,7 @@ class UserFactory extends Factory<InsertUser> {
    * Ensures email and name are always set (never null).
    */
   async create(params?: Partial<InsertUser>): Promise<SelectUser> {
-    const built = this.build(params);
+    const built = this.build(params)
     // Construct DB insert object with all required fields
     const insertData = {
       name: built.name || '',
@@ -71,9 +71,9 @@ class UserFactory extends Factory<InsertUser> {
       onboardingData:
         (built.onboardingData as Record<string, unknown> | null) ?? null,
       data: built.data ?? null,
-    };
-    const [created] = await db.insert(users).values(insertData).returning();
-    return created;
+    }
+    const [created] = await db.insert(users).values(insertData).returning()
+    return created
   }
 
   /**
@@ -93,8 +93,8 @@ class UserFactory extends Factory<InsertUser> {
       onboardingData:
         (built.onboardingData as Record<string, unknown> | null) ?? null,
       data: built.data ?? null,
-    }));
-    return await db.insert(users).values(userList).returning();
+    }))
+    return await db.insert(users).values(userList).returning()
   }
 }
 
@@ -108,4 +108,4 @@ export const userFactory = UserFactory.define(() => ({
   onboardingCompleted: false,
   onboardingData: null,
   data: null,
-}));
+}))

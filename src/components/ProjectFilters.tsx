@@ -1,32 +1,32 @@
-'use client';
+'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import { enumToOptions } from '@/lib/enum-utils';
-import { Select } from '@/components/ui/select';
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Select } from '@/components/ui/select'
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects'
+import { enumToOptions } from '@/lib/enum-utils'
 
 interface Team {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface ProjectFiltersProps {
-  userTeams: Team[];
+  userTeams: Team[]
 }
 
 export function ProjectFilters({ userTeams }: ProjectFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams.toString())
     if (value) {
-      params.set(key, value);
+      params.set(key, value)
     } else {
-      params.delete(key);
+      params.delete(key)
     }
-    router.push(`/projects?${params.toString()}`);
-  };
+    router.push(`/projects?${params.toString()}`)
+  }
 
   return (
     <div className="mb-6 flex flex-wrap gap-3">
@@ -84,5 +84,5 @@ export function ProjectFilters({ userTeams }: ProjectFiltersProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

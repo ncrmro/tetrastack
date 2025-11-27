@@ -1,6 +1,6 @@
-import type { NextAuthConfig } from 'next-auth';
-import Google from 'next-auth/providers/google';
-import { Provider } from 'next-auth/providers';
+import type { NextAuthConfig } from 'next-auth'
+import type { Provider } from 'next-auth/providers'
+import Google from 'next-auth/providers/google'
 
 /**
  * Edge-compatible auth configuration for middleware
@@ -14,7 +14,7 @@ export const authConfig = {
   providers: [Google] as Provider[],
   callbacks: {
     authorized({ auth }) {
-      return !!auth?.user;
+      return !!auth?.user
     },
   },
-} satisfies NextAuthConfig;
+} satisfies NextAuthConfig

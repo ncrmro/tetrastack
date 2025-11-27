@@ -14,17 +14,17 @@
  * before the tests in each file.
  */
 
-import '@testing-library/jest-dom/vitest';
-import { beforeAll } from 'vitest';
-import { db } from '@/database';
-import { migrate } from 'drizzle-orm/libsql/migrator';
-import { seed } from './scripts/seed';
+import '@testing-library/jest-dom/vitest'
+import { migrate } from 'drizzle-orm/libsql/migrator'
+import { beforeAll } from 'vitest'
+import { db } from '@/database'
+import { seed } from './scripts/seed'
 
 // Run migrations and seed before each test file
 beforeAll(async () => {
   // Run migrations to create schema (required for :memory: database)
-  await migrate(db, { migrationsFolder: './drizzle' });
+  await migrate(db, { migrationsFolder: './drizzle' })
 
   // Seed test data
-  await seed();
-});
+  await seed()
+})

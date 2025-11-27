@@ -88,7 +88,7 @@ When Claude Code runs with `bin/claude --worktree branch-name`:
 
 - The agent works in `/path/to/repo/worktree/branch-name`
 - Hooks run in the root directory by default
-- Commands like `git diff`, `npx tsc`, `prettier` operate on root repo
+- Commands like `git diff`, `npx tsc`, `biome` operate on root repo
 - Agent sees errors from root repo, which are confusing and incorrect
 
 ### The Solution
@@ -226,7 +226,7 @@ Runs Prettier and ESLint after file modifications. **Only processes the specific
 #!/usr/bin/env python3
 """
 Format and lint code files after Write/Edit operations.
-Runs prettier first, then eslint on relevant files.
+Runs Biome formatter and linter on relevant files.
 
 Only processes the specific file that was modified - not the entire codebase.
 """
@@ -235,9 +235,8 @@ import sys
 import os
 import subprocess
 
-# File patterns that should be formatted
+# File patterns that should be formatted and linted
 FORMAT_PATTERNS = ('.ts', '.tsx', '.js', '.jsx', '.md', '.json')
-LINT_PATTERNS = ('.ts', '.tsx', '.js', '.jsx')
 
 def get_workspace_dir():
     """Get workspace directory, handling worktree context."""
@@ -263,15 +262,14 @@ def main():
 
         # Check if file matches our patterns
         should_format = file_path.endswith(FORMAT_PATTERNS)
-        should_lint = file_path.endswith(LINT_PATTERNS)
 
         if not should_format:
             sys.exit(0)
 
-        # Run prettier on ONLY the modified file
+        # Run Biome on ONLY the modified file
         try:
             result = subprocess.run(
-                ['npx', 'prettier', '--write', file_path],
+                ['npx', '@biomejs/biome', 'check', '--write', file_path],
                 capture_output=True,
                 text=True,
                 timeout=30
@@ -279,27 +277,9 @@ def main():
             if result.returncode == 0:
                 print(f"✓ Formatted {file_path}")
             else:
-                print(f"⚠ Prettier warning for {file_path}: {result.stderr}", file=sys.stderr)
+                print(f"⚠ Biome warning for {file_path}: {result.stderr}", file=sys.stderr)
         except Exception as e:
-            print(f"⚠ Prettier error for {file_path}: {e}", file=sys.stderr)
-
-        # Run eslint on ONLY the modified file
-        if should_lint:
-            try:
-                result = subprocess.run(
-                    ['npx', 'eslint', '--fix', file_path],
-                    capture_output=True,
-                    text=True,
-                    timeout=30
-                )
-                if result.returncode == 0:
-                    print(f"✓ Linted {file_path}")
-                else:
-                    # ESLint warnings shown but not blocking
-                    if result.stdout:
-                        print(f"ESLint output for {file_path}:\n{result.stdout}")
-            except Exception as e:
-                print(f"⚠ ESLint error for {file_path}: {e}", file=sys.stderr)
+            print(f"⚠ Biome error for {file_path}: {e}", file=sys.stderr)
 
         # Exit 0: Success, don't show output to agent
         sys.exit(0)
@@ -437,8 +417,8 @@ CLAUDE_WORKSPACE_DIR=/path/to/worktree/branch \
 
 ## Common Use Cases
 
-- **Code formatting**: Prettier, Black, rustfmt on Write/Edit (only changed files)
-- **Linting**: ESLint, Pylint, Clippy on Write/Edit (only changed files)
+- **Code formatting**: Biome, Black, rustfmt on Write/Edit (only changed files)
+- **Linting**: Biome, Pylint, Clippy on Write/Edit (only changed files)
 - **Type checking**: TypeScript, mypy on Stop (only if relevant files changed)
 - **Testing**: Run relevant tests on Write/Edit (only tests for changed files)
 - **Validation**: Schema validation, API contract checking on Write

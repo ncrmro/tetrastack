@@ -1,10 +1,10 @@
-import { auth } from '@/app/auth';
-import { signInAction, signOutAction } from '@/actions/auth';
-import Navigation from './Navigation';
+import { signInAction, signOutAction } from '@/actions/auth'
+import { auth } from '@/app/auth'
+import Navigation from './Navigation'
 
 export default async function NavigationWrapper() {
-  const session = await auth();
-  const isAdmin = session?.user?.admin ?? false;
+  const session = await auth()
+  const isAdmin = session?.user?.admin ?? false
 
   return (
     <Navigation
@@ -13,5 +13,5 @@ export default async function NavigationWrapper() {
       signIn={signInAction}
       signOut={signOutAction}
     />
-  );
+  )
 }

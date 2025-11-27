@@ -1,12 +1,12 @@
+import { relations, sql } from 'drizzle-orm'
 import {
+  check,
+  index,
   integer,
   sqliteTable,
   text,
-  index,
-  check,
-} from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { generateUuidV7 } from '@/lib/uuid';
+} from 'drizzle-orm/sqlite-core'
+import { generateUuidV7 } from '@/lib/uuid'
 
 /**
  * Job status enum - defines all possible job states
@@ -16,8 +16,8 @@ export const JOB_STATUS = {
   RUNNING: 'running',
   COMPLETED: 'completed',
   FAILED: 'failed',
-} as const;
-export type JobStatus = (typeof JOB_STATUS)[keyof typeof JOB_STATUS];
+} as const
+export type JobStatus = (typeof JOB_STATUS)[keyof typeof JOB_STATUS]
 
 /**
  * Jobs table - tracks individual job executions
@@ -71,7 +71,7 @@ export const jobs = sqliteTable(
       sql`${table.progress} >= 0 AND ${table.progress} <= 100`,
     ),
   ],
-);
+)
 
 /**
  * Cron Jobs table - schedules recurring jobs with cron expressions
@@ -110,15 +110,15 @@ export const cronJobs = sqliteTable(
       sql`length(${table.cronExpression}) > 0`,
     ),
   ],
-);
+)
 
 // Relations (if needed in the future)
-export const jobsRelations = relations(jobs, () => ({}));
-export const cronJobsRelations = relations(cronJobs, () => ({}));
+export const jobsRelations = relations(jobs, () => ({}))
+export const cronJobsRelations = relations(cronJobs, () => ({}))
 
 // Schema generation and types
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
 
 /**
  * Base job schema for insertions (auto-generated from Drizzle table)
@@ -127,12 +127,12 @@ export const insertJobSchema = createInsertSchema(jobs).omit({
   id: true, // Auto-generated UUIDv7
   createdAt: true, // Auto-generated
   updatedAt: true, // Auto-generated
-});
+})
 
 /**
  * Complete job schema including all fields (auto-generated from Drizzle table)
  */
-export const selectJobSchema = createSelectSchema(jobs);
+export const selectJobSchema = createSelectSchema(jobs)
 
 /**
  * Base cron job schema for insertions (auto-generated from Drizzle table)
@@ -141,15 +141,15 @@ export const insertCronJobSchema = createInsertSchema(cronJobs).omit({
   id: true, // Auto-generated UUIDv7
   createdAt: true, // Auto-generated
   updatedAt: true, // Auto-generated
-});
+})
 
 /**
  * Complete cron job schema including all fields (auto-generated from Drizzle table)
  */
-export const selectCronJobSchema = createSelectSchema(cronJobs);
+export const selectCronJobSchema = createSelectSchema(cronJobs)
 
 // Export types for TypeScript usage
-export type InsertJob = z.infer<typeof insertJobSchema>;
-export type SelectJob = z.infer<typeof selectJobSchema>;
-export type InsertCronJob = z.infer<typeof insertCronJobSchema>;
-export type SelectCronJob = z.infer<typeof selectCronJobSchema>;
+export type InsertJob = z.infer<typeof insertJobSchema>
+export type SelectJob = z.infer<typeof selectJobSchema>
+export type InsertCronJob = z.infer<typeof insertCronJobSchema>
+export type SelectCronJob = z.infer<typeof selectCronJobSchema>

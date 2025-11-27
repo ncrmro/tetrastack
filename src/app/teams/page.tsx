@@ -1,26 +1,26 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getProjects } from '@/models/projects';
-import { getTeamMemberships } from '@/models/teams';
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { ButtonLink } from '@/components/ui/button';
-import { TeamCard } from '@/components/TeamCard';
-import { Card, CardContent } from '@/components/ui/card';
+import { TeamCard } from '@/components/TeamCard'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { PROJECT_STATUS } from '@/database/schema.projects'
+import { getProjects } from '@/models/projects'
+import { getTeamMemberships } from '@/models/teams'
+import { User } from '@/models/user'
+import { authRedirect } from '../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 export default async function TeamsPage() {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
 
   // Get user's teams
-  const userTeams = await User.getUserTeams(userId);
+  const userTeams = await User.getUserTeams(userId)
 
   // Get member counts and project counts for each team
   const teamsWithCounts = await Promise.all(
     userTeams.map(async ({ team, role, joinedAt }) => {
-      const memberships = await getTeamMemberships({ teamIds: [team.id] });
-      const projects = await getProjects({ teamIds: [team.id] });
+      const memberships = await getTeamMemberships({ teamIds: [team.id] })
+      const projects = await getProjects({ teamIds: [team.id] })
 
       return {
         ...team,
@@ -31,9 +31,9 @@ export default async function TeamsPage() {
         activeProjectCount: projects.filter(
           (p) => p.status === PROJECT_STATUS.ACTIVE,
         ).length,
-      };
+      }
     }),
-  );
+  )
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,5 +85,5 @@ export default async function TeamsPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

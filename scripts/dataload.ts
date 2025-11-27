@@ -15,19 +15,19 @@
  */
 
 async function dataload() {
-  console.log('='.repeat(60));
-  console.log('DATALOAD: Production data loading script');
-  console.log('='.repeat(60));
-  console.log('Status: No-op (placeholder)');
-  console.log('');
-  console.log('This script is reserved for production-safe data loading.');
-  console.log('Unlike seed.ts, this script will NOT clear existing data.');
-  console.log('');
-  console.log('Implement this script when you need to:');
-  console.log('  - Load initial reference data');
-  console.log('  - Import production datasets');
-  console.log('  - Perform incremental data updates');
-  console.log('='.repeat(60));
+  console.log('='.repeat(60))
+  console.log('DATALOAD: Production data loading script')
+  console.log('='.repeat(60))
+  console.log('Status: No-op (placeholder)')
+  console.log('')
+  console.log('This script is reserved for production-safe data loading.')
+  console.log('Unlike seed.ts, this script will NOT clear existing data.')
+  console.log('')
+  console.log('Implement this script when you need to:')
+  console.log('  - Load initial reference data')
+  console.log('  - Import production datasets')
+  console.log('  - Perform incremental data updates')
+  console.log('='.repeat(60))
 }
 
 // Only run if this file is executed directly
@@ -37,13 +37,13 @@ if (
 ) {
   dataload()
     .then(() => {
-      console.log('Dataload completed (no-op)');
-      process.exit(0);
+      console.log('Dataload completed (no-op)')
+      process.exit(0)
     })
     .catch((error) => {
-      console.error('Dataload failed:', error);
-      process.exit(1);
-    });
+      console.error('Dataload failed:', error)
+      process.exit(1)
+    })
 }
 
-export { dataload };
+export { dataload }

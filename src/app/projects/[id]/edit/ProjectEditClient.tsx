@@ -1,53 +1,53 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { updateProject, type SelectProject } from '@/actions/projects';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import { enumToOptions } from '@/lib/enum-utils';
-import { Button, ButtonLink } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { type SelectProject, updateProject } from '@/actions/projects'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects'
+import { enumToOptions } from '@/lib/enum-utils'
 
 interface ProjectEditClientProps {
-  project: SelectProject;
+  project: SelectProject
 }
 
 export default function ProjectEditClient({ project }: ProjectEditClientProps) {
-  const router = useRouter();
-  const [title, setTitle] = useState(project.title);
-  const [description, setDescription] = useState(project.description || '');
-  const [status, setStatus] = useState(project.status);
-  const [priority, setPriority] = useState(project.priority);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter()
+  const [title, setTitle] = useState(project.title)
+  const [description, setDescription] = useState(project.description || '')
+  const [status, setStatus] = useState(project.status)
+  const [priority, setPriority] = useState(project.priority)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    setSuccessMessage(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
 
     const result = await updateProject(project.id, {
       title,
       description: description || null,
       status,
       priority,
-    });
+    })
 
     if (result.success) {
-      setSuccessMessage('Project updated successfully');
+      setSuccessMessage('Project updated successfully')
       setTimeout(() => {
-        router.push(`/projects/${result.data.slug}`);
-      }, 500);
+        router.push(`/projects/${result.data.slug}`)
+      }, 500)
     } else {
-      setError(result.error);
-      setIsSubmitting(false);
+      setError(result.error)
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -186,5 +186,5 @@ export default function ProjectEditClient({ project }: ProjectEditClientProps) {
         </form>
       </div>
     </div>
-  );
+  )
 }

@@ -38,25 +38,25 @@
  * ```
  */
 
-import { db, createDatabaseClient, getResultArray } from '@/database';
-import { jobs, JOB_STATUS } from '@/lib/jobs/schema.jobs';
-import { eq, sql } from 'drizzle-orm';
-import { z } from 'zod';
+import { eq, sql } from 'drizzle-orm'
+import { z } from 'zod'
+import { createDatabaseClient, db, getResultArray } from '@/database'
+import { JOB_STATUS, jobs } from '@/lib/jobs/schema.jobs'
 
-export type JobStatus = 'pending' | 'running' | 'completed' | 'failed';
+export type JobStatus = 'pending' | 'running' | 'completed' | 'failed'
 
 export interface JobMetadata {
-  jobName: string;
-  enqueuedAt: Date;
-  startedAt?: Date;
-  completedAt?: Date;
-  status: JobStatus;
-  error?: string;
+  jobName: string
+  enqueuedAt: Date
+  startedAt?: Date
+  completedAt?: Date
+  status: JobStatus
+  error?: string
 }
 
 export interface JobResult<T> {
-  data: T;
-  metadata: JobMetadata;
+  data: T
+  metadata: JobMetadata
 }
 
 /**
@@ -66,28 +66,28 @@ export interface JobResult<T> {
  * TResult: Type of result the job produces (inferred from resultSchema)
  */
 export abstract class Job<TParams = unknown, TResult = unknown> {
-  protected abstract perform(params: TParams): Promise<TResult>;
+  protected abstract perform(params: TParams): Promise<TResult>
 
   // Required Zod schemas for runtime validation
-  protected static readonly paramsSchema: z.ZodType<unknown>;
-  protected static readonly resultSchema: z.ZodType<unknown>;
+  protected static readonly paramsSchema: z.ZodType<unknown>
+  protected static readonly resultSchema: z.ZodType<unknown>
 
   // Current job ID when executing from database
-  private _currentJobId?: string;
+  private _currentJobId?: string
 
   /**
    * Validate and parse job parameters using the schema
    */
   private static validateParams<T>(params: unknown, jobName: string): T {
     try {
-      return this.paramsSchema.parse(params) as T;
+      return Job.paramsSchema.parse(params) as T
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new Error(
           `Invalid params for ${jobName}: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
-        );
+        )
       }
-      throw error;
+      throw error
     }
   }
 
@@ -96,14 +96,14 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
    */
   private static validateResult<T>(result: unknown, jobName: string): T {
     try {
-      return this.resultSchema.parse(result) as T;
+      return Job.resultSchema.parse(result) as T
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new Error(
           `Invalid result for ${jobName}: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
-        );
+        )
       }
-      throw error;
+      throw error
     }
   }
 
@@ -119,11 +119,11 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
   ): Promise<void> {
     if (!this._currentJobId) {
       // Job not persisted, skip update
-      return;
+      return
     }
 
     // Use fresh database client to avoid connection timeout issues
-    const progressDb = createDatabaseClient();
+    const progressDb = createDatabaseClient()
     await progressDb
       .update(jobs)
       .set({
@@ -131,7 +131,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         progressMessage: message,
         updatedAt: new Date(),
       })
-      .where(eq(jobs.id, this._currentJobId));
+      .where(eq(jobs.id, this._currentJobId))
   }
 
   /**
@@ -147,13 +147,13 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     params: TParams,
     options: { persist?: boolean } = {},
   ): Promise<JobResult<TResult>> {
-    const { persist = true } = options;
-    const instance = new (this as unknown as new () => Job<TParams, TResult>)();
-    const jobName = this.name;
-    const now = new Date();
+    const { persist = true } = options
+    const instance = new (Job as unknown as new () => Job<TParams, TResult>)()
+    const jobName = Job.name
+    const now = new Date()
 
     // Validate params
-    const validatedParams = this.validateParams<TParams>(params, jobName);
+    const validatedParams = Job.validateParams<TParams>(params, jobName)
 
     // If persist is false, execute directly without database
     if (!persist) {
@@ -162,26 +162,26 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         enqueuedAt: now,
         startedAt: now,
         status: 'running',
-      };
+      }
 
       try {
-        const data = await instance.perform(validatedParams);
-        const validatedResult = this.validateResult<TResult>(data, jobName);
+        const data = await instance.perform(validatedParams)
+        const validatedResult = Job.validateResult<TResult>(data, jobName)
 
-        metadata.completedAt = new Date();
-        metadata.status = 'completed';
+        metadata.completedAt = new Date()
+        metadata.status = 'completed'
 
-        return { data: validatedResult, metadata } as JobResult<TResult>;
+        return { data: validatedResult, metadata } as JobResult<TResult>
       } catch (error) {
-        metadata.completedAt = new Date();
-        metadata.status = 'failed';
-        metadata.error = error instanceof Error ? error.message : String(error);
-        throw error;
+        metadata.completedAt = new Date()
+        metadata.status = 'failed'
+        metadata.error = error instanceof Error ? error.message : String(error)
+        throw error
       }
     }
 
     // Create fresh database client to avoid connection timeout issues
-    const freshDb = createDatabaseClient();
+    const freshDb = createDatabaseClient()
 
     // Create job record in database
     const result = await freshDb
@@ -194,29 +194,29 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         attemptCount: 1,
         workerStartedAt: now,
       })
-      .returning();
-    const [jobRecord] = getResultArray(result);
+      .returning()
+    const [jobRecord] = getResultArray(result)
 
-    instance._currentJobId = jobRecord.id;
+    instance._currentJobId = jobRecord.id
 
     const metadata: JobMetadata = {
       jobName,
       enqueuedAt: jobRecord.createdAt,
       startedAt: now,
       status: 'running',
-    };
+    }
 
     try {
-      const data = await instance.perform(validatedParams);
+      const data = await instance.perform(validatedParams)
 
       // Validate result before storing
-      const validatedResult = this.validateResult<TResult>(data, jobName);
+      const validatedResult = Job.validateResult<TResult>(data, jobName)
 
-      metadata.completedAt = new Date();
-      metadata.status = 'completed';
+      metadata.completedAt = new Date()
+      metadata.status = 'completed'
 
       // Update job record with success (use fresh client)
-      const updateDb = createDatabaseClient();
+      const updateDb = createDatabaseClient()
       await updateDb
         .update(jobs)
         .set({
@@ -226,16 +226,16 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
           completedAt: metadata.completedAt,
           updatedAt: metadata.completedAt,
         })
-        .where(eq(jobs.id, jobRecord.id));
+        .where(eq(jobs.id, jobRecord.id))
 
-      return { data: validatedResult, metadata } as JobResult<TResult>;
+      return { data: validatedResult, metadata } as JobResult<TResult>
     } catch (error) {
-      metadata.completedAt = new Date();
-      metadata.status = 'failed';
-      metadata.error = error instanceof Error ? error.message : String(error);
+      metadata.completedAt = new Date()
+      metadata.status = 'failed'
+      metadata.error = error instanceof Error ? error.message : String(error)
 
       // Update job record with failure (use fresh client)
-      const errorDb = createDatabaseClient();
+      const errorDb = createDatabaseClient()
       await errorDb
         .update(jobs)
         .set({
@@ -244,9 +244,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
           completedAt: metadata.completedAt,
           updatedAt: metadata.completedAt,
         })
-        .where(eq(jobs.id, jobRecord.id));
+        .where(eq(jobs.id, jobRecord.id))
 
-      throw error;
+      throw error
     }
   }
 
@@ -263,10 +263,10 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     this: typeof Job<TParams, TResult>,
     params: TParams,
   ): Promise<string> {
-    const jobName = this.name;
+    const jobName = Job.name
 
     // Validate params before storing
-    const validatedParams = this.validateParams<TParams>(params, jobName);
+    const validatedParams = Job.validateParams<TParams>(params, jobName)
 
     // Persist job to database
     const [job] = await db
@@ -278,9 +278,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         progress: 0,
         attemptCount: 0,
       })
-      .returning();
+      .returning()
 
-    return job.id;
+    return job.id
   }
 
   /**
@@ -298,13 +298,13 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     jobId: string,
     workerTimeoutMs: number = 5 * 60 * 1000, // 5 minutes default
   ): Promise<JobResult<TResult>> {
-    const instance = new (this as unknown as new () => Job<TParams, TResult>)();
-    instance._currentJobId = jobId;
-    const jobName = this.name;
+    const instance = new (Job as unknown as new () => Job<TParams, TResult>)()
+    instance._currentJobId = jobId
+    const jobName = Job.name
 
     // Claim the job with worker lock
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + workerTimeoutMs);
+    const now = new Date()
+    const expiresAt = new Date(now.getTime() + workerTimeoutMs)
 
     await db
       .update(jobs)
@@ -315,36 +315,36 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
         attemptCount: sql`${jobs.attemptCount} + 1`,
         updatedAt: now,
       })
-      .where(eq(jobs.id, jobId));
+      .where(eq(jobs.id, jobId))
 
     // Fetch job details
-    const [jobRecord] = await db.select().from(jobs).where(eq(jobs.id, jobId));
+    const [jobRecord] = await db.select().from(jobs).where(eq(jobs.id, jobId))
 
     if (!jobRecord) {
-      throw new Error(`Job ${jobId} not found`);
+      throw new Error(`Job ${jobId} not found`)
     }
 
     // Validate params when retrieving from database
-    const validatedParams = this.validateParams<TParams>(
+    const validatedParams = Job.validateParams<TParams>(
       jobRecord.params,
       jobName,
-    );
+    )
 
     const metadata: JobMetadata = {
       jobName,
       enqueuedAt: jobRecord.createdAt,
       startedAt: now,
       status: 'running',
-    };
+    }
 
     try {
-      const data = await instance.perform(validatedParams);
+      const data = await instance.perform(validatedParams)
 
       // Validate result before storing
-      const validatedResult = this.validateResult<TResult>(data, jobName);
+      const validatedResult = Job.validateResult<TResult>(data, jobName)
 
-      metadata.completedAt = new Date();
-      metadata.status = 'completed';
+      metadata.completedAt = new Date()
+      metadata.status = 'completed'
 
       // Update job record with success
       await db
@@ -356,13 +356,13 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
           completedAt: metadata.completedAt,
           updatedAt: metadata.completedAt,
         })
-        .where(eq(jobs.id, jobId));
+        .where(eq(jobs.id, jobId))
 
-      return { data: validatedResult, metadata } as JobResult<TResult>;
+      return { data: validatedResult, metadata } as JobResult<TResult>
     } catch (error) {
-      metadata.completedAt = new Date();
-      metadata.status = 'failed';
-      metadata.error = error instanceof Error ? error.message : String(error);
+      metadata.completedAt = new Date()
+      metadata.status = 'failed'
+      metadata.error = error instanceof Error ? error.message : String(error)
 
       // Update job record with failure
       await db
@@ -373,9 +373,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
           completedAt: metadata.completedAt,
           updatedAt: metadata.completedAt,
         })
-        .where(eq(jobs.id, jobId));
+        .where(eq(jobs.id, jobId))
 
-      throw error;
+      throw error
     }
   }
 
@@ -393,63 +393,63 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     this: typeof Job<TParams, TResult>,
     paramsList: TParams[],
     options: {
-      concurrency?: number;
-      stopOnError?: boolean;
-      persist?: boolean;
+      concurrency?: number
+      stopOnError?: boolean
+      persist?: boolean
     } = {},
   ): Promise<JobResult<TResult>[]> {
-    const { concurrency = 3, stopOnError = false, persist = true } = options;
+    const { concurrency = 3, stopOnError = false, persist = true } = options
 
     // Validate concurrency is a positive integer
     if (!Number.isInteger(concurrency) || concurrency <= 0) {
-      throw new Error('Concurrency must be a positive integer');
+      throw new Error('Concurrency must be a positive integer')
     }
 
     // Simple batch execution with concurrency control
-    const results: JobResult<TResult>[] = [];
-    const errors: Error[] = [];
+    const results: JobResult<TResult>[] = []
+    const errors: Error[] = []
 
     // Get reference to the constructor with proper typing
-    const JobClass = this as unknown as {
+    const JobClass = Job as unknown as {
       now: (
         params: TParams,
         options?: { persist?: boolean },
-      ) => Promise<JobResult<TResult>>;
-    };
+      ) => Promise<JobResult<TResult>>
+    }
 
     for (let i = 0; i < paramsList.length; i += concurrency) {
-      const batch = paramsList.slice(i, i + concurrency);
+      const batch = paramsList.slice(i, i + concurrency)
 
       const batchPromises = batch.map((params) =>
         JobClass.now(params, { persist }).catch((error: Error) => {
-          if (stopOnError) throw error;
-          errors.push(error);
-          return null;
+          if (stopOnError) throw error
+          errors.push(error)
+          return null
         }),
-      );
+      )
 
-      const batchResults = await Promise.all(batchPromises);
+      const batchResults = await Promise.all(batchPromises)
       results.push(
         ...batchResults.filter((r): r is JobResult<TResult> => r !== null),
-      );
+      )
 
       if (stopOnError && errors.length > 0) {
-        throw errors[0];
+        throw errors[0]
       }
     }
 
     if (errors.length > 0 && !stopOnError) {
-      console.warn(`${errors.length} jobs failed in batch execution`);
+      console.warn(`${errors.length} jobs failed in batch execution`)
     }
 
-    return results;
+    return results
   }
 
   /**
    * Get job name (useful for logging and monitoring)
    */
   static getJobName(): string {
-    return this.name;
+    return Job.name
   }
 }
 
@@ -487,12 +487,12 @@ export function createJob<TParams, TResult>(
   handler: (params: TParams) => Promise<TResult>,
 ): typeof Job<TParams, TResult> {
   return class extends Job<TParams, TResult> {
-    static readonly jobName = name;
-    protected static readonly paramsSchema = paramsSchema;
-    protected static readonly resultSchema = resultSchema;
+    static readonly jobName = name
+    protected static readonly paramsSchema = paramsSchema
+    protected static readonly resultSchema = resultSchema
 
     protected async perform(params: TParams): Promise<TResult> {
-      return handler(params);
+      return handler(params)
     }
-  };
+  }
 }

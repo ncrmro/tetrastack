@@ -1,8 +1,8 @@
-import { openai } from '@ai-sdk/openai';
-import type { LanguageModel } from 'ai';
-import { ProgressCallback, ChatMessage, AgentState } from './types';
-import { AgentBuilder } from './builder';
-import type { createEventBuilders } from './event-factory';
+import { openai } from '@ai-sdk/openai'
+import type { LanguageModel } from 'ai'
+import { AgentBuilder } from './builder'
+import type { createEventBuilders } from './event-factory'
+import type { AgentState, ChatMessage, ProgressCallback } from './types'
 
 /**
  * Standard discriminated union workflow for agents that search existing items
@@ -23,7 +23,7 @@ export function standardWorkflow(entityName: string, toolName: string): string {
    - Return { "result": { "type": "new", "${entityName}": {...} }, "explanation": "..." }
    - Generate complete ${entityName} data with all details
    - The schema describes all required and optional fields with their specific requirements
-4. You MUST ALWAYS return a terse conversational explanation in its own key outside of the result`;
+4. You MUST ALWAYS return a terse conversational explanation in its own key outside of the result`
 }
 
 /**
@@ -107,9 +107,9 @@ export abstract class BaseAgent<
   TResult = unknown,
   TPersisted = unknown,
 > {
-  static readonly SYSTEM_PROMPT: string;
-  static readonly PROMPT?: string;
-  static readonly DEFAULT_MODEL = openai('gpt-5');
+  static readonly SYSTEM_PROMPT: string
+  static readonly PROMPT?: string
+  static readonly DEFAULT_MODEL = openai('gpt-5')
 
   /**
    * Create a fluent builder for this agent class
@@ -128,40 +128,43 @@ export abstract class BaseAgent<
     TResult = unknown,
     TPersisted = unknown,
   >(
-    this: new (progressCallback?: ProgressCallback, model?: LanguageModel) => T,
+    this: new (
+      progressCallback?: ProgressCallback,
+      model?: LanguageModel,
+    ) => T,
   ): AgentBuilder<T, TResult, TPersisted> {
-    return new AgentBuilder<T, TResult, TPersisted>(this);
+    return new AgentBuilder<T, TResult, TPersisted>(BaseAgent)
   }
 
-  protected readonly agentName: string;
-  protected readonly model: LanguageModel;
-  protected result?: TResult;
-  protected messages: ChatMessage[] = [];
-  protected context?: unknown;
-  protected completedStages: string[] = [];
+  protected readonly agentName: string
+  protected readonly model: LanguageModel
+  protected result?: TResult
+  protected messages: ChatMessage[] = []
+  protected context?: unknown
+  protected completedStages: string[] = []
 
   /**
    * Auto-emitting event builder proxy
    * Subclasses will override this with their specific event builder
    */
-  protected emit!: ReturnType<typeof createEventBuilders>;
+  protected emit!: ReturnType<typeof createEventBuilders>
 
   constructor(
     protected progressCallback?: ProgressCallback,
     model?: LanguageModel,
   ) {
-    this.agentName = this.constructor.name;
+    this.agentName = this.constructor.name
     // Use subclass DEFAULT_MODEL if defined, otherwise use BaseAgent.DEFAULT_MODEL
-    const agentClass = this.constructor as typeof BaseAgent;
-    this.model = model ?? agentClass.DEFAULT_MODEL ?? BaseAgent.DEFAULT_MODEL;
+    const agentClass = this.constructor as typeof BaseAgent
+    this.model = model ?? agentClass.DEFAULT_MODEL ?? BaseAgent.DEFAULT_MODEL
 
     // Auto-initialize emit proxy from subclass's static eventBuilder
     const agentClassWithBuilder = agentClass as typeof BaseAgent & {
-      eventBuilder?: ReturnType<typeof createEventBuilders>;
-    };
+      eventBuilder?: ReturnType<typeof createEventBuilders>
+    }
 
     if (agentClassWithBuilder.eventBuilder) {
-      this.emit = this.createEmitter(agentClassWithBuilder.eventBuilder);
+      this.emit = this.createEmitter(agentClassWithBuilder.eventBuilder)
     }
   }
 
@@ -180,27 +183,27 @@ export abstract class BaseAgent<
   ): T {
     return new Proxy(eventBuilder, {
       get: (target, prop) => {
-        const builder = target[prop as keyof T];
+        const builder = target[prop as keyof T]
         if (typeof builder === 'function') {
           return (...args: unknown[]) => {
-            const event = (builder as (...args: unknown[]) => unknown)(...args);
-            this.emitEvent(event as { type: string; data: unknown });
-          };
+            const event = (builder as (...args: unknown[]) => unknown)(...args)
+            this.emitEvent(event as { type: string; data: unknown })
+          }
         }
-        return builder;
+        return builder
       },
-    }) as T;
+    }) as T
   }
 
   /**
    * Get the prompt with placeholders replaced by values
    */
   protected getPrompt(placeholderValues: TPlaceholders): string {
-    let prompt = (this.constructor as typeof BaseAgent).PROMPT || '';
+    let prompt = (this.constructor as typeof BaseAgent).PROMPT || ''
     for (const [key, value] of Object.entries(placeholderValues)) {
-      prompt = prompt.replace(`{${key}}`, value);
+      prompt = prompt.replace(`{${key}}`, value)
     }
-    return prompt;
+    return prompt
   }
 
   /**
@@ -213,13 +216,13 @@ export abstract class BaseAgent<
   protected emitEvent<
     TEvent extends { type: string; data: unknown; timestamp?: string },
   >(event: TEvent): void {
-    if (!this.progressCallback) return;
+    if (!this.progressCallback) return
 
     // Add timestamp if not present
     const eventWithTimestamp = {
       ...event,
       timestamp: event.timestamp ?? new Date().toISOString(),
-    };
+    }
 
     // Call progress callback
     // For backward compatibility during migration, we still use the old signature
@@ -229,18 +232,18 @@ export abstract class BaseAgent<
       eventWithTimestamp.type,
       this.completedStages,
       eventWithTimestamp,
-    );
+    )
   }
 
   /**
    * Extract the latest user message from a conversation
    */
   protected getLatestUserMessage(messages: ChatMessage[]): string {
-    const latestUserMessage = messages.filter((m) => m.role === 'user').pop();
+    const latestUserMessage = messages.filter((m) => m.role === 'user').pop()
     if (!latestUserMessage) {
-      throw new Error('No user message found');
+      throw new Error('No user message found')
     }
-    return latestUserMessage.content;
+    return latestUserMessage.content
   }
 
   /**
@@ -251,9 +254,9 @@ export abstract class BaseAgent<
     if (!this.result) {
       throw new Error(
         'No result available - execute() must be called first before accessing result',
-      );
+      )
     }
-    return this.result;
+    return this.result
   }
 
   /**
@@ -283,11 +286,11 @@ export abstract class BaseAgent<
     context?: unknown,
   ): Promise<TResult> {
     // Append new messages to existing conversation history
-    this.messages = [...this.messages, ...newMessages];
+    this.messages = [...this.messages, ...newMessages]
 
     // Re-execute with full conversation history
     // Subclass execute() will see all messages including follow-ups
-    return this.execute(this.messages, context);
+    return this.execute(this.messages, context)
   }
 
   /**
@@ -308,7 +311,7 @@ export abstract class BaseAgent<
           : BaseAgent.DEFAULT_MODEL.modelId,
       completedStages: this.completedStages,
       timestamp: new Date().toISOString(),
-    };
+    }
   }
 
   /**
@@ -316,31 +319,31 @@ export abstract class BaseAgent<
    * Note: Subclasses must implement this to properly recreate the agent instance
    */
   static fromJSON<T extends BaseAgent>(
-    this: new (progressCallback?: ProgressCallback, model?: LanguageModel) => T,
+    this: new (
+      progressCallback?: ProgressCallback,
+      model?: LanguageModel,
+    ) => T,
     state: AgentState,
   ): T {
     // Create agent instance with model from state
-    const modelId = state.modelId;
-    const model = openai(modelId);
-    const agent = new this(undefined, model);
+    const modelId = state.modelId
+    const model = openai(modelId)
+    const agent = new BaseAgent(undefined, model)
 
     // Restore state
-    agent.result = state.result;
-    agent.messages = state.messages;
-    agent.context = state.context;
-    agent.completedStages = state.completedStages || [];
+    agent.result = state.result
+    agent.messages = state.messages
+    agent.context = state.context
+    agent.completedStages = state.completedStages || []
 
-    return agent;
+    return agent
   }
 
   /**
    * Execute the agent - generate AI output
    * Subclasses should store the result using this.result before returning
    */
-  abstract execute(
-    messages: ChatMessage[],
-    context?: unknown,
-  ): Promise<TResult>;
+  abstract execute(messages: ChatMessage[], context?: unknown): Promise<TResult>
 
   /**
    * @deprecated Persistence should be handled by actions/scripts, not agents
@@ -367,6 +370,6 @@ export abstract class BaseAgent<
       `persist() is deprecated. Agents focus on generation only. ` +
         `Handle persistence in actions/scripts using model layer. ` +
         `See src/agents/README.md for the new pattern.`,
-    );
+    )
   }
 }

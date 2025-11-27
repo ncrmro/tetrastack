@@ -1,35 +1,35 @@
-import * as React from 'react';
-import { cn } from './utils';
-import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline'
+import type * as React from 'react'
+import { cn } from './utils'
 
 export interface BreadcrumbItem {
   /**
    * Display label for the breadcrumb
    */
-  label: string;
+  label: string
 
   /**
    * URL path for the breadcrumb link
    * If not provided, the breadcrumb will be rendered as plain text (current page)
    */
-  href?: string;
+  href?: string
 
   /**
    * Whether this is the home/root breadcrumb
    */
-  isHome?: boolean;
+  isHome?: boolean
 }
 
 export interface BreadcrumbsProps extends React.ComponentProps<'nav'> {
   /**
    * Array of breadcrumb items to display
    */
-  items: BreadcrumbItem[];
+  items: BreadcrumbItem[]
 
   /**
    * Whether to show the home icon for the first item
    */
-  showHomeIcon?: boolean;
+  showHomeIcon?: boolean
 
   /**
    * Custom Link component for navigation (e.g., Next.js Link, React Router Link)
@@ -48,10 +48,10 @@ export interface BreadcrumbsProps extends React.ComponentProps<'nav'> {
    * ```
    */
   LinkComponent?: React.ElementType<{
-    href: string;
-    className?: string;
-    children: React.ReactNode;
-  }>;
+    href: string
+    className?: string
+    children: React.ReactNode
+  }>
 }
 
 /**
@@ -94,7 +94,7 @@ export function Breadcrumbs({
   ...props
 }: BreadcrumbsProps) {
   if (!items || items.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -105,9 +105,9 @@ export function Breadcrumbs({
     >
       <ol className="flex items-center space-x-2">
         {items.map((item, index) => {
-          const isLast = index === items.length - 1;
-          const isFirst = index === 0;
-          const showIcon = isFirst && item.isHome && showHomeIcon;
+          const isLast = index === items.length - 1
+          const isFirst = index === 0
+          const showIcon = isFirst && item.isHome && showHomeIcon
 
           return (
             <li key={index} className="flex items-center space-x-2">
@@ -150,9 +150,9 @@ export function Breadcrumbs({
                 </span>
               )}
             </li>
-          );
+          )
         })}
       </ol>
     </nav>
-  );
+  )
 }

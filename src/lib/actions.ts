@@ -1,5 +1,5 @@
-import type { ZodSchema } from 'zod';
-import { auth } from '@/app/auth';
+import type { ZodSchema } from 'zod'
+import { auth } from '@/app/auth'
 
 /**
  * Action result type for server actions
@@ -23,7 +23,7 @@ import { auth } from '@/app/auth';
  */
 export type ActionResult<T> = Promise<
   { success: true; data: T } | { success: false; error: string }
->;
+>
 
 /**
  * Validates input data against a Zod schema with standardized error formatting
@@ -43,14 +43,14 @@ export function validateActionInput<T>(
   data: unknown,
   entityName: string,
 ): { success: true; data: T } | { success: false; error: string } {
-  const result = schema.safeParse(data);
+  const result = schema.safeParse(data)
   if (!result.success) {
     return {
       success: false,
       error: `Invalid ${entityName} data: ${result.error.issues.map((e) => e.message).join(', ')}`,
-    };
+    }
   }
-  return { success: true, data: result.data };
+  return { success: true, data: result.data }
 }
 
 /**
@@ -71,27 +71,27 @@ export function validateBulkInput<T>(
   data: unknown[],
   entityName: string,
 ): { success: true; data: T[] } | { success: false; error: string } {
-  const errors: string[] = [];
-  const validated: T[] = [];
+  const errors: string[] = []
+  const validated: T[] = []
 
   data.forEach((item, i) => {
-    const result = schema.safeParse(item);
+    const result = schema.safeParse(item)
     if (!result.success) {
       errors.push(
         `${entityName} ${i + 1}: ${result.error.issues.map((e) => e.message).join(', ')}`,
-      );
+      )
     } else {
-      validated.push(result.data);
+      validated.push(result.data)
     }
-  });
+  })
 
   if (errors.length > 0) {
     return {
       success: false,
       error: `Invalid ${entityName} data: ${errors.join('; ')}`,
-    };
+    }
   }
-  return { success: true, data: validated };
+  return { success: true, data: validated }
 }
 
 /**
@@ -118,16 +118,16 @@ export async function withAuth<T>(
   handler: (userId: number) => Promise<T>,
 ): ActionResult<T> {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session?.user?.id) {
-      return { success: false, error: 'Unauthorized' };
+      return { success: false, error: 'Unauthorized' }
     }
-    const result = await handler(parseInt(session.user.id));
-    return { success: true, data: result };
+    const result = await handler(parseInt(session.user.id, 10))
+    return { success: true, data: result }
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : 'An error occurred';
-    return { success: false, error: errorMessage };
+      error instanceof Error ? error.message : 'An error occurred'
+    return { success: false, error: errorMessage }
   }
 }
 
@@ -162,10 +162,10 @@ export async function withAuthAndValidation<TInput, TOutput>(
   handler: (userId: number, validatedData: TInput) => Promise<TOutput>,
 ): ActionResult<TOutput> {
   return withAuth(async (userId) => {
-    const validation = validateActionInput(schema, data, entityName);
+    const validation = validateActionInput(schema, data, entityName)
     if (!validation.success) {
-      throw new Error(validation.error);
+      throw new Error(validation.error)
     }
-    return await handler(userId, validation.data);
-  });
+    return await handler(userId, validation.data)
+  })
 }
