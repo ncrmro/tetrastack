@@ -1,10 +1,10 @@
-'use server';
+'use server'
 
-import { auth } from '@/app/auth';
-import type { ActionResult } from '@/lib/actions';
-import { db } from '@/database';
-import { users } from '@/database/schema.auth';
-import { eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm'
+import { auth } from '@/app/auth'
+import { db } from '@/database'
+import { users } from '@/database/schema.auth'
+import type { ActionResult } from '@/lib/actions'
 
 /**
  * Complete user onboarding
@@ -13,9 +13,9 @@ import { eq } from 'drizzle-orm';
  */
 export async function completeOnboarding(): ActionResult<void> {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session?.user?.id) {
-      return { success: false, error: 'Unauthorized' };
+      return { success: false, error: 'Unauthorized' }
     }
 
     // Update user's onboarding completion status
@@ -24,14 +24,14 @@ export async function completeOnboarding(): ActionResult<void> {
       .set({
         onboardingCompleted: true,
       })
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, parseInt(session.user.id, 10)))
 
-    return { success: true, data: undefined };
+    return { success: true, data: undefined }
   } catch (err) {
-    console.error('Failed to complete onboarding:', err);
+    console.error('Failed to complete onboarding:', err)
     return {
       success: false,
       error: 'Failed to complete onboarding',
-    };
+    }
   }
 }

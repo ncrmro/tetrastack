@@ -1,7 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
-import { config } from 'dotenv';
+import { defineConfig, devices } from '@playwright/test'
+import { config } from 'dotenv'
 
-config({ path: '.env', quiet: true });
+config({ path: '.env', quiet: true })
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -53,4 +53,4 @@ export default defineConfig({
       `http://localhost:${process.env.WEB_PORT || 3000}`,
     reuseExistingServer: !process.env.CI,
   },
-});
+})

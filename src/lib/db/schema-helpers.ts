@@ -1,5 +1,5 @@
-import { createInsertSchema } from 'drizzle-zod';
-import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
+import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
+import { createInsertSchema } from 'drizzle-zod'
 
 /**
  * Creates an insert schema with automatic omission of common auto-generated fields
@@ -33,5 +33,5 @@ export function createAutoInsertSchema<TTable extends SQLiteTable>(
     id: true,
     createdAt: true,
     updatedAt: true,
-  });
+  })
 }

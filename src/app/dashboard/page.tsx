@@ -1,54 +1,54 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getProjects } from '@/models/projects';
-import { getTasks } from '@/models/tasks';
-import { ProjectCard } from '@/components/ProjectCard';
-import { TaskCard } from '@/components/TaskCard';
-import { TeamCard } from '@/components/TeamCard';
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { TASK_STATUS } from '@/database/schema.tasks';
-import Link from 'next/link';
-import { ButtonLink } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link'
+import { ProjectCard } from '@/components/ProjectCard'
+import { TaskCard } from '@/components/TaskCard'
+import { TeamCard } from '@/components/TeamCard'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { PROJECT_STATUS } from '@/database/schema.projects'
+import { TASK_STATUS } from '@/database/schema.tasks'
+import { getProjects } from '@/models/projects'
+import { getTasks } from '@/models/tasks'
+import { User } from '@/models/user'
+import { authRedirect } from '../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
 
   // Get user's teams
-  const userTeams = await User.getUserTeams(userId);
-  const teamIds = userTeams.map((t) => t.team.id);
+  const userTeams = await User.getUserTeams(userId)
+  const teamIds = userTeams.map((t) => t.team.id)
 
   // Get projects across all user teams (limit to recent 6)
-  const allProjects = teamIds.length > 0 ? await getProjects({ teamIds }) : [];
+  const allProjects = teamIds.length > 0 ? await getProjects({ teamIds }) : []
   const recentProjects = allProjects
     .sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )
-    .slice(0, 6);
+    .slice(0, 6)
 
   // Get tasks assigned to user (limit to recent 8)
-  const allTasks = await getTasks({ assigneeIds: [userId] });
+  const allTasks = await getTasks({ assigneeIds: [userId] })
   const recentTasks = allTasks
     .sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )
-    .slice(0, 8);
+    .slice(0, 8)
 
   // Calculate stats
   const activeProjects = allProjects.filter(
     (p) => p.status === PROJECT_STATUS.ACTIVE,
-  ).length;
+  ).length
   const pendingTasks = allTasks.filter(
     (t) => t.status === TASK_STATUS.TODO,
-  ).length;
+  ).length
   const inProgressTasks = allTasks.filter(
     (t) => t.status === TASK_STATUS.IN_PROGRESS,
-  ).length;
+  ).length
 
   return (
     <div className="min-h-screen bg-background">
@@ -217,5 +217,5 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,47 +1,47 @@
-import { authRedirect } from '../../auth';
-import { getTasks, getTaskWithComments } from '@/models/tasks';
-import { getProjects } from '@/models/projects';
-import { StatusBadge } from '@/components/StatusBadge';
-import { PriorityIndicator } from '@/components/PriorityIndicator';
-import { CommentThread } from '@/components/CommentThread';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { CommentThread } from '@/components/CommentThread'
+import { PriorityIndicator } from '@/components/PriorityIndicator'
+import { StatusBadge } from '@/components/StatusBadge'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   TASK_STATUS,
-  type TaskStatus,
   type TaskPriority,
-} from '@/database/schema.tasks';
-import { Card, CardContent } from '@/components/ui/card';
+  type TaskStatus,
+} from '@/database/schema.tasks'
+import { getProjects } from '@/models/projects'
+import { getTasks, getTaskWithComments } from '@/models/tasks'
+import { authRedirect } from '../../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface TaskPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function TaskPage({ params }: TaskPageProps) {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
-  const { id } = await params;
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
+  const { id } = await params
 
   // Get task details
-  const tasks = await getTasks({ ids: [id] });
+  const tasks = await getTasks({ ids: [id] })
   if (tasks.length === 0) {
-    notFound();
+    notFound()
   }
-  const task = tasks[0];
+  const task = tasks[0]
 
   // Get task with comments
-  const taskWithComments = await getTaskWithComments(task.id);
+  const taskWithComments = await getTaskWithComments(task.id)
 
   // Get project details
-  const projects = await getProjects({ ids: [task.projectId] });
-  const project = projects[0];
+  const projects = await getProjects({ ids: [task.projectId] })
+  const project = projects[0]
 
   const isOverdue =
     task.dueDate &&
     new Date(task.dueDate) < new Date() &&
-    task.status !== TASK_STATUS.DONE;
+    task.status !== TASK_STATUS.DONE
 
   return (
     <div className="min-h-screen bg-background">
@@ -156,5 +156,5 @@ export default async function TaskPage({ params }: TaskPageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

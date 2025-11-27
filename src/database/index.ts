@@ -18,10 +18,11 @@
  * @see https://github.com/tursodatabase/libsql
  */
 
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client/web';
-import * as schema from './schema';
-export * from './schema';
+import { createClient } from '@libsql/client/web'
+import { drizzle } from 'drizzle-orm/libsql'
+import * as schema from './schema'
+
+export * from './schema'
 
 /**
  * Creates a database client based on the current environment.
@@ -34,8 +35,8 @@ export function createDatabaseClient() {
     const client = createClient({
       url: process.env.TURSO_DATABASE_URL,
       authToken: process.env.TURSO_AUTH_TOKEN,
-    });
-    return drizzle(client, { schema });
+    })
+    return drizzle(client, { schema })
   }
 
   // Integration tests: Use in-memory database with Node.js client
@@ -44,11 +45,11 @@ export function createDatabaseClient() {
     // Use dynamic import in Node.js environment (test mode)
     // This keeps @libsql/client/node out of Cloudflare Workers bundle
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createClient: createNodeClient } = require('@libsql/client/node');
+    const { createClient: createNodeClient } = require('@libsql/client/node')
     const client = createNodeClient({
       url: ':memory:',
-    });
-    return drizzle(client, { schema });
+    })
+    return drizzle(client, { schema })
   }
 
   // Local development with Docker or HTTP connection
@@ -56,8 +57,8 @@ export function createDatabaseClient() {
     url:
       process.env.DATABASE_URL ||
       `http://localhost:${process.env.DB_PORT || 8080}`,
-  });
-  return drizzle(client, { schema });
+  })
+  return drizzle(client, { schema })
 }
 
 /**
@@ -70,9 +71,9 @@ export function createDatabaseClient() {
  *
  * Migrations and seeding for tests are handled in vitest.setup.ts
  */
-export const db = createDatabaseClient();
+export const db = createDatabaseClient()
 
-export type Database = typeof db;
+export type Database = typeof db
 
 /**
  * Utility function to handle both array and ResultSet return types from .returning()
@@ -89,5 +90,5 @@ export type Database = typeof db;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getResultArray(result: any[] | { rows: any[] }): any[] {
-  return Array.isArray(result) ? result : result.rows;
+  return Array.isArray(result) ? result : result.rows
 }

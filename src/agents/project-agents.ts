@@ -1,22 +1,22 @@
-import { generateText, Output, stepCountIs } from 'ai';
-import type { LanguageModel } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import { z } from 'zod';
-import { BaseAgent } from '@/lib/agents/base-agent';
-import { createSystemPrompt, createSearchTool } from '@/lib/agents/factories';
+import { openai } from '@ai-sdk/openai'
+import type { LanguageModel } from 'ai'
+import { generateText, Output, stepCountIs } from 'ai'
+import { z } from 'zod'
 import {
-  createEventConstants,
-  createEventBuilders,
-  ExtractEventUnion,
-} from '@/lib/agents/event-factory';
-import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers';
-import { ChatMessage, ProgressCallback } from '@/lib/agents/types';
-import {
-  projects,
   insertProjectSchema,
-  PROJECT_STATUS,
   PROJECT_PRIORITY,
-} from '@/database/schema.projects';
+  PROJECT_STATUS,
+  projects,
+} from '@/database/schema.projects'
+import { BaseAgent } from '@/lib/agents/base-agent'
+import {
+  createEventBuilders,
+  createEventConstants,
+  type ExtractEventUnion,
+} from '@/lib/agents/event-factory'
+import { createSearchTool, createSystemPrompt } from '@/lib/agents/factories'
+import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers'
+import type { ChatMessage, ProgressCallback } from '@/lib/agents/types'
 
 /**
  * Schema for AI-generated project with suggested tags
@@ -28,9 +28,9 @@ export const PROJECT_GENERATION_SCHEMA = insertProjectSchema.extend({
     .min(1)
     .max(5)
     .describe('Suggested tag names for this project (1-5 relevant tags)'),
-});
+})
 
-export type ProjectGenerationData = z.infer<typeof PROJECT_GENERATION_SCHEMA>;
+export type ProjectGenerationData = z.infer<typeof PROJECT_GENERATION_SCHEMA>
 
 /**
  * Generates or finds existing projects with AI.
@@ -62,26 +62,26 @@ export type ProjectGenerationData = z.infer<typeof PROJECT_GENERATION_SCHEMA>;
  */
 export class ProjectGeneratorAgent extends BaseAgent<
   {
-    USER_MESSAGE: string;
+    USER_MESSAGE: string
   },
   | {
-      type: 'existing';
-      id: string;
-      explanation: string;
+      type: 'existing'
+      id: string
+      explanation: string
     }
   | {
-      type: 'new';
-      project: ProjectGenerationData;
-      explanation: string;
+      type: 'new'
+      project: ProjectGenerationData
+      explanation: string
     },
   never
 > {
-  static readonly DEFAULT_MODEL = openai('gpt-4o-mini');
+  static readonly DEFAULT_MODEL = openai('gpt-4o-mini')
 
   static readonly event = createEventConstants({
     entity: 'project',
     custom: ['tagsGenerated'],
-  });
+  })
 
   static readonly eventBuilder = createEventBuilders({
     entity: 'project',
@@ -91,7 +91,7 @@ export class ProjectGeneratorAgent extends BaseAgent<
         tags,
       }),
     },
-  });
+  })
 
   static readonly SYSTEM_PROMPT = createSystemPrompt({
     role: 'project management expert',
@@ -110,18 +110,18 @@ export class ProjectGeneratorAgent extends BaseAgent<
       'Follow all field requirements and validation rules defined in the schema',
       'Suggested tags should be lowercase, hyphenated slugs (e.g., "high-priority" not "High Priority")',
     ],
-  });
+  })
 
   static readonly TOOLS = {
     searchProjects: createSearchTool({
       entityName: 'project',
       table: projects,
     }),
-  };
+  }
 
   static readonly PROMPT = `The user described: "{USER_MESSAGE}"
 
-Generate a structured project object based on this description.`;
+Generate a structured project object based on this description.`
 
   /**
    * Discriminated union output schema
@@ -147,27 +147,27 @@ Generate a structured project object based on this description.`;
       .describe(
         'Conversational explanation describing your project choices and tag suggestions.',
       ),
-  });
+  })
 
   static async generate(
     messages: ChatMessage[],
     progressCallback?: ProgressCallback,
     model?: LanguageModel,
   ): Promise<ProjectGeneratorAgent> {
-    const agent = new ProjectGeneratorAgent(progressCallback, model);
-    await agent.execute(messages);
-    return agent;
+    const agent = new ProjectGeneratorAgent(progressCallback, model)
+    await agent.execute(messages)
+    return agent
   }
 
   async execute(messages: ChatMessage[]) {
-    this.messages = messages;
+    this.messages = messages
 
-    const userMessage = this.getLatestUserMessage(messages);
+    const userMessage = this.getLatestUserMessage(messages)
 
     try {
-      const prompt = this.getPrompt({ USER_MESSAGE: userMessage });
+      const prompt = this.getPrompt({ USER_MESSAGE: userMessage })
 
-      this.emit.generationStart(userMessage);
+      this.emit.generationStart(userMessage)
 
       const aiResult = await generateText({
         model: this.model,
@@ -182,55 +182,55 @@ Generate a structured project object based on this description.`;
           emit: (e) => this.emitEvent(e),
         }),
         prompt,
-      });
+      })
 
       if (!aiResult.experimental_output) {
         throw new Error(
           'Failed to generate project - no structured output from AI',
-        );
+        )
       }
 
-      const output = aiResult.experimental_output;
+      const output = aiResult.experimental_output
 
       if (output.result.type === 'existing') {
-        this.emit.existingFound(userMessage, output.result.id);
+        this.emit.existingFound(userMessage, output.result.id)
 
         this.result = {
           type: 'existing',
           id: output.result.id,
           explanation: output.explanation,
-        };
+        }
       } else {
-        const { suggestedTags, ...projectData } = output.result.project;
+        const { suggestedTags, ...projectData } = output.result.project
 
-        this.emit.tagsGenerated(projectData.title, suggestedTags);
+        this.emit.tagsGenerated(projectData.title, suggestedTags)
 
         this.result = {
           type: 'new',
           project: output.result.project,
           explanation: output.explanation,
-        };
+        }
 
-        this.emit.generationComplete(projectData.title, this.result);
+        this.emit.generationComplete(projectData.title, this.result)
       }
 
-      return this.result;
+      return this.result
     } catch (error) {
       this.emit.error(
         userMessage,
         error instanceof Error ? error.message : 'Unknown error',
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 }
 
 export type ProjectEvent = ExtractEventUnion<
   typeof ProjectGeneratorAgent.eventBuilder
->;
+>
 
-export const ProjectEvents = ProjectGeneratorAgent.event;
+export const ProjectEvents = ProjectGeneratorAgent.event
 
 /**
  * Schema for multi-project planning output
@@ -281,9 +281,9 @@ export const PROJECT_PLANNING_SCHEMA = z.object({
     .min(1)
     .max(10)
     .describe('List of projects in the plan (1-10 projects)'),
-});
+})
 
-export type ProjectPlanningData = z.infer<typeof PROJECT_PLANNING_SCHEMA>;
+export type ProjectPlanningData = z.infer<typeof PROJECT_PLANNING_SCHEMA>
 
 /**
  * Multi-step project planning agent that breaks down high-level goals into projects and tasks.
@@ -315,17 +315,17 @@ export type ProjectPlanningData = z.infer<typeof PROJECT_PLANNING_SCHEMA>;
  */
 export class ProjectPlannerAgent extends BaseAgent<
   {
-    USER_MESSAGE: string;
+    USER_MESSAGE: string
   },
   ProjectPlanningData,
   never
 > {
-  static readonly DEFAULT_MODEL = openai('gpt-4o');
+  static readonly DEFAULT_MODEL = openai('gpt-4o')
 
   static readonly event = createEventConstants({
     entity: 'projectPlan',
     custom: ['projectsPlanned'],
-  });
+  })
 
   static readonly eventBuilder = createEventBuilders({
     entity: 'projectPlan',
@@ -335,9 +335,10 @@ export class ProjectPlannerAgent extends BaseAgent<
         taskCount,
       }),
     },
-  });
+  })
 
-  static readonly SYSTEM_PROMPT = `You are a strategic project planning expert helping users break down complex initiatives into manageable projects and tasks.
+  static readonly SYSTEM_PROMPT =
+    `You are a strategic project planning expert helping users break down complex initiatives into manageable projects and tasks.
 
 Your task is to take a high-level goal or initiative and create a comprehensive project plan with:
 1. Multiple related projects that together accomplish the goal
@@ -361,38 +362,39 @@ Critical Rules:
 - Set realistic status (most new projects should start in "planning")
 - Assign appropriate priority based on dependencies and business value
 - Suggest relevant tags (e.g., "frontend", "backend", "infrastructure", "ux")
-- Tasks should be ordered by logical execution sequence`;
+- Tasks should be ordered by logical execution sequence`
 
-  static readonly PROMPT = `The user described their initiative: "{USER_MESSAGE}"
+  static readonly PROMPT =
+    `The user described their initiative: "{USER_MESSAGE}"
 
-Create a comprehensive project plan with multiple projects and initial tasks.`;
+Create a comprehensive project plan with multiple projects and initial tasks.`
 
   static readonly OUTPUT_SCHEMA = PROJECT_PLANNING_SCHEMA.extend({
     explanation: z
       .string()
       .min(1)
       .describe('Explanation of your planning strategy and key decisions'),
-  });
+  })
 
   static async generate(
     messages: ChatMessage[],
     progressCallback?: ProgressCallback,
     model?: LanguageModel,
   ): Promise<ProjectPlannerAgent> {
-    const agent = new ProjectPlannerAgent(progressCallback, model);
-    await agent.execute(messages);
-    return agent;
+    const agent = new ProjectPlannerAgent(progressCallback, model)
+    await agent.execute(messages)
+    return agent
   }
 
   async execute(messages: ChatMessage[]): Promise<ProjectPlanningData> {
-    this.messages = messages;
+    this.messages = messages
 
-    const userMessage = this.getLatestUserMessage(messages);
+    const userMessage = this.getLatestUserMessage(messages)
 
     try {
-      const prompt = this.getPrompt({ USER_MESSAGE: userMessage });
+      const prompt = this.getPrompt({ USER_MESSAGE: userMessage })
 
-      this.emit.generationStart(userMessage);
+      this.emit.generationStart(userMessage)
 
       const aiResult = await generateText({
         model: this.model,
@@ -407,45 +409,45 @@ Create a comprehensive project plan with multiple projects and initial tasks.`;
           emit: (e) => this.emitEvent(e),
         }),
         prompt,
-      });
+      })
 
       if (!aiResult.experimental_output) {
         throw new Error(
           'Failed to generate project plan - no structured output from AI',
-        );
+        )
       }
 
-      const output = aiResult.experimental_output;
-      const planData = output;
+      const output = aiResult.experimental_output
+      const planData = output
 
       const totalTasks = planData.projects.reduce(
         (sum, p) => sum + p.tasks.length,
         0,
-      );
+      )
 
-      this.emit.projectsPlanned(planData.projects.length, totalTasks);
+      this.emit.projectsPlanned(planData.projects.length, totalTasks)
 
-      this.result = planData;
+      this.result = planData
 
       this.emit.generationComplete(
         `${planData.projects.length} projects`,
         planData,
-      );
+      )
 
-      return this.result;
+      return this.result
     } catch (error) {
       this.emit.error(
         userMessage,
         error instanceof Error ? error.message : 'Unknown error',
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 }
 
 export type ProjectPlannerEvent = ExtractEventUnion<
   typeof ProjectPlannerAgent.eventBuilder
->;
+>
 
-export const ProjectPlannerEvents = ProjectPlannerAgent.event;
+export const ProjectPlannerEvents = ProjectPlannerAgent.event

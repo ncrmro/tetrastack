@@ -1,12 +1,12 @@
-import { db } from '@/database';
+import { and, inArray } from 'drizzle-orm'
+import { db } from '@/database'
 import {
-  teams,
-  teamMemberships,
-  insertTeamSchema,
   insertTeamMembershipSchema,
-} from '@/database/schema.teams';
-import { and, inArray } from 'drizzle-orm';
-import { createModelFactory } from '@/lib/models';
+  insertTeamSchema,
+  teamMemberships,
+  teams,
+} from '@/database/schema.teams'
+import { createModelFactory } from '@/lib/models'
 
 /**
  * CRUD operations for teams using many-first design pattern
@@ -19,7 +19,7 @@ export const {
   delete: deleteTeams,
   buildConditions: buildTeamConditions,
   takeFirst: takeFirstTeam,
-} = createModelFactory('teams', teams, teams.id, insertTeamSchema);
+} = createModelFactory('teams', teams, teams.id, insertTeamSchema)
 
 /**
  * CRUD operations for team memberships using many-first design pattern
@@ -36,7 +36,7 @@ export const {
   teamMemberships,
   teamMemberships.teamId,
   insertTeamMembershipSchema,
-);
+)
 
 /**
  * Get teams with flexible filtering using WHERE IN clauses
@@ -52,10 +52,10 @@ export const {
  * await getTeams({ userIds: [1, 2] })
  */
 export async function getTeams(params: { ids?: string[]; userIds?: number[] }) {
-  const conditions = [];
+  const conditions = []
 
   if (params.ids) {
-    conditions.push(inArray(teams.id, params.ids));
+    conditions.push(inArray(teams.id, params.ids))
   }
 
   // If filtering by users, we need to join with memberships
@@ -67,12 +67,12 @@ export async function getTeams(params: { ids?: string[]; userIds?: number[] }) {
           where: inArray(teamMemberships.userId, params.userIds),
         },
       },
-    });
+    })
   }
 
   return await db.query.teams.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
-  });
+  })
 }
 
 /**
@@ -88,17 +88,17 @@ export async function getTeams(params: { ids?: string[]; userIds?: number[] }) {
  * await getTeamMemberships({ userIds: [1] })
  */
 export async function getTeamMemberships(params: {
-  teamIds?: string[];
-  userIds?: number[];
+  teamIds?: string[]
+  userIds?: number[]
 }) {
-  const conditions = [];
+  const conditions = []
 
   if (params.teamIds) {
-    conditions.push(inArray(teamMemberships.teamId, params.teamIds));
+    conditions.push(inArray(teamMemberships.teamId, params.teamIds))
   }
 
   if (params.userIds) {
-    conditions.push(inArray(teamMemberships.userId, params.userIds));
+    conditions.push(inArray(teamMemberships.userId, params.userIds))
   }
 
   return await db.query.teamMemberships.findMany({
@@ -107,5 +107,5 @@ export async function getTeamMemberships(params: {
       team: true,
       user: true,
     },
-  });
+  })
 }

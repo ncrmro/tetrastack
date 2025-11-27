@@ -28,4 +28,4 @@ export const users = [
     admin: false,
     password: 'password', // Login with "password" or "password-456" etc
   },
-];
+]

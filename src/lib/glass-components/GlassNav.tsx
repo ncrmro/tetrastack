@@ -1,6 +1,5 @@
-import * as React from 'react';
-import { cn } from './utils';
-import { GlassSurface, GlassSurfaceProps } from './GlassSurface';
+import { GlassSurface, type GlassSurfaceProps } from './GlassSurface'
+import { cn } from './utils'
 
 export interface GlassNavProps
   extends Omit<
@@ -10,18 +9,18 @@ export interface GlassNavProps
   /**
    * Whether the nav is sticky at the top
    */
-  sticky?: boolean;
+  sticky?: boolean
 
   /**
    * Glass intensity - defaults to 'light' for subtle effect
    */
-  intensity?: 'light' | 'medium' | 'strong';
+  intensity?: 'light' | 'medium' | 'strong'
 
   /**
    * Color variant for tinting
    * @default 'default'
    */
-  variant?: 'default' | 'primary' | 'secondary' | 'tertiary' | 'error';
+  variant?: 'default' | 'primary' | 'secondary' | 'tertiary' | 'error'
 }
 
 /**
@@ -64,5 +63,5 @@ export function GlassNav({
     >
       {children}
     </GlassSurface>
-  );
+  )
 }

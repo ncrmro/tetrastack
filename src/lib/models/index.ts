@@ -1,7 +1,7 @@
-import { db } from '@/database';
-import { and, inArray, type SQL } from 'drizzle-orm';
-import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
-import { z } from 'zod';
+import { and, inArray, type SQL } from 'drizzle-orm'
+import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
+import type { z } from 'zod'
+import { db } from '@/database'
 
 /**
  * Model utility functions and types
@@ -28,9 +28,9 @@ import { z } from 'zod';
  */
 export function takeFirst<T>(items: T[], errorMsg?: string): T {
   if (!items[0]) {
-    throw new Error(errorMsg || 'Record not found');
+    throw new Error(errorMsg || 'Record not found')
   }
-  return items[0];
+  return items[0]
 }
 
 /**
@@ -55,7 +55,7 @@ export function takeFirst<T>(items: T[], errorMsg?: string): T {
  * }
  */
 export type ModelResult<T extends (...args: never[]) => Promise<unknown>> =
-  NonNullable<Awaited<ReturnType<T>>>;
+  NonNullable<Awaited<ReturnType<T>>>
 
 /**
  * Extracts the return type from an async model function that returns an array
@@ -68,7 +68,7 @@ export type ModelResult<T extends (...args: never[]) => Promise<unknown>> =
  */
 export type ModelArrayElement<
   T extends (...args: never[]) => Promise<unknown>,
-> = NonNullable<Awaited<ReturnType<T>>> extends (infer U)[] ? U : never;
+> = NonNullable<Awaited<ReturnType<T>>> extends (infer U)[] ? U : never
 
 /**
  * Generic CRUD model factory - "many-first" design pattern
@@ -110,10 +110,10 @@ export function createModelFactory<
 >(
   tableName: string,
   table: TTable,
-  idColumn: TTable[keyof TTable], // Accept any column from the table
+  _idColumn: TTable[keyof TTable], // Accept any column from the table
   insertSchema: z.ZodObject<z.ZodRawShape> & { _output: TInsert }, // Needs .partial() method
 ) {
-  type TSelect = TTable['$inferSelect'];
+  type TSelect = TTable['$inferSelect']
   return {
     /**
      * Takes the first element from an array, throwing an error if not found.
@@ -144,10 +144,10 @@ export function createModelFactory<
         >
       )[tableName].findMany({
         where: conditions.length > 0 ? and(...conditions) : undefined,
-      });
+      })
 
       // Drizzle already returns type-safe results
-      return result;
+      return result
     },
 
     /**
@@ -169,15 +169,15 @@ export function createModelFactory<
      */
     async insert(data: TInsert[]): Promise<TSelect[]> {
       // Validate input data before inserting
-      const validated = data.map((item) => insertSchema.parse(item));
+      const validated = data.map((item) => insertSchema.parse(item))
 
       const result = await db
         .insert(table)
         .values(validated as TInsert[])
-        .returning();
+        .returning()
 
       // Drizzle .returning() returns type-safe TTable['$inferSelect'][]
-      return result;
+      return result
     },
 
     /**
@@ -200,16 +200,16 @@ export function createModelFactory<
       data: Partial<TInsert>,
     ): Promise<TSelect[]> {
       // Validate partial update data
-      const validated = insertSchema.partial().parse(data);
+      const validated = insertSchema.partial().parse(data)
 
       const result = await db
         .update(table)
         .set(validated as Partial<TInsert>)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .returning();
+        .returning()
 
       // Drizzle .returning() returns type-safe TTable['$inferSelect'][]
-      return result;
+      return result
     },
 
     /**
@@ -229,7 +229,7 @@ export function createModelFactory<
     async delete(conditions: SQL[]): Promise<void> {
       await db
         .delete(table)
-        .where(conditions.length > 0 ? and(...conditions) : undefined);
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
     },
 
     /**
@@ -250,21 +250,21 @@ export function createModelFactory<
       filters: Record<
         string,
         | {
-            column: TTable['_']['columns'][TColumn];
-            values: unknown[];
+            column: TTable['_']['columns'][TColumn]
+            values: unknown[]
           }
         | undefined
       >,
     ): SQL[] {
-      const conditions: SQL[] = [];
+      const conditions: SQL[] = []
       for (const filter of Object.values(filters)) {
         if (filter && filter.values.length > 0) {
-          conditions.push(inArray(filter.column, filter.values));
+          conditions.push(inArray(filter.column, filter.values))
         }
       }
-      return conditions;
+      return conditions
     },
-  };
+  }
 }
 
 /**
@@ -277,7 +277,7 @@ export function createModelFactory<
  */
 export type ModelCrudSelect<
   T extends { getMany: (...args: never[]) => Promise<unknown[]> },
-> = Awaited<ReturnType<T['getMany']>>[number];
+> = Awaited<ReturnType<T['getMany']>>[number]
 
 /**
  * Type helper to infer Insert type from a model CRUD instance
@@ -288,4 +288,4 @@ export type ModelCrudSelect<
  */
 export type ModelCrudInsert<
   T extends { create: (...args: never[]) => Promise<unknown> },
-> = Parameters<T['create']>[0] extends (infer U)[] | infer U ? U : never;
+> = Parameters<T['create']>[0] extends (infer U)[] | infer U ? U : never

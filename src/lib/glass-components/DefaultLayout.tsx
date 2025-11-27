@@ -1,38 +1,38 @@
-import * as React from 'react';
-import { cn } from './utils';
-import { Breadcrumbs, BreadcrumbItem } from './Breadcrumbs';
-import { GlassCard } from './GlassCard';
+import type * as React from 'react'
+import { type BreadcrumbItem, Breadcrumbs } from './Breadcrumbs'
+import { GlassCard } from './GlassCard'
+import { cn } from './utils'
 
 export interface DefaultLayoutProps extends React.ComponentProps<'div'> {
   /**
    * Breadcrumb items for navigation
    */
-  breadcrumbs?: BreadcrumbItem[];
+  breadcrumbs?: BreadcrumbItem[]
 
   /**
    * Page title to display
    */
-  title?: string;
+  title?: string
 
   /**
    * Page description/subtitle
    */
-  description?: string;
+  description?: string
 
   /**
    * Actions to display in the header (e.g., buttons)
    */
-  headerActions?: React.ReactNode;
+  headerActions?: React.ReactNode
 
   /**
    * Whether to wrap content in a GlassCard
    */
-  useCard?: boolean;
+  useCard?: boolean
 
   /**
    * Maximum width constraint
    */
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '7xl' | 'full';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '7xl' | 'full'
 }
 
 /**
@@ -78,7 +78,7 @@ export function DefaultLayout({
     '4xl': 'max-w-4xl',
     '7xl': 'max-w-7xl',
     full: 'max-w-full',
-  };
+  }
 
   const content = (
     <>
@@ -113,7 +113,7 @@ export function DefaultLayout({
       {/* Page Content */}
       <div>{children}</div>
     </>
-  );
+  )
 
   return (
     <div
@@ -126,5 +126,5 @@ export function DefaultLayout({
     >
       {useCard ? <GlassCard intensity="medium">{content}</GlassCard> : content}
     </div>
-  );
+  )
 }

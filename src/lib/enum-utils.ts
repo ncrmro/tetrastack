@@ -15,7 +15,7 @@ export function formatEnumKey(key: string): string {
   return key
     .split('_')
     .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(' ');
+    .join(' ')
 }
 
 /**
@@ -36,5 +36,5 @@ export function enumToOptions<T extends Record<string, string>>(
   return Object.entries(enumObj).map(([key, value]) => ({
     value: value as T[keyof T],
     label: formatEnumKey(key),
-  }));
+  }))
 }

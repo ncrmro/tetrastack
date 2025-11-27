@@ -1,19 +1,19 @@
-import { generateText, Output, stepCountIs } from 'ai';
-import type { LanguageModel } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import { z } from 'zod';
-import { BaseAgent } from '@/lib/agents/base-agent';
-import { createSystemPrompt, createSearchTool } from '@/lib/agents/factories';
+import { openai } from '@ai-sdk/openai'
+import type { LanguageModel } from 'ai'
+import { generateText, Output, stepCountIs } from 'ai'
+import { z } from 'zod'
+import { insertTaskSchema, tasks } from '@/database/schema.tasks'
+import { BaseAgent } from '@/lib/agents/base-agent'
 import {
-  createEventConstants,
   createEventBuilders,
-  ExtractEventUnion,
-} from '@/lib/agents/event-factory';
-import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers';
-import { ChatMessage, ProgressCallback } from '@/lib/agents/types';
-import { tasks, insertTaskSchema } from '@/database/schema.tasks';
+  createEventConstants,
+  type ExtractEventUnion,
+} from '@/lib/agents/event-factory'
+import { createSearchTool, createSystemPrompt } from '@/lib/agents/factories'
+import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers'
+import type { ChatMessage, ProgressCallback } from '@/lib/agents/types'
 
-export type TaskGenerationData = z.infer<typeof insertTaskSchema>;
+export type TaskGenerationData = z.infer<typeof insertTaskSchema>
 
 /**
  * Generates or finds existing tasks with AI.
@@ -44,26 +44,26 @@ export type TaskGenerationData = z.infer<typeof insertTaskSchema>;
  */
 export class TaskGeneratorAgent extends BaseAgent<
   {
-    USER_MESSAGE: string;
+    USER_MESSAGE: string
   },
   | {
-      type: 'existing';
-      id: string;
-      explanation: string;
+      type: 'existing'
+      id: string
+      explanation: string
     }
   | {
-      type: 'new';
-      task: TaskGenerationData;
-      explanation: string;
+      type: 'new'
+      task: TaskGenerationData
+      explanation: string
     },
   never
 > {
-  static readonly DEFAULT_MODEL = openai('gpt-4o-mini');
+  static readonly DEFAULT_MODEL = openai('gpt-4o-mini')
 
   static readonly event = createEventConstants({
     entity: 'task',
     custom: ['prioritySet'],
-  });
+  })
 
   static readonly eventBuilder = createEventBuilders({
     entity: 'task',
@@ -73,7 +73,7 @@ export class TaskGeneratorAgent extends BaseAgent<
         priority,
       }),
     },
-  });
+  })
 
   static readonly SYSTEM_PROMPT = createSystemPrompt({
     role: 'project management expert',
@@ -94,18 +94,18 @@ export class TaskGeneratorAgent extends BaseAgent<
       'Task titles should be concise (under 100 characters) but descriptive',
       'Descriptions should provide enough context for anyone to pick up the task',
     ],
-  });
+  })
 
   static readonly TOOLS = {
     searchTasks: createSearchTool({
       entityName: 'task',
       table: tasks,
     }),
-  };
+  }
 
   static readonly PROMPT = `The user described: "{USER_MESSAGE}"
 
-Generate a structured task object based on this description.`;
+Generate a structured task object based on this description.`
 
   /**
    * Discriminated union output schema
@@ -131,27 +131,27 @@ Generate a structured task object based on this description.`;
       .describe(
         'Conversational explanation describing your task choices and priority rationale.',
       ),
-  });
+  })
 
   static async generate(
     messages: ChatMessage[],
     progressCallback?: ProgressCallback,
     model?: LanguageModel,
   ): Promise<TaskGeneratorAgent> {
-    const agent = new TaskGeneratorAgent(progressCallback, model);
-    await agent.execute(messages);
-    return agent;
+    const agent = new TaskGeneratorAgent(progressCallback, model)
+    await agent.execute(messages)
+    return agent
   }
 
   async execute(messages: ChatMessage[]) {
-    this.messages = messages;
+    this.messages = messages
 
-    const userMessage = this.getLatestUserMessage(messages);
+    const userMessage = this.getLatestUserMessage(messages)
 
     try {
-      const prompt = this.getPrompt({ USER_MESSAGE: userMessage });
+      const prompt = this.getPrompt({ USER_MESSAGE: userMessage })
 
-      this.emit.generationStart(userMessage);
+      this.emit.generationStart(userMessage)
 
       const aiResult = await generateText({
         model: this.model,
@@ -166,55 +166,55 @@ Generate a structured task object based on this description.`;
           emit: (e) => this.emitEvent(e),
         }),
         prompt,
-      });
+      })
 
       if (!aiResult.experimental_output) {
         throw new Error(
           'Failed to generate task - no structured output from AI',
-        );
+        )
       }
 
-      const output = aiResult.experimental_output;
+      const output = aiResult.experimental_output
 
       if (output.result.type === 'existing') {
-        this.emit.existingFound(userMessage, output.result.id);
+        this.emit.existingFound(userMessage, output.result.id)
 
         this.result = {
           type: 'existing',
           id: output.result.id,
           explanation: output.explanation,
-        };
+        }
       } else {
-        const taskData = output.result.task;
+        const taskData = output.result.task
 
-        this.emit.prioritySet(taskData.title, taskData.priority);
+        this.emit.prioritySet(taskData.title, taskData.priority)
 
         this.result = {
           type: 'new',
           task: taskData,
           explanation: output.explanation,
-        };
+        }
 
-        this.emit.generationComplete(taskData.title, this.result);
+        this.emit.generationComplete(taskData.title, this.result)
       }
 
-      return this.result;
+      return this.result
     } catch (error) {
       this.emit.error(
         userMessage,
         error instanceof Error ? error.message : 'Unknown error',
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 }
 
 export type TaskEvent = ExtractEventUnion<
   typeof TaskGeneratorAgent.eventBuilder
->;
+>
 
-export const TaskEvents = TaskGeneratorAgent.event;
+export const TaskEvents = TaskGeneratorAgent.event
 
 /**
  * Schema for bulk task generation output
@@ -226,11 +226,9 @@ export const BULK_TASK_GENERATION_SCHEMA = z.object({
     .max(20)
     .describe('List of tasks to create (1-20 tasks)'),
   rationale: z.string().describe('Explanation of the task breakdown strategy'),
-});
+})
 
-export type BulkTaskGenerationData = z.infer<
-  typeof BULK_TASK_GENERATION_SCHEMA
->;
+export type BulkTaskGenerationData = z.infer<typeof BULK_TASK_GENERATION_SCHEMA>
 
 /**
  * Bulk task generation agent that creates multiple related tasks at once.
@@ -259,26 +257,27 @@ export type BulkTaskGenerationData = z.infer<
  */
 export class BulkTaskGeneratorAgent extends BaseAgent<
   {
-    USER_MESSAGE: string;
+    USER_MESSAGE: string
   },
   BulkTaskGenerationData & { explanation: string },
   never
 > {
-  static readonly DEFAULT_MODEL = openai('gpt-4o-mini');
+  static readonly DEFAULT_MODEL = openai('gpt-4o-mini')
 
   static readonly event = createEventConstants({
     entity: 'bulkTasks',
     custom: ['tasksPlanned'],
-  });
+  })
 
   static readonly eventBuilder = createEventBuilders({
     entity: 'bulkTasks',
     custom: {
       tasksPlanned: (taskCount: number) => ({ taskCount }),
     },
-  });
+  })
 
-  static readonly SYSTEM_PROMPT = `You are a project management expert helping users break down features and goals into actionable tasks.
+  static readonly SYSTEM_PROMPT =
+    `You are a project management expert helping users break down features and goals into actionable tasks.
 
 Your task is to take a high-level feature, goal, or requirement and create a list of specific, actionable tasks:
 1. Break down the work into 3-20 distinct tasks
@@ -301,40 +300,40 @@ Critical Rules:
 - Each task must have a clear, actionable title
 - Descriptions should include acceptance criteria when applicable
 - Set realistic priorities based on dependencies and business value
-- Tasks should be ordered in a logical sequence for execution`;
+- Tasks should be ordered in a logical sequence for execution`
 
   static readonly PROMPT = `The user wants to break down: "{USER_MESSAGE}"
 
-Create a list of actionable tasks for this work.`;
+Create a list of actionable tasks for this work.`
 
   static readonly OUTPUT_SCHEMA = BULK_TASK_GENERATION_SCHEMA.extend({
     explanation: z
       .string()
       .min(1)
       .describe('Explanation of your task breakdown strategy'),
-  });
+  })
 
   static async generate(
     messages: ChatMessage[],
     progressCallback?: ProgressCallback,
     model?: LanguageModel,
   ): Promise<BulkTaskGeneratorAgent> {
-    const agent = new BulkTaskGeneratorAgent(progressCallback, model);
-    await agent.execute(messages);
-    return agent;
+    const agent = new BulkTaskGeneratorAgent(progressCallback, model)
+    await agent.execute(messages)
+    return agent
   }
 
   async execute(
     messages: ChatMessage[],
   ): Promise<BulkTaskGenerationData & { explanation: string }> {
-    this.messages = messages;
+    this.messages = messages
 
-    const userMessage = this.getLatestUserMessage(messages);
+    const userMessage = this.getLatestUserMessage(messages)
 
     try {
-      const prompt = this.getPrompt({ USER_MESSAGE: userMessage });
+      const prompt = this.getPrompt({ USER_MESSAGE: userMessage })
 
-      this.emit.generationStart(userMessage);
+      this.emit.generationStart(userMessage)
 
       const aiResult = await generateText({
         model: this.model,
@@ -349,37 +348,37 @@ Create a list of actionable tasks for this work.`;
           emit: (e) => this.emitEvent(e),
         }),
         prompt,
-      });
+      })
 
       if (!aiResult.experimental_output) {
         throw new Error(
           'Failed to generate tasks - no structured output from AI',
-        );
+        )
       }
 
-      const output = aiResult.experimental_output;
-      const taskData = output;
+      const output = aiResult.experimental_output
+      const taskData = output
 
-      this.emit.tasksPlanned(taskData.tasks.length);
+      this.emit.tasksPlanned(taskData.tasks.length)
 
-      this.result = taskData;
+      this.result = taskData
 
-      this.emit.generationComplete(`${taskData.tasks.length} tasks`, taskData);
+      this.emit.generationComplete(`${taskData.tasks.length} tasks`, taskData)
 
-      return this.result;
+      return this.result
     } catch (error) {
       this.emit.error(
         userMessage,
         error instanceof Error ? error.message : 'Unknown error',
         error,
-      );
-      throw error;
+      )
+      throw error
     }
   }
 }
 
 export type BulkTaskEvent = ExtractEventUnion<
   typeof BulkTaskGeneratorAgent.eventBuilder
->;
+>
 
-export const BulkTaskEvents = BulkTaskGeneratorAgent.event;
+export const BulkTaskEvents = BulkTaskGeneratorAgent.event

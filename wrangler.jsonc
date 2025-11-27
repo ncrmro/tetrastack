@@ -10,10 +10,10 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "binding": "ASSETS",
-    "directory": ".open-next/assets",
+    "directory": ".open-next/assets"
   },
   "observability": {
-    "enabled": true,
+    "enabled": true
   },
   /**
    * Smart Placement
@@ -72,8 +72,8 @@
     "AUTH_GOOGLE_ID": "example.apps.googleusercontent.com", // → Needs: AUTH_GOOGLE_SECRET (wrangler secret)
 
     // Analytics
-    "NEXT_PUBLIC_POSTHOG_KEY": "phc_EXAMPLE", // PostHog project API key (public)
-  },
+    "NEXT_PUBLIC_POSTHOG_KEY": "phc_EXAMPLE" // PostHog project API key (public)
+  }
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/

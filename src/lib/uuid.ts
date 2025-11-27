@@ -1,4 +1,4 @@
-import { v7 as uuidv7 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid'
 
 /**
  * Generate a UUIDv7 following RFC 9562 specification
@@ -14,5 +14,5 @@ import { v7 as uuidv7 } from 'uuid';
  * @returns A UUIDv7 string in the format xxxxxxxx-xxxx-7xxx-xxxx-xxxxxxxxxxxx
  */
 export function generateUuidV7(): string {
-  return uuidv7();
+  return uuidv7()
 }

@@ -1,18 +1,18 @@
-import Link from 'next/link';
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type {
-  SelectProject,
   ProjectPriority,
   ProjectStatus,
-} from '@/database/schema.projects';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { StatusBadge } from './StatusBadge';
-import { PriorityIndicator } from './PriorityIndicator';
+  SelectProject,
+} from '@/database/schema.projects'
+import { PriorityIndicator } from './PriorityIndicator'
+import { StatusBadge } from './StatusBadge'
 
 interface ProjectCardProps {
   project: SelectProject & {
-    tags?: Array<{ id: string; name: string; color: string }>;
-  };
-  showTeam?: boolean;
+    tags?: Array<{ id: string; name: string; color: string }>
+  }
+  showTeam?: boolean
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
@@ -57,7 +57,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                     key={tag.id}
                     className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                     style={{
-                      backgroundColor: tag.color + '20',
+                      backgroundColor: `${tag.color}20`,
                       color: tag.color,
                     }}
                   >
@@ -81,5 +81,5 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </CardContent>
       </Card>
     </Link>
-  );
+  )
 }

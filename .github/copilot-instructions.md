@@ -98,8 +98,8 @@ All commands use Docker and automatically manage service dependencies:
 
 ```bash
 # Formatting (no service dependencies)
-make format              # Auto-format with Prettier + ESLint fix
-make lint                # Run ESLint and typecheck
+make format              # Auto-format with Biome
+make lint                # Run Biome linter and typecheck
 
 # Testing (Docker-based)
 make test-unit           # Unit tests (no service dependencies)
@@ -113,7 +113,7 @@ make test-all            # Runs unit, integration, component, and e2e tests (doe
 make ci                  # Runs lint + unit + integration + e2e tests
 ```
 
-**Note**: Pre-commit hooks auto-format with Prettier. ESLint requires manual `make format`.
+**Note**: Pre-commit hooks auto-format with Biome. Typecheck requires manual `make format`.
 
 ## Tech Stack
 

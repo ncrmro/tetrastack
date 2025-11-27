@@ -1,4 +1,4 @@
-import posthog from 'posthog-js';
+import posthog from 'posthog-js'
 
 if (
   process.env.NODE_ENV === 'production' ||
@@ -10,5 +10,5 @@ if (
     defaults: '2025-05-24',
     capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
     debug: process.env.NODE_ENV === 'development',
-  });
+  })
 }

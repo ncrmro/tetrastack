@@ -14,10 +14,10 @@
  * vitest.config.ts in the `test.env` section.
  */
 
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'
 
 // Load environment variables from .env files
-dotenv.config({ quiet: true });
+dotenv.config({ quiet: true })
 
 /**
  * Global setup - runs once before all tests

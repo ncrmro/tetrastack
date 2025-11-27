@@ -1,38 +1,38 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getTasks } from '@/models/tasks';
+import { TaskList } from '@/components/TaskList'
+import { ButtonLink } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   TASK_STATUS,
-  type TaskStatus,
   type TaskPriority,
-} from '@/database/schema.tasks';
-import { TaskList } from '@/components/TaskList';
-import { ButtonLink } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+  type TaskStatus,
+} from '@/database/schema.tasks'
+import { getTasks } from '@/models/tasks'
+import { User } from '@/models/user'
+import { authRedirect } from '../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface TasksPageProps {
-  searchParams: Promise<{ status?: string; priority?: string }>;
+  searchParams: Promise<{ status?: string; priority?: string }>
 }
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
-  const params = await searchParams;
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
+  const params = await searchParams
 
   // Get user's teams
-  const userTeams = await User.getUserTeams(userId);
-  const teamIds = userTeams.map((t) => t.team.id);
+  const userTeams = await User.getUserTeams(userId)
+  const teamIds = userTeams.map((t) => t.team.id)
 
   // Apply filters
-  const status = params.status ? [params.status as TaskStatus] : undefined;
+  const status = params.status ? [params.status as TaskStatus] : undefined
   const priority = params.priority
     ? [params.priority as TaskPriority]
-    : undefined;
+    : undefined
 
   // Get tasks assigned to user
-  const tasks = await getTasks({ assigneeIds: [userId], status, priority });
+  const tasks = await getTasks({ assigneeIds: [userId], status, priority })
 
   // Sort by due date (overdue first), then by priority
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -40,32 +40,32 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     const aOverdue =
       a.dueDate &&
       new Date(a.dueDate) < new Date() &&
-      a.status !== TASK_STATUS.DONE;
+      a.status !== TASK_STATUS.DONE
     const bOverdue =
       b.dueDate &&
       new Date(b.dueDate) < new Date() &&
-      b.status !== TASK_STATUS.DONE;
-    if (aOverdue && !bOverdue) return -1;
-    if (!aOverdue && bOverdue) return 1;
+      b.status !== TASK_STATUS.DONE
+    if (aOverdue && !bOverdue) return -1
+    if (!aOverdue && bOverdue) return 1
 
     // Then by due date
     if (a.dueDate && b.dueDate) {
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     }
-    if (a.dueDate) return -1;
-    if (b.dueDate) return 1;
+    if (a.dueDate) return -1
+    if (b.dueDate) return 1
 
     // Then by priority
     const priorityOrder: Record<TaskPriority, number> = {
       high: 0,
       medium: 1,
       low: 2,
-    };
+    }
     return (
       priorityOrder[a.priority as TaskPriority] -
       priorityOrder[b.priority as TaskPriority]
-    );
-  });
+    )
+  })
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,5 +155,5 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

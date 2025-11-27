@@ -1,8 +1,8 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { slugify } from '@/lib/slugify';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import type { SelectProject } from '@/database/schema.projects';
-import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams';
+import type { SelectProject } from '@/database/schema.projects'
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects'
+import { slugify } from '@/lib/slugify'
+import { generateUuidV7 } from '@/lib/uuid'
+import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams'
 
 export const PROJECT_WEBSITE_REDESIGN: SelectProject = {
   id: generateUuidV7(),
@@ -16,7 +16,7 @@ export const PROJECT_WEBSITE_REDESIGN: SelectProject = {
   createdBy: 1, // John Doe
   createdAt: new Date('2024-01-20'),
   updatedAt: new Date('2024-03-15'),
-};
+}
 
 export const PROJECT_API_V2: SelectProject = {
   id: generateUuidV7(),
@@ -29,7 +29,7 @@ export const PROJECT_API_V2: SelectProject = {
   createdBy: 1, // John Doe
   createdAt: new Date('2024-02-01'),
   updatedAt: new Date('2024-03-10'),
-};
+}
 
 export const PROJECT_MOBILE_APP: SelectProject = {
   id: generateUuidV7(),
@@ -42,7 +42,7 @@ export const PROJECT_MOBILE_APP: SelectProject = {
   createdBy: 2, // Jane Doe
   createdAt: new Date('2024-03-01'),
   updatedAt: new Date('2024-03-01'),
-};
+}
 
 export const PROJECT_CUSTOMER_PORTAL: SelectProject = {
   id: generateUuidV7(),
@@ -56,7 +56,7 @@ export const PROJECT_CUSTOMER_PORTAL: SelectProject = {
   createdBy: 1, // John Doe
   createdAt: new Date('2024-01-10'),
   updatedAt: new Date('2024-03-12'),
-};
+}
 
 export const PROJECT_PERFORMANCE_OPTIMIZATION: SelectProject = {
   id: generateUuidV7(),
@@ -69,7 +69,7 @@ export const PROJECT_PERFORMANCE_OPTIMIZATION: SelectProject = {
   createdBy: 2, // Jane Doe
   createdAt: new Date('2023-11-01'),
   updatedAt: new Date('2024-01-15'),
-};
+}
 
 export const PROJECT_USER_RESEARCH: SelectProject = {
   id: generateUuidV7(),
@@ -82,7 +82,7 @@ export const PROJECT_USER_RESEARCH: SelectProject = {
   createdBy: 1, // John Doe
   createdAt: new Date('2024-01-05'),
   updatedAt: new Date('2024-02-28'),
-};
+}
 
 export const PROJECT_LEGACY_MIGRATION: SelectProject = {
   id: generateUuidV7(),
@@ -96,7 +96,7 @@ export const PROJECT_LEGACY_MIGRATION: SelectProject = {
   createdBy: 1, // John Doe
   createdAt: new Date('2023-06-01'),
   updatedAt: new Date('2023-12-31'),
-};
+}
 
 export const projects = [
   PROJECT_WEBSITE_REDESIGN,
@@ -106,4 +106,4 @@ export const projects = [
   PROJECT_PERFORMANCE_OPTIMIZATION,
   PROJECT_USER_RESEARCH,
   PROJECT_LEGACY_MIGRATION,
-];
+]

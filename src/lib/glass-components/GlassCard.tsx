@@ -1,24 +1,24 @@
-import * as React from 'react';
-import { cn } from './utils';
-import { GlassSurface, GlassSurfaceProps } from './GlassSurface';
+import type * as React from 'react'
+import { GlassSurface, type GlassSurfaceProps } from './GlassSurface'
+import { cn } from './utils'
 
 export interface GlassCardProps
   extends Omit<GlassSurfaceProps, 'bordered' | 'shadowed'> {
   /**
    * Whether to add padding to the card
    */
-  padded?: boolean;
+  padded?: boolean
 
   /**
    * Corner radius variant
    */
-  rounded?: 'sm' | 'md' | 'lg' | 'xl';
+  rounded?: 'sm' | 'md' | 'lg' | 'xl'
 
   /**
    * Color variant for the card
    * @default 'default'
    */
-  variant?: 'default' | 'primary' | 'secondary' | 'tertiary' | 'error';
+  variant?: 'default' | 'primary' | 'secondary' | 'tertiary' | 'error'
 }
 
 /**
@@ -62,7 +62,7 @@ export function GlassCard({
     md: 'rounded-md',
     lg: 'rounded-lg',
     xl: 'rounded-xl',
-  };
+  }
 
   return (
     <GlassSurface
@@ -75,13 +75,13 @@ export function GlassCard({
     >
       {children}
     </GlassSurface>
-  );
+  )
 }
 
-export type GlassCardHeaderProps = React.ComponentProps<'div'>;
+export type GlassCardHeaderProps = React.ComponentProps<'div'>
 
 export function GlassCardHeader({ className, ...props }: GlassCardHeaderProps) {
-  return <div className={cn('mb-4', className)} {...props} />;
+  return <div className={cn('mb-4', className)} {...props} />
 }
 
 type GlassCardTitleOwnProps = {
@@ -89,28 +89,28 @@ type GlassCardTitleOwnProps = {
    * The HTML element to render as
    * @default 'h3'
    */
-  as?: React.ElementType;
-};
+  as?: React.ElementType
+}
 
 export type GlassCardTitleProps<T extends React.ElementType = 'h3'> =
   GlassCardTitleOwnProps &
-    Omit<React.ComponentPropsWithoutRef<T>, keyof GlassCardTitleOwnProps>;
+    Omit<React.ComponentPropsWithoutRef<T>, keyof GlassCardTitleOwnProps>
 
 export function GlassCardTitle<T extends React.ElementType = 'h3'>({
   as,
   className,
   ...props
 }: GlassCardTitleProps<T>) {
-  const Component = as || 'h3';
+  const Component = as || 'h3'
   return (
     <Component
       className={cn('text-2xl font-semibold text-on-surface', className)}
       {...props}
     />
-  );
+  )
 }
 
-export type GlassCardDescriptionProps = React.ComponentProps<'p'>;
+export type GlassCardDescriptionProps = React.ComponentProps<'p'>
 
 export function GlassCardDescription({
   className,
@@ -121,19 +121,19 @@ export function GlassCardDescription({
       className={cn('text-sm text-on-surface-variant mt-1', className)}
       {...props}
     />
-  );
+  )
 }
 
-export type GlassCardContentProps = React.ComponentProps<'div'>;
+export type GlassCardContentProps = React.ComponentProps<'div'>
 
 export function GlassCardContent({
   className,
   ...props
 }: GlassCardContentProps) {
-  return <div className={cn('', className)} {...props} />;
+  return <div className={cn('', className)} {...props} />
 }
 
-export type GlassCardFooterProps = React.ComponentProps<'div'>;
+export type GlassCardFooterProps = React.ComponentProps<'div'>
 
 export function GlassCardFooter({ className, ...props }: GlassCardFooterProps) {
   return (
@@ -141,5 +141,5 @@ export function GlassCardFooter({ className, ...props }: GlassCardFooterProps) {
       className={cn('mt-auto pt-4 flex items-center gap-2', className)}
       {...props}
     />
-  );
+  )
 }

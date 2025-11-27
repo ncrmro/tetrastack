@@ -1,9 +1,9 @@
-import { db } from '@/database';
-import { teamMemberships, TEAM_ROLE } from '@/database/schema.teams';
-import { projects } from '@/database/schema.projects';
-import { tasks, comments } from '@/database/schema.tasks';
-import { tags } from '@/database/schema.tags';
-import { and, eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm'
+import { db } from '@/database'
+import { projects } from '@/database/schema.projects'
+import { tags } from '@/database/schema.tags'
+import { comments, tasks } from '@/database/schema.tasks'
+import { TEAM_ROLE, teamMemberships } from '@/database/schema.teams'
 
 /**
  * Verify if a user is a member of a team
@@ -21,8 +21,8 @@ export async function verifyTeamMembership(
       eq(teamMemberships.userId, userId),
       eq(teamMemberships.teamId, teamId),
     ),
-  });
-  return !!membership;
+  })
+  return !!membership
 }
 
 /**
@@ -42,8 +42,8 @@ export async function verifyTeamAdmin(
       eq(teamMemberships.teamId, teamId),
       eq(teamMemberships.role, TEAM_ROLE.ADMIN),
     ),
-  });
-  return !!membership;
+  })
+  return !!membership
 }
 
 /**
@@ -60,13 +60,13 @@ export async function verifyProjectTeamMembership(
   const project = await db.query.projects.findFirst({
     where: eq(projects.id, projectId),
     columns: { teamId: true },
-  });
+  })
 
   if (!project) {
-    return false;
+    return false
   }
 
-  return verifyTeamMembership(userId, project.teamId);
+  return verifyTeamMembership(userId, project.teamId)
 }
 
 /**
@@ -83,13 +83,13 @@ export async function verifyProjectTeamAdmin(
   const project = await db.query.projects.findFirst({
     where: eq(projects.id, projectId),
     columns: { teamId: true },
-  });
+  })
 
   if (!project) {
-    return false;
+    return false
   }
 
-  return verifyTeamAdmin(userId, project.teamId);
+  return verifyTeamAdmin(userId, project.teamId)
 }
 
 /**
@@ -106,13 +106,13 @@ export async function verifyTaskTeamMembership(
   const task = await db.query.tasks.findFirst({
     where: eq(tasks.id, taskId),
     columns: { projectId: true },
-  });
+  })
 
   if (!task) {
-    return false;
+    return false
   }
 
-  return verifyProjectTeamMembership(userId, task.projectId);
+  return verifyProjectTeamMembership(userId, task.projectId)
 }
 
 /**
@@ -129,13 +129,13 @@ export async function verifyCommentOwnership(
   const comment = await db.query.comments.findFirst({
     where: eq(comments.id, commentId),
     columns: { userId: true },
-  });
+  })
 
   if (!comment) {
-    return false;
+    return false
   }
 
-  return comment.userId === userId;
+  return comment.userId === userId
 }
 
 /**
@@ -152,13 +152,13 @@ export async function verifyTagTeamMembership(
   const tag = await db.query.tags.findFirst({
     where: eq(tags.id, tagId),
     columns: { teamId: true },
-  });
+  })
 
   if (!tag) {
-    return false;
+    return false
   }
 
-  return verifyTeamMembership(userId, tag.teamId);
+  return verifyTeamMembership(userId, tag.teamId)
 }
 
 /**
@@ -186,12 +186,12 @@ export async function verifyBulkTeamAccess<T>(
   extractId: (item: T) => string,
   verifyFn: (userId: number, id: string) => Promise<boolean>,
 ): Promise<boolean> {
-  const uniqueIds = [...new Set(items.map(extractId))];
+  const uniqueIds = [...new Set(items.map(extractId))]
   for (const id of uniqueIds) {
-    const hasAccess = await verifyFn(userId, id);
+    const hasAccess = await verifyFn(userId, id)
     if (!hasAccess) {
-      return false;
+      return false
     }
   }
-  return true;
+  return true
 }

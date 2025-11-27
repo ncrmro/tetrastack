@@ -20,9 +20,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
-import type { InsertTag } from '@/database/schema.tags';
-import { tags } from '@/database/schema.tags';
+import type { InsertTag } from '@/database/schema.tags'
+import { tags } from '@/database/schema.tags'
+import { db, Factory } from '@/lib/factories'
 
 /**
  * Tag factory with trait methods for common tag types.
@@ -35,7 +35,7 @@ class TagFactory extends Factory<InsertTag> {
     return this.params({
       name: 'frontend',
       color: '#3b82f6', // blue
-    });
+    })
   }
 
   /**
@@ -45,7 +45,7 @@ class TagFactory extends Factory<InsertTag> {
     return this.params({
       name: 'backend',
       color: '#10b981', // green
-    });
+    })
   }
 
   /**
@@ -55,7 +55,7 @@ class TagFactory extends Factory<InsertTag> {
     return this.params({
       name: 'infrastructure',
       color: '#f59e0b', // amber
-    });
+    })
   }
 
   /**
@@ -65,7 +65,7 @@ class TagFactory extends Factory<InsertTag> {
     return this.params({
       name: 'ux',
       color: '#ec4899', // pink
-    });
+    })
   }
 
   /**
@@ -75,7 +75,7 @@ class TagFactory extends Factory<InsertTag> {
     return this.params({
       name: 'urgent',
       color: '#ef4444', // red
-    });
+    })
   }
 
   /**
@@ -83,22 +83,22 @@ class TagFactory extends Factory<InsertTag> {
    * Automatically creates team if not provided.
    */
   async create(params?: Partial<InsertTag>) {
-    const built = this.build(params);
+    const built = this.build(params)
 
     // Auto-create team if not provided
-    let teamId = built.teamId;
+    let teamId = built.teamId
     if (!teamId) {
-      const { teamFactory } = await import('./team.factory');
-      const team = await teamFactory.create();
-      teamId = team.id;
+      const { teamFactory } = await import('./team.factory')
+      const team = await teamFactory.create()
+      teamId = team.id
     }
 
     const tag = {
       ...built,
       teamId,
-    };
-    const [created] = await db.insert(tags).values(tag).returning();
-    return created;
+    }
+    const [created] = await db.insert(tags).values(tag).returning()
+    return created
   }
 
   /**
@@ -107,18 +107,18 @@ class TagFactory extends Factory<InsertTag> {
    */
   async createList(count: number, params?: Partial<InsertTag>) {
     // Auto-create team if not provided (shared by all tags in list)
-    let teamId = params?.teamId;
+    let teamId = params?.teamId
     if (!teamId) {
-      const { teamFactory } = await import('./team.factory');
-      const team = await teamFactory.create();
-      teamId = team.id;
+      const { teamFactory } = await import('./team.factory')
+      const team = await teamFactory.create()
+      teamId = team.id
     }
 
     const tagList = this.buildList(count, params).map((built) => ({
       ...built,
       teamId,
-    }));
-    return await db.insert(tags).values(tagList).returning();
+    }))
+    return await db.insert(tags).values(tagList).returning()
   }
 }
 
@@ -126,4 +126,4 @@ export const tagFactory = TagFactory.define(() => ({
   name: Factory.faker.word.noun(),
   color: Factory.faker.color.rgb({ format: 'hex' }),
   teamId: '', // Auto-created if not provided
-}));
+}))

@@ -1,8 +1,8 @@
-import { db } from '@/database';
-import { tasks, insertTaskSchema } from '@/database/schema.tasks';
-import type { TaskStatus, TaskPriority } from '@/database/schema.tasks';
-import { and, eq, inArray } from 'drizzle-orm';
-import { createModelFactory } from '@/lib/models';
+import { and, eq, inArray } from 'drizzle-orm'
+import { db } from '@/database'
+import type { TaskPriority, TaskStatus } from '@/database/schema.tasks'
+import { insertTaskSchema, tasks } from '@/database/schema.tasks'
+import { createModelFactory } from '@/lib/models'
 
 // Create and export CRUD functions using factory
 export const {
@@ -12,7 +12,7 @@ export const {
   delete: deleteTasks,
   buildConditions,
   takeFirst: takeFirstTask,
-} = createModelFactory('tasks', tasks, tasks.id, insertTaskSchema);
+} = createModelFactory('tasks', tasks, tasks.id, insertTaskSchema)
 
 /**
  * Get tasks with flexible filtering using WHERE IN clauses
@@ -31,37 +31,37 @@ export const {
  * await getTasks({ assigneeIds: [1, 2] })
  */
 export async function getTasks(params: {
-  ids?: string[];
-  projectIds?: string[];
-  assigneeIds?: number[];
-  status?: TaskStatus[];
-  priority?: TaskPriority[];
+  ids?: string[]
+  projectIds?: string[]
+  assigneeIds?: number[]
+  status?: TaskStatus[]
+  priority?: TaskPriority[]
 }) {
-  const conditions = [];
+  const conditions = []
 
   if (params.ids) {
-    conditions.push(inArray(tasks.id, params.ids));
+    conditions.push(inArray(tasks.id, params.ids))
   }
 
   if (params.projectIds) {
-    conditions.push(inArray(tasks.projectId, params.projectIds));
+    conditions.push(inArray(tasks.projectId, params.projectIds))
   }
 
   if (params.assigneeIds) {
-    conditions.push(inArray(tasks.assigneeId, params.assigneeIds));
+    conditions.push(inArray(tasks.assigneeId, params.assigneeIds))
   }
 
   if (params.status) {
-    conditions.push(inArray(tasks.status, params.status));
+    conditions.push(inArray(tasks.status, params.status))
   }
 
   if (params.priority) {
-    conditions.push(inArray(tasks.priority, params.priority));
+    conditions.push(inArray(tasks.priority, params.priority))
   }
 
   return await db.query.tasks.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
-  });
+  })
 }
 
 /**
@@ -81,5 +81,5 @@ export async function getTaskWithComments(id: string) {
         },
       },
     },
-  });
+  })
 }

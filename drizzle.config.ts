@@ -16,10 +16,10 @@
  * @see https://orm.drizzle.team/kit-docs/config-reference
  */
 
-import { defineConfig } from 'drizzle-kit';
-import { config } from 'dotenv';
+import { config } from 'dotenv'
+import { defineConfig } from 'drizzle-kit'
 
-config({ path: '.env.local', quiet: true });
+config({ path: '.env.local', quiet: true })
 
 export default defineConfig({
   schema: './src/database/schema.ts',
@@ -45,4 +45,4 @@ export default defineConfig({
               : `http://localhost:${process.env.DB_PORT || 8080}`),
         },
       }),
-});
+})

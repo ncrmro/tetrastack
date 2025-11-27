@@ -1,3 +1,2 @@
-node_modules/.bin/prettier --write --cache .
-node_modules/.bin/eslint --cache
+node_modules/.bin/biome check --write .
 node_modules/.bin/tsc --noEmit

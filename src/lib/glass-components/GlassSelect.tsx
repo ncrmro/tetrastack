@@ -1,13 +1,13 @@
-import React from 'react';
-import { cn } from './utils';
-import { GlassSurface } from './GlassSurface';
+import type React from 'react'
+import { GlassSurface } from './GlassSurface'
+import { cn } from './utils'
 
 export interface GlassSelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   /**
    * Glass intensity - defaults to 'strong' for heavy blur
    */
-  intensity?: 'light' | 'medium' | 'strong';
+  intensity?: 'light' | 'medium' | 'strong'
 }
 
 /**
@@ -53,5 +53,5 @@ export function GlassSelect({
     >
       {children}
     </GlassSurface>
-  );
+  )
 }

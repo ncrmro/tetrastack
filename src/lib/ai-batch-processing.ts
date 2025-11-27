@@ -179,11 +179,11 @@
  * No other code changes needed!
  */
 
-import { z } from 'zod';
-import OpenAI from 'openai';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import OpenAI from 'openai'
+import { z } from 'zod'
 
 /**
  * Supported batch processing providers
@@ -191,10 +191,10 @@ import * as os from 'os';
 export const BATCH_PROVIDERS = {
   OPENAI: 'openai',
   ANTHROPIC: 'anthropic',
-} as const;
+} as const
 
 export type BatchProvider =
-  (typeof BATCH_PROVIDERS)[keyof typeof BATCH_PROVIDERS];
+  (typeof BATCH_PROVIDERS)[keyof typeof BATCH_PROVIDERS]
 
 /**
  * Normalized batch status across all providers
@@ -213,31 +213,31 @@ export const BATCH_STATUS = {
   CANCELLED: 'cancelled',
   /** Batch expired (24-hour window) */
   EXPIRED: 'expired',
-} as const;
+} as const
 
-export type BatchStatus = (typeof BATCH_STATUS)[keyof typeof BATCH_STATUS];
+export type BatchStatus = (typeof BATCH_STATUS)[keyof typeof BATCH_STATUS]
 
 /**
  * Individual request in a batch
  */
 export interface BatchRequest {
   /** Unique identifier for this request (used to match results) */
-  customId: string;
+  customId: string
   /** Model to use (e.g., "gpt-4o-mini", "claude-opus-4-1") */
-  model: string;
+  model: string
   /** Messages for the request */
   messages: Array<{
-    role: 'user' | 'assistant' | 'system';
-    content: string;
-  }>;
+    role: 'user' | 'assistant' | 'system'
+    content: string
+  }>
   /** Maximum tokens in response */
-  maxTokens: number;
+  maxTokens: number
   /** System prompt (optional) */
-  systemPrompt?: string;
+  systemPrompt?: string
   /** Temperature for sampling (optional) */
-  temperature?: number;
+  temperature?: number
   /** Top P for sampling (optional) */
-  topP?: number;
+  topP?: number
 }
 
 /**
@@ -245,18 +245,18 @@ export interface BatchRequest {
  */
 export interface BatchResult {
   /** Matches BatchRequest.customId */
-  customId: string;
+  customId: string
   /** Result status */
-  status: 'succeeded' | 'errored' | 'expired' | 'cancelled';
+  status: 'succeeded' | 'errored' | 'expired' | 'cancelled'
   /** Parsed response content (for succeeded requests) */
-  content?: unknown;
+  content?: unknown
   /** Error details (for errored requests) */
   error?: {
-    type: string;
-    message: string;
-  };
+    type: string
+    message: string
+  }
   /** Raw response from provider (for debugging) */
-  rawResponse?: unknown;
+  rawResponse?: unknown
 }
 
 /**
@@ -264,30 +264,30 @@ export interface BatchResult {
  */
 export interface BatchInfo {
   /** Internal batch ID (may differ from provider batch ID) */
-  id: string;
+  id: string
   /** Provider that handles this batch */
-  provider: BatchProvider;
+  provider: BatchProvider
   /** Current status */
-  status: BatchStatus;
+  status: BatchStatus
   /** When batch was created */
-  createdAt: Date;
+  createdAt: Date
   /** When batch completed processing (if applicable) */
-  completedAt?: Date;
+  completedAt?: Date
   /** Total number of requests */
-  totalRequests: number;
+  totalRequests: number
   /** Number of successful requests */
-  successCount: number;
+  successCount: number
   /** Number of failed requests */
-  failureCount: number;
+  failureCount: number
   /** Provider-specific batch ID (openai: "batch_...", anthropic: "msgbatch_...") */
-  providerBatchId: string;
+  providerBatchId: string
   /** URL to download results (if available) */
-  resultsUrl?: string;
+  resultsUrl?: string
   /** Error details (if batch failed) */
   error?: {
-    type: string;
-    message: string;
-  };
+    type: string
+    message: string
+  }
 }
 
 /**
@@ -297,29 +297,29 @@ export interface IBatchProvider {
   /**
    * Submit a batch for processing
    */
-  createBatch(requests: BatchRequest[]): Promise<BatchInfo>;
+  createBatch(requests: BatchRequest[]): Promise<BatchInfo>
 
   /**
    * Check the current status of a batch
    */
-  checkStatus(batchId: string): Promise<BatchInfo>;
+  checkStatus(batchId: string): Promise<BatchInfo>
 
   /**
    * Stream results from a completed batch
    * Results may arrive in any order - use customId to match requests
    */
-  retrieveResults(batchId: string): AsyncGenerator<BatchResult>;
+  retrieveResults(batchId: string): AsyncGenerator<BatchResult>
 
   /**
    * Cancel an in-progress batch
    * May not immediately stop all requests
    */
-  cancelBatch(batchId: string): Promise<BatchInfo>;
+  cancelBatch(batchId: string): Promise<BatchInfo>
 
   /**
    * List all batches (optional, for debugging/monitoring)
    */
-  listBatches?(limit?: number): AsyncGenerator<BatchInfo>;
+  listBatches?(limit?: number): AsyncGenerator<BatchInfo>
 }
 
 /**
@@ -338,7 +338,7 @@ export const batchRequestSchema = z.object({
   systemPrompt: z.string().optional(),
   temperature: z.number().min(0).max(2).optional(),
   topP: z.number().min(0).max(1).optional(),
-});
+})
 
 export const batchResultSchema = z.object({
   customId: z.string(),
@@ -351,7 +351,7 @@ export const batchResultSchema = z.object({
     })
     .optional(),
   rawResponse: z.any().optional(),
-});
+})
 
 /**
  * OpenAI Batch API Provider
@@ -364,13 +364,13 @@ export const batchResultSchema = z.object({
  * 5. Download results from output_file_id
  */
 class OpenAIBatchProvider implements IBatchProvider {
-  private openai: OpenAI;
+  private openai: OpenAI
 
   constructor(apiKey: string = process.env.OPENAI_API_KEY || '') {
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is required');
+      throw new Error('OPENAI_API_KEY environment variable is required')
     }
-    this.openai = new OpenAI({ apiKey });
+    this.openai = new OpenAI({ apiKey })
   }
 
   /**
@@ -385,7 +385,7 @@ class OpenAIBatchProvider implements IBatchProvider {
           },
           ...request.messages,
         ]
-      : request.messages;
+      : request.messages
 
     return {
       custom_id: request.customId,
@@ -400,7 +400,7 @@ class OpenAIBatchProvider implements IBatchProvider {
         }),
         ...(request.topP !== undefined && { top_p: request.topP }),
       },
-    };
+    }
   }
 
   /**
@@ -416,27 +416,27 @@ class OpenAIBatchProvider implements IBatchProvider {
     // Convert requests to JSONL format
     const jsonlLines = requests
       .map((req) => JSON.stringify(this.buildOpenAIRequest(req)))
-      .join('\n');
+      .join('\n')
 
     // Create temporary file
-    const tempDir = os.tmpdir();
-    const tempFilePath = path.join(tempDir, `batch-${Date.now()}.jsonl`);
+    const tempDir = os.tmpdir()
+    const tempFilePath = path.join(tempDir, `batch-${Date.now()}.jsonl`)
 
     try {
       // Write JSONL content to temp file
-      fs.writeFileSync(tempFilePath, jsonlLines, 'utf-8');
+      fs.writeFileSync(tempFilePath, jsonlLines, 'utf-8')
 
       // Upload file to OpenAI
       const file = await this.openai.files.create({
         file: fs.createReadStream(tempFilePath),
         purpose: 'batch',
-      });
+      })
 
-      return file.id;
+      return file.id
     } finally {
       // Clean up temp file
       if (fs.existsSync(tempFilePath)) {
-        fs.unlinkSync(tempFilePath);
+        fs.unlinkSync(tempFilePath)
       }
     }
   }
@@ -451,20 +451,20 @@ class OpenAIBatchProvider implements IBatchProvider {
    */
   async createBatch(requests: BatchRequest[]): Promise<BatchInfo> {
     // Validate requests
-    const validated = z.array(batchRequestSchema).safeParse(requests);
+    const validated = z.array(batchRequestSchema).safeParse(requests)
     if (!validated.success) {
-      throw new Error(`Invalid batch requests: ${validated.error.message}`);
+      throw new Error(`Invalid batch requests: ${validated.error.message}`)
     }
 
     // Upload JSONL file
-    const fileId = await this.uploadBatchFile(requests);
+    const fileId = await this.uploadBatchFile(requests)
 
     // Create batch with file ID
     const openAIBatch = await this.openai.batches.create({
       input_file_id: fileId,
       endpoint: '/v1/chat/completions',
       completion_window: '24h',
-    });
+    })
 
     return {
       id: openAIBatch.id,
@@ -475,14 +475,14 @@ class OpenAIBatchProvider implements IBatchProvider {
       successCount: openAIBatch.request_counts?.completed ?? 0,
       failureCount: openAIBatch.request_counts?.failed ?? 0,
       providerBatchId: openAIBatch.id,
-    };
+    }
   }
 
   /**
    * Check the status of a batch
    */
   async checkStatus(batchId: string): Promise<BatchInfo> {
-    const openAIBatch = await this.openai.batches.retrieve(batchId);
+    const openAIBatch = await this.openai.batches.retrieve(batchId)
 
     return {
       id: openAIBatch.id,
@@ -499,7 +499,7 @@ class OpenAIBatchProvider implements IBatchProvider {
       resultsUrl: openAIBatch.output_file_id
         ? `https://api.openai.com/v1/files/${openAIBatch.output_file_id}/content`
         : undefined,
-    };
+    }
   }
 
   /**
@@ -508,25 +508,25 @@ class OpenAIBatchProvider implements IBatchProvider {
    */
   async *retrieveResults(batchId: string): AsyncGenerator<BatchResult> {
     // Get batch to find output_file_id
-    const batch = await this.openai.batches.retrieve(batchId);
+    const batch = await this.openai.batches.retrieve(batchId)
 
     if (!batch.output_file_id) {
-      return;
+      return
     }
 
     // Download results file from OpenAI
-    const fileContent = await this.openai.files.content(batch.output_file_id);
-    const text = await fileContent.text();
+    const fileContent = await this.openai.files.content(batch.output_file_id)
+    const text = await fileContent.text()
 
     // Parse JSONL line by line
-    const lines = text.split('\n').filter((line: string) => line.trim());
+    const lines = text.split('\n').filter((line: string) => line.trim())
 
     for (const line of lines) {
       try {
-        const response = JSON.parse(line);
-        yield this.mapOpenAIResult(response);
+        const response = JSON.parse(line)
+        yield this.mapOpenAIResult(response)
       } catch (error) {
-        console.error('Failed to parse JSONL line:', line, error);
+        console.error('Failed to parse JSONL line:', line, error)
         // Continue processing remaining lines even if one fails
       }
     }
@@ -536,7 +536,7 @@ class OpenAIBatchProvider implements IBatchProvider {
    * Cancel a batch
    */
   async cancelBatch(batchId: string): Promise<BatchInfo> {
-    const batch = await this.openai.batches.cancel(batchId);
+    const batch = await this.openai.batches.cancel(batchId)
 
     return {
       id: batch.id,
@@ -550,7 +550,7 @@ class OpenAIBatchProvider implements IBatchProvider {
       successCount: batch.request_counts?.completed ?? 0,
       failureCount: batch.request_counts?.failed ?? 0,
       providerBatchId: batch.id,
-    };
+    }
   }
 
   /**
@@ -561,17 +561,17 @@ class OpenAIBatchProvider implements IBatchProvider {
       case 'validating':
       case 'in_progress':
       case 'finalizing':
-        return BATCH_STATUS.PROCESSING;
+        return BATCH_STATUS.PROCESSING
       case 'completed':
-        return BATCH_STATUS.COMPLETED;
+        return BATCH_STATUS.COMPLETED
       case 'failed':
-        return BATCH_STATUS.FAILED;
+        return BATCH_STATUS.FAILED
       case 'expired':
-        return BATCH_STATUS.EXPIRED;
+        return BATCH_STATUS.EXPIRED
       case 'cancelled':
-        return BATCH_STATUS.CANCELLED;
+        return BATCH_STATUS.CANCELLED
       default:
-        return BATCH_STATUS.PROCESSING;
+        return BATCH_STATUS.PROCESSING
     }
   }
 
@@ -581,18 +581,18 @@ class OpenAIBatchProvider implements IBatchProvider {
   private mapOpenAIResult(response: Record<string, unknown>): BatchResult {
     // Type assertions needed for dynamic JSON parsing from OpenAI Batch API
     // OpenAI returns batch results as JSONL with optional error or response fields
-    const customId = response.custom_id as string;
+    const customId = response.custom_id as string
     const error = response.error as
       | { code?: string; message?: string }
-      | undefined;
+      | undefined
     const apiResponse = response.response as
       | { status_code?: number; body?: unknown }
-      | undefined;
+      | undefined
 
     const baseResult = {
       customId,
       rawResponse: response,
-    };
+    }
 
     if (error) {
       return {
@@ -602,7 +602,7 @@ class OpenAIBatchProvider implements IBatchProvider {
           type: error.code || 'unknown_error',
           message: error.message || 'Unknown error',
         },
-      };
+      }
     }
 
     if (apiResponse?.status_code === 200) {
@@ -610,7 +610,7 @@ class OpenAIBatchProvider implements IBatchProvider {
         ...baseResult,
         status: 'succeeded' as const,
         content: apiResponse.body,
-      };
+      }
     }
 
     return {
@@ -620,7 +620,7 @@ class OpenAIBatchProvider implements IBatchProvider {
         type: 'api_error',
         message: `OpenAI API returned status ${apiResponse?.status_code}`,
       },
-    };
+    }
   }
 }
 
@@ -634,36 +634,11 @@ class OpenAIBatchProvider implements IBatchProvider {
  * 4. Stream results from results_url
  */
 class AnthropicBatchProvider implements IBatchProvider {
-  private apiKey: string;
-
   constructor(apiKey: string = process.env.ANTHROPIC_API_KEY || '') {
     if (!apiKey) {
-      throw new Error('ANTHROPIC_API_KEY environment variable is required');
+      throw new Error('ANTHROPIC_API_KEY environment variable is required')
     }
-    this.apiKey = apiKey;
-  }
-
-  /**
-   * Convert BatchRequest to Anthropic batch format
-   */
-  private buildAnthropicRequest(
-    request: BatchRequest,
-  ): Record<string, unknown> {
-    const messages = request.messages;
-
-    return {
-      custom_id: request.customId,
-      params: {
-        model: request.model,
-        max_tokens: request.maxTokens,
-        system: request.systemPrompt,
-        messages,
-        ...(request.temperature !== undefined && {
-          temperature: request.temperature,
-        }),
-        ...(request.topP !== undefined && { top_p: request.topP }),
-      },
-    };
+    this.apiKey = apiKey
   }
 
   /**
@@ -676,7 +651,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async createBatch(_requests: BatchRequest[]): Promise<BatchInfo> {
-    throw new Error('Not implemented - createBatch requires Anthropic SDK');
+    throw new Error('Not implemented - createBatch requires Anthropic SDK')
     // const anthropicRequests = requests.map((req) =>
     //   this.buildAnthropicRequest(req),
     // );
@@ -703,7 +678,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async checkStatus(_batchId: string): Promise<BatchInfo> {
-    throw new Error('Not implemented - checkStatus requires Anthropic SDK');
+    throw new Error('Not implemented - checkStatus requires Anthropic SDK')
     // const batch = await anthropic.messages.batches.retrieve(batchId);
     //
     // return {
@@ -730,7 +705,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async *retrieveResults(_batchId: string): AsyncGenerator<BatchResult> {
-    throw new Error('Not implemented - retrieveResults requires Anthropic SDK');
+    throw new Error('Not implemented - retrieveResults requires Anthropic SDK')
     // for await (const result of anthropic.messages.batches.results(batchId)) {
     //   yield this.mapAnthropicResult(result);
     // }
@@ -741,79 +716,9 @@ class AnthropicBatchProvider implements IBatchProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async cancelBatch(_batchId: string): Promise<BatchInfo> {
-    throw new Error('Not implemented - cancelBatch requires Anthropic SDK');
+    throw new Error('Not implemented - cancelBatch requires Anthropic SDK')
     // const batch = await anthropic.messages.batches.cancel(batchId);
     // return this.mapAnthropicBatch(batch);
-  }
-
-  /**
-   * Map Anthropic status to normalized BatchStatus
-   */
-  private mapAnthropicStatus(anthropicStatus: string): BatchStatus {
-    switch (anthropicStatus) {
-      case 'in_progress':
-        return BATCH_STATUS.PROCESSING;
-      case 'ended':
-        return BATCH_STATUS.COMPLETED;
-      default:
-        return BATCH_STATUS.PROCESSING;
-    }
-  }
-
-  /**
-   * Map Anthropic result format to normalized BatchResult
-   */
-  private mapAnthropicResult(result: Record<string, unknown>): BatchResult {
-    // Type assertions needed for dynamic JSON parsing from Anthropic Batch API
-    // Anthropic returns batch results with required 'result' field containing type and optional message/error
-    const customId = result.custom_id as string;
-    const resultData = result.result as {
-      type: string;
-      message?: unknown;
-      error?: { type?: string; message?: string };
-    };
-
-    const baseResult = {
-      customId,
-      rawResponse: result,
-    };
-
-    switch (resultData.type) {
-      case 'succeeded':
-        return {
-          ...baseResult,
-          status: 'succeeded' as const,
-          content: resultData.message,
-        };
-      case 'errored':
-        return {
-          ...baseResult,
-          status: 'errored' as const,
-          error: {
-            type: resultData.error?.type || 'unknown_error',
-            message: resultData.error?.message || 'Unknown error',
-          },
-        };
-      case 'expired':
-        return {
-          ...baseResult,
-          status: 'expired' as const,
-        };
-      case 'cancelled':
-        return {
-          ...baseResult,
-          status: 'cancelled' as const,
-        };
-      default:
-        return {
-          ...baseResult,
-          status: 'errored' as const,
-          error: {
-            type: 'unknown_result_type',
-            message: `Unknown result type: ${resultData.type}`,
-          },
-        };
-    }
   }
 
   /**
@@ -821,7 +726,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async *listBatches(_limit: number = 10): AsyncGenerator<BatchInfo> {
-    throw new Error('Not implemented - listBatches requires Anthropic SDK');
+    throw new Error('Not implemented - listBatches requires Anthropic SDK')
     // for await (const batch of anthropic.messages.batches.list({
     //   limit,
     // })) {
@@ -849,12 +754,12 @@ class AnthropicBatchProvider implements IBatchProvider {
 export function createBatchProvider(provider: BatchProvider): IBatchProvider {
   switch (provider) {
     case BATCH_PROVIDERS.OPENAI:
-      return new OpenAIBatchProvider();
+      return new OpenAIBatchProvider()
     case BATCH_PROVIDERS.ANTHROPIC:
-      return new AnthropicBatchProvider();
+      return new AnthropicBatchProvider()
     default: {
-      const exhaustiveCheck: never = provider;
-      throw new Error(`Unknown batch provider: ${exhaustiveCheck}`);
+      const exhaustiveCheck: never = provider
+      throw new Error(`Unknown batch provider: ${exhaustiveCheck}`)
     }
   }
 }
@@ -896,38 +801,38 @@ export async function submitAndWaitForBatch(
   pollInterval: number = 60000, // 1 minute
   maxWaitTime: number = 86400000, // 24 hours
 ): Promise<BatchInfo> {
-  const batchProvider = createBatchProvider(provider);
+  const batchProvider = createBatchProvider(provider)
 
   // Validate requests
-  const validated = z.array(batchRequestSchema).safeParse(requests);
+  const validated = z.array(batchRequestSchema).safeParse(requests)
   if (!validated.success) {
-    throw new Error(`Invalid batch requests: ${validated.error.message}`);
+    throw new Error(`Invalid batch requests: ${validated.error.message}`)
   }
 
   // Submit batch
-  let batch = await batchProvider.createBatch(requests);
-  console.log(`Submitted batch ${batch.id} to ${provider}`);
+  let batch = await batchProvider.createBatch(requests)
+  console.log(`Submitted batch ${batch.id} to ${provider}`)
 
   // Poll for completion
-  const startTime = Date.now();
+  const startTime = Date.now()
   while (batch.status === BATCH_STATUS.PROCESSING) {
-    const elapsed = Date.now() - startTime;
+    const elapsed = Date.now() - startTime
     if (elapsed > maxWaitTime) {
       throw new Error(
         `Batch processing exceeded max wait time of ${maxWaitTime}ms`,
-      );
+      )
     }
 
-    await new Promise((resolve) => setTimeout(resolve, pollInterval));
-    batch = await batchProvider.checkStatus(batch.id);
-    console.log(`Batch ${batch.id} status: ${batch.status}`);
+    await new Promise((resolve) => setTimeout(resolve, pollInterval))
+    batch = await batchProvider.checkStatus(batch.id)
+    console.log(`Batch ${batch.id} status: ${batch.status}`)
   }
 
   if (batch.status === BATCH_STATUS.FAILED) {
-    throw new Error(`Batch ${batch.id} failed: ${batch.error?.message}`);
+    throw new Error(`Batch ${batch.id} failed: ${batch.error?.message}`)
   }
 
-  return batch;
+  return batch
 }
 
 /**
@@ -956,8 +861,8 @@ export async function* streamBatchResults(
   provider: BatchProvider,
   batchId: string,
 ): AsyncGenerator<BatchResult> {
-  const batchProvider = createBatchProvider(provider);
-  yield* batchProvider.retrieveResults(batchId);
+  const batchProvider = createBatchProvider(provider)
+  yield* batchProvider.retrieveResults(batchId)
 }
 
 /**
@@ -984,11 +889,11 @@ export async function collectBatchResults(
   provider: BatchProvider,
   batchId: string,
 ): Promise<BatchResult[]> {
-  const results: BatchResult[] = [];
+  const results: BatchResult[] = []
   for await (const result of streamBatchResults(provider, batchId)) {
-    results.push(result);
+    results.push(result)
   }
-  return results;
+  return results
 }
 
 /**
@@ -1012,15 +917,15 @@ export async function collectBatchResults(
  * ```
  */
 export function groupResultsByStatus(results: BatchResult[]): {
-  succeeded: BatchResult[];
-  errored: BatchResult[];
-  expired: BatchResult[];
-  cancelled: BatchResult[];
+  succeeded: BatchResult[]
+  errored: BatchResult[]
+  expired: BatchResult[]
+  cancelled: BatchResult[]
 } {
   return {
     succeeded: results.filter((r) => r.status === 'succeeded'),
     errored: results.filter((r) => r.status === 'errored'),
     expired: results.filter((r) => r.status === 'expired'),
     cancelled: results.filter((r) => r.status === 'cancelled'),
-  };
+  }
 }

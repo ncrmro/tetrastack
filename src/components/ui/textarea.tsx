@@ -1,13 +1,13 @@
-import React from 'react';
-import { cn } from '@/lib/glass-components/utils';
-import { GlassSurface } from '@/lib/glass-components/GlassSurface';
+import type React from 'react'
+import { GlassSurface } from '@/lib/glass-components/GlassSurface'
+import { cn } from '@/lib/glass-components/utils'
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   /**
    * Glass intensity - defaults to 'strong' for heavy blur
    */
-  intensity?: 'light' | 'medium' | 'strong';
+  intensity?: 'light' | 'medium' | 'strong'
 }
 
 /**
@@ -46,5 +46,5 @@ export function Textarea({
       )}
       {...props}
     />
-  );
+  )
 }

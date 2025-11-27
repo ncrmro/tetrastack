@@ -1,95 +1,95 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import type { SelectProject } from '@/database/schema.projects';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import type { SelectProject } from '@/database/schema.projects'
 
 interface AIProjectGeneratorProps {
-  teamId: string;
-  onSuccess?: (project: SelectProject) => void;
+  teamId: string
+  onSuccess?: (project: SelectProject) => void
 }
 
 interface ProgressEvent {
-  type: string;
-  message?: string;
-  [key: string]: unknown;
+  type: string
+  message?: string
+  [key: string]: unknown
 }
 
 export function AIProjectGenerator({
   teamId,
   onSuccess,
 }: AIProjectGeneratorProps) {
-  const router = useRouter();
-  const [description, setDescription] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState<ProgressEvent[]>([]);
+  const router = useRouter()
+  const [description, setDescription] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [progress, setProgress] = useState<ProgressEvent[]>([])
   const [result, setResult] = useState<{
-    project?: SelectProject;
-    explanation?: string;
-    error?: string;
-  } | null>(null);
+    project?: SelectProject
+    explanation?: string
+    error?: string
+  } | null>(null)
 
   const handleGenerate = async () => {
-    if (!description.trim()) return;
+    if (!description.trim()) return
 
-    setIsGenerating(true);
-    setProgress([]);
-    setResult(null);
+    setIsGenerating(true)
+    setProgress([])
+    setResult(null)
 
     try {
       const response = await fetch('/api/ai/generate-project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description, teamId }),
-      });
+      })
 
       if (!response.body) {
-        throw new Error('No response body');
+        throw new Error('No response body')
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done, value } = await reader.read()
+        if (done) break
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
 
         for (const line of lines) {
           if (line.startsWith('event: ')) {
-            const eventType = line.substring(7);
-            const nextLine = lines[lines.indexOf(line) + 1];
+            const eventType = line.substring(7)
+            const nextLine = lines[lines.indexOf(line) + 1]
 
             if (nextLine?.startsWith('data: ')) {
-              const data = JSON.parse(nextLine.substring(6));
+              const data = JSON.parse(nextLine.substring(6))
 
               if (eventType === 'progress') {
-                setProgress((prev) => [...prev, data]);
+                setProgress((prev) => [...prev, data])
               } else if (eventType === 'complete') {
                 setResult({
                   project: data.project,
                   explanation: data.explanation,
-                });
+                })
                 if (data.project && onSuccess) {
-                  onSuccess(data.project);
+                  onSuccess(data.project)
                 }
               } else if (eventType === 'error') {
-                setResult({ error: data.error });
+                setResult({ error: data.error })
               }
             }
           }
         }
       }
     } catch {
-      setResult({ error: 'Failed to generate project. Please try again.' });
+      setResult({ error: 'Failed to generate project. Please try again.' })
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -166,7 +166,7 @@ export function AIProjectGenerator({
                 </p>
               )}
               <button
-                onClick={() => router.push(`/projects/${result.project!.slug}`)}
+                onClick={() => router.push(`/projects/${result.project?.slug}`)}
                 className="text-sm font-medium text-primary hover:underline"
               >
                 View Project →
@@ -176,5 +176,5 @@ export function AIProjectGenerator({
         </div>
       )}
     </div>
-  );
+  )
 }

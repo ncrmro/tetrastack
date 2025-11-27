@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import ThemeToggle from '@/components/ui/ThemeToggle';
-import AccountDropdown from '@/components/AccountDropdown';
-import { Session } from 'next-auth';
-import { Button } from '@/components/ui/button';
-import { Nav } from '@/components/ui/nav';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import type { Session } from 'next-auth'
+import { useState } from 'react'
+import AccountDropdown from '@/components/AccountDropdown'
+import { Button } from '@/components/ui/button'
+import { Nav } from '@/components/ui/nav'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 interface NavigationProps {
-  session: Session | null;
-  isAdmin: boolean;
-  signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
+  session: Session | null
+  isAdmin: boolean
+  signIn: () => Promise<void>
+  signOut: () => Promise<void>
 }
 
 export default function Navigation({
@@ -22,7 +22,7 @@ export default function Navigation({
   signIn,
   signOut,
 }: NavigationProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <Nav sticky intensity="light">
@@ -77,7 +77,7 @@ export default function Navigation({
             ) : (
               <form
                 action={async () => {
-                  await signIn();
+                  await signIn()
                 }}
               >
                 <Button type="submit" variant="tertiary" className="text-sm">
@@ -162,8 +162,8 @@ export default function Navigation({
                 {session?.user ? (
                   <form
                     action={async () => {
-                      await signOut();
-                      setMobileMenuOpen(false);
+                      await signOut()
+                      setMobileMenuOpen(false)
                     }}
                   >
                     <Button
@@ -177,8 +177,8 @@ export default function Navigation({
                 ) : (
                   <form
                     action={async () => {
-                      await signIn();
-                      setMobileMenuOpen(false);
+                      await signIn()
+                      setMobileMenuOpen(false)
                     }}
                   >
                     <Button
@@ -196,5 +196,5 @@ export default function Navigation({
         )}
       </div>
     </Nav>
-  );
+  )
 }

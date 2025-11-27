@@ -1,1 +1,1 @@
-export { GlassSelect as Select } from '@/lib/glass-components/GlassSelect';
+export { GlassSelect as Select } from '@/lib/glass-components/GlassSelect'

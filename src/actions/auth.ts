@@ -1,11 +1,11 @@
-'use server';
+'use server'
 
-import { signIn as authSignIn, signOut as authSignOut } from '@/app/auth';
+import { signIn as authSignIn, signOut as authSignOut } from '@/app/auth'
 
 export async function signInAction() {
-  await authSignIn();
+  await authSignIn()
 }
 
 export async function signOutAction() {
-  await authSignOut({ redirectTo: '/' });
+  await authSignOut({ redirectTo: '/' })
 }

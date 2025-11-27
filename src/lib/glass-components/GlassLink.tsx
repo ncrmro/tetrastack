@@ -1,6 +1,6 @@
-import React from 'react';
-import { cn } from './utils';
-import { GlassSurface } from './GlassSurface';
+import type React from 'react'
+import { GlassSurface } from './GlassSurface'
+import { cn } from './utils'
 
 export interface GlassLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -8,20 +8,20 @@ export interface GlassLinkProps
    * The variant of the link button
    * @default 'primary'
    */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'error';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'error'
   /**
    * The size of the link button
    * @default 'medium'
    */
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large'
   /**
    * The URL to link to
    */
-  href: string;
+  href: string
   /**
    * Link content
    */
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 /**
@@ -69,13 +69,13 @@ export function GlassLink({
     tertiary:
       'bg-tertiary/20 text-tertiary hover:bg-tertiary/30 active:bg-tertiary/40',
     error: 'bg-error/20 text-error hover:bg-error/30 active:bg-error/40',
-  };
+  }
 
   const sizeStyles = {
     small: 'px-3 py-1.5 text-sm',
     medium: 'px-4 py-2 text-base',
     large: 'px-6 py-3 text-lg',
-  };
+  }
 
   return (
     <GlassSurface<'a'>
@@ -95,5 +95,5 @@ export function GlassLink({
     >
       {children}
     </GlassSurface>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import type { BaseAgent } from './base-agent';
-import type { AgentState } from './types';
+import type { BaseAgent } from './base-agent'
+import type { AgentState } from './types'
 
 /**
  * Helper utilities for agent state serialization and persistence
@@ -40,7 +40,7 @@ export function serializeAgentState<T extends BaseAgent>(
   return {
     id: crypto.randomUUID(),
     state: agent.toJSON(),
-  };
+  }
 }
 
 /**
@@ -72,7 +72,7 @@ export function deserializeAgentState<T extends BaseAgent>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   AgentClass: any,
 ): T {
-  return AgentClass.fromJSON(state) as T;
+  return AgentClass.fromJSON(state) as T
 }
 
 /**
@@ -105,7 +105,7 @@ export function createExpiringState<T extends BaseAgent>(
     id: crypto.randomUUID(),
     state: agent.toJSON(),
     expiresAt: new Date(Date.now() + ttlHours * 60 * 60 * 1000),
-  };
+  }
 }
 
 /**
@@ -116,6 +116,6 @@ export function createExpiringState<T extends BaseAgent>(
  */
 export function isStateExpired(expiresAt: Date | string): boolean {
   const expiration =
-    typeof expiresAt === 'string' ? new Date(expiresAt) : expiresAt;
-  return expiration < new Date();
+    typeof expiresAt === 'string' ? new Date(expiresAt) : expiresAt
+  return expiration < new Date()
 }

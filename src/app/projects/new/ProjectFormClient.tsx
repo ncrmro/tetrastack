@@ -1,40 +1,40 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { createProject } from '@/actions/projects';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import { enumToOptions } from '@/lib/enum-utils';
-import type { SelectTeam } from '@/database/schema.teams';
-import { Button, ButtonLink } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { createProject } from '@/actions/projects'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects'
+import type { SelectTeam } from '@/database/schema.teams'
+import { enumToOptions } from '@/lib/enum-utils'
 
 interface ProjectFormClientProps {
-  teams: SelectTeam[];
-  preselectedTeamId?: string;
+  teams: SelectTeam[]
+  preselectedTeamId?: string
 }
 
 export default function ProjectFormClient({
   teams,
   preselectedTeamId,
 }: ProjectFormClientProps) {
-  const router = useRouter();
-  const [teamId, setTeamId] = useState(preselectedTeamId || teams[0]?.id || '');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<keyof typeof PROJECT_STATUS>('PLANNING');
+  const router = useRouter()
+  const [teamId, setTeamId] = useState(preselectedTeamId || teams[0]?.id || '')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState<keyof typeof PROJECT_STATUS>('PLANNING')
   const [priority, setPriority] =
-    useState<keyof typeof PROJECT_PRIORITY>('MEDIUM');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    useState<keyof typeof PROJECT_PRIORITY>('MEDIUM')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
     const result = await createProject({
       teamId,
@@ -43,15 +43,15 @@ export default function ProjectFormClient({
       status,
       priority,
       createdBy: 1, // Will be set properly by the action
-    });
+    })
 
     if (result.success) {
-      router.push(`/projects/${result.data.slug}`);
+      router.push(`/projects/${result.data.slug}`)
     } else {
-      setError(result.error);
-      setIsSubmitting(false);
+      setError(result.error)
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -208,5 +208,5 @@ export default function ProjectFormClient({
         </form>
       </div>
     </div>
-  );
+  )
 }

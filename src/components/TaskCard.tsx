@@ -1,21 +1,21 @@
-import Link from 'next/link';
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  TASK_STATUS,
   type SelectTask,
+  TASK_STATUS,
   type TaskPriority,
   type TaskStatus,
-} from '@/database/schema.tasks';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { StatusBadge } from './StatusBadge';
-import { PriorityIndicator } from './PriorityIndicator';
+} from '@/database/schema.tasks'
+import { PriorityIndicator } from './PriorityIndicator'
+import { StatusBadge } from './StatusBadge'
 
 interface TaskCardProps {
   task: SelectTask & {
-    assignee?: { id: number; name: string | null } | null;
-    project?: { id: string; title: string; slug: string } | null;
-  };
-  showProject?: boolean;
-  className?: string;
+    assignee?: { id: number; name: string | null } | null
+    project?: { id: string; title: string; slug: string } | null
+  }
+  showProject?: boolean
+  className?: string
 }
 
 export function TaskCard({
@@ -26,7 +26,7 @@ export function TaskCard({
   const isOverdue =
     task.dueDate &&
     new Date(task.dueDate) < new Date() &&
-    task.status !== TASK_STATUS.DONE;
+    task.status !== TASK_STATUS.DONE
 
   return (
     <Link
@@ -85,5 +85,5 @@ export function TaskCard({
         </CardContent>
       </Card>
     </Link>
-  );
+  )
 }

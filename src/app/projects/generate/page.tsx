@@ -1,30 +1,30 @@
-import { authRedirect } from '../../auth';
-import { User } from '@/models/user';
-import { notFound } from 'next/navigation';
-import { AIProjectGenerator } from '@/components/AIProjectGenerator';
-import Link from 'next/link';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { AIProjectGenerator } from '@/components/AIProjectGenerator'
+import { User } from '@/models/user'
+import { authRedirect } from '../../auth'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 interface GenerateProjectPageProps {
-  searchParams: Promise<{ teamId?: string }>;
+  searchParams: Promise<{ teamId?: string }>
 }
 
 export default async function GenerateProjectPage({
   searchParams,
 }: GenerateProjectPageProps) {
-  const session = await authRedirect();
-  const userId = parseInt(session.user.id);
-  const params = await searchParams;
+  const session = await authRedirect()
+  const userId = parseInt(session.user.id, 10)
+  const params = await searchParams
 
   // Get user's teams
-  const userTeams = await User.getUserTeams(userId);
+  const userTeams = await User.getUserTeams(userId)
 
   if (userTeams.length === 0) {
-    notFound();
+    notFound()
   }
 
-  const preselectedTeamId = params.teamId || userTeams[0].team.id;
+  const preselectedTeamId = params.teamId || userTeams[0].team.id
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,5 +52,5 @@ export default async function GenerateProjectPage({
         <AIProjectGenerator teamId={preselectedTeamId} />
       </div>
     </div>
-  );
+  )
 }

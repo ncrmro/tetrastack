@@ -33,7 +33,7 @@ export function slugify(text: string): string {
     .replace(/[^\w\s-]/g, '') // Remove all non-word chars except spaces and hyphens
     .replace(/\s+/g, '-') // Replace spaces with hyphens
     .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
+    .replace(/^-+|-+$/g, '') // Trim leading/trailing hyphens
 }
 
 /**
@@ -52,16 +52,16 @@ export function generateUniqueSlug(
   existingSlugs: Set<string>,
 ): string {
   if (!existingSlugs.has(baseSlug)) {
-    return baseSlug;
+    return baseSlug
   }
 
-  let counter = 2;
-  let uniqueSlug = `${baseSlug}-${counter}`;
+  let counter = 2
+  let uniqueSlug = `${baseSlug}-${counter}`
 
   while (existingSlugs.has(uniqueSlug)) {
-    counter++;
-    uniqueSlug = `${baseSlug}-${counter}`;
+    counter++
+    uniqueSlug = `${baseSlug}-${counter}`
   }
 
-  return uniqueSlug;
+  return uniqueSlug
 }

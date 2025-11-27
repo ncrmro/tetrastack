@@ -1,5 +1,4 @@
-import React from 'react';
-import { ButtonLink } from '@/components/ui/button';
+import { ButtonLink } from '@/components/ui/button'
 
 export default function LandingPage() {
   return (
@@ -311,5 +310,5 @@ export default function LandingPage() {
         </div>
       </section>
     </div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { teams } from './schema.teams';
-import { generateUuidV7 } from '@/lib/uuid';
+import { relations, sql } from 'drizzle-orm'
+import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { generateUuidV7 } from '@/lib/uuid'
+import { teams } from './schema.teams'
 
 export const tags = sqliteTable(
   'tags',
@@ -23,7 +23,7 @@ export const tags = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [check('name_not_empty', sql`length(${table.name}) > 0`)],
-);
+)
 
 // Relations
 export const tagsRelations = relations(tags, ({ one }) => ({
@@ -31,24 +31,24 @@ export const tagsRelations = relations(tags, ({ one }) => ({
     fields: [tags.teamId],
     references: [teams.id],
   }),
-}));
+}))
 
 // Schema generation and types
-import { createSelectSchema } from 'drizzle-zod';
-import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
+import { createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
+import { createAutoInsertSchema } from '@/lib/db/schema-helpers'
 
 /**
  * Base tag schema for insertions (auto-generated from Drizzle table)
  * Auto-omits: id, createdAt, updatedAt
  */
-export const insertTagSchema = createAutoInsertSchema(tags);
+export const insertTagSchema = createAutoInsertSchema(tags)
 
 /**
  * Complete tag schema including all fields (auto-generated from Drizzle table)
  */
-export const selectTagSchema = createSelectSchema(tags);
+export const selectTagSchema = createSelectSchema(tags)
 
 // Export types for TypeScript usage
-export type InsertTag = z.infer<typeof insertTagSchema>;
-export type SelectTag = z.infer<typeof selectTagSchema>;
+export type InsertTag = z.infer<typeof insertTagSchema>
+export type SelectTag = z.infer<typeof selectTagSchema>
