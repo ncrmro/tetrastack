@@ -4,6 +4,7 @@ import {
   teamMemberships,
   insertTeamSchema,
   insertTeamMembershipSchema,
+  TEAM_ROLE,
 } from '@/database/schema.teams';
 import { and, inArray } from 'drizzle-orm';
 import { createModelFactory } from '@/lib/models';
@@ -108,4 +109,38 @@ export async function getTeamMemberships(params: {
       user: true,
     },
   });
+}
+
+/**
+ * Creates a default team for a new user
+ * Uses existing insertTeams and insertTeamMemberships functions
+ *
+ * @param userId - The user ID to create the team for
+ * @param userName - Optional user name for team naming
+ * @returns The created team
+ */
+export async function createDefaultTeam(
+  userId: number,
+  userName?: string | null,
+) {
+  const teamName = userName ? `${userName}'s Team` : 'My Team';
+
+  // Create the team
+  const [team] = await insertTeams([
+    {
+      name: teamName,
+      description: 'Default team created on signup',
+    },
+  ]);
+
+  // Add user as admin of their default team
+  await insertTeamMemberships([
+    {
+      teamId: team.id,
+      userId: userId,
+      role: TEAM_ROLE.ADMIN,
+    },
+  ]);
+
+  return team;
 }

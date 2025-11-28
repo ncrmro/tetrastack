@@ -2,6 +2,7 @@ import { db } from '@/database';
 import { users } from '@/database/schema.auth';
 import { teamMemberships, teams } from '@/database/schema.teams';
 import { inArray, and, eq } from 'drizzle-orm';
+import { createDefaultTeam } from './teams';
 
 /**
  * Internal query function to get users with all relations
@@ -111,6 +112,37 @@ export class User {
       console.error('Error getting user teams:', error);
       throw new Error('Failed to get user teams');
     }
+  }
+
+  /**
+   * Creates a new user from OAuth sign-in
+   * Handles all NextAuth.js user creation logic and post-creation side effects
+   *
+   * @param data - OAuth user data (email, name, image)
+   * @returns The created user record
+   */
+  static async createOAuthUser(data: {
+    email: string;
+    name?: string | null;
+    image?: string | null;
+  }) {
+    // Insert the user
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: data.email,
+        name: data.name ?? null,
+        image: data.image ?? null,
+        admin: false,
+        onboardingCompleted: true,
+        onboardingData: null,
+      })
+      .returning();
+
+    // After commit: Create default team for the new user
+    await createDefaultTeam(newUser.id, newUser.name);
+
+    return newUser;
   }
 
   /**

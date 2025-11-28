@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { users } from '@/database/schema.auth';
 import PostHogClient from '@/lib/posthog-server';
 import { authConfig } from '@/lib/auth.config';
+import { User } from '@/models/user';
 
 // Redirect URL for authenticated users
 export const AUTHENTICATED_USER_REDIRECT_URL = '/dashboard';
@@ -150,17 +151,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Create new user for OAuth sign-ins (production only)
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          email,
-          name: name as string | null,
-          image: image as string | null,
-          admin: false,
-          onboardingCompleted: true,
-          onboardingData: null,
-        })
-        .returning();
+      const newUser = await User.createOAuthUser({
+        email,
+        name: name as string | null,
+        image: image as string | null,
+      });
 
       token.id = newUser.id.toString();
       token.admin = newUser.admin ?? false;
