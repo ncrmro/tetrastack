@@ -289,15 +289,15 @@ describe('Browser Database', () => {
 
 ## Browser Compatibility Matrix
 
-| Feature           | Chrome | Edge   | Firefox | Safari   | Notes                                             |
-| ----------------- | ------ | ------ | ------- | -------- | ------------------------------------------------- |
-| SQLite WASM       | ✅ 86+ | ✅ 86+ | ✅ 100+ | ✅ 15.2+ | Universal support                                 |
-| OPFS (Sync)       | ✅ 86+ | ✅ 86+ | ✅ 111+ | ⚠️ 15.2+ | Safari: No synchronous access in Workers          |
-| OPFS (Async)      | ✅ 86+ | ✅ 86+ | ✅ 111+ | ✅ 15.2+ | Broader support                                   |
-| IndexedDB         | ✅ All | ✅ All | ✅ All  | ✅ All   | Fallback option                                   |
-| Web Workers       | ✅ All | ✅ All | ✅ All  | ✅ All   | Required for OPFS sync                            |
-| libsql Web Client | ✅ All | ✅ All | ✅ All  | ✅ All   | HTTP/WS only                                      |
-| Embedded Replicas | ✅ 86+ | ✅ 86+ | ⚠️ 111+ | ⚠️ 15.2+ | Needs OPFS sync support                           |
+| Feature           | Chrome | Edge   | Firefox | Safari   | Notes                                    |
+| ----------------- | ------ | ------ | ------- | -------- | ---------------------------------------- |
+| SQLite WASM       | ✅ 86+ | ✅ 86+ | ✅ 100+ | ✅ 15.2+ | Universal support                        |
+| OPFS (Sync)       | ✅ 86+ | ✅ 86+ | ✅ 111+ | ⚠️ 15.2+ | Safari: No synchronous access in Workers |
+| OPFS (Async)      | ✅ 86+ | ✅ 86+ | ✅ 111+ | ✅ 15.2+ | Broader support                          |
+| IndexedDB         | ✅ All | ✅ All | ✅ All  | ✅ All   | Fallback option                          |
+| Web Workers       | ✅ All | ✅ All | ✅ All  | ✅ All   | Required for OPFS sync                   |
+| libsql Web Client | ✅ All | ✅ All | ✅ All  | ✅ All   | HTTP/WS only                             |
+| Embedded Replicas | ✅ 86+ | ✅ 86+ | ⚠️ 111+ | ⚠️ 15.2+ | Needs OPFS sync support                  |
 
 **Recommendation:** Target Chrome/Edge as primary, provide IndexedDB fallback for Firefox/Safari if needed.
 
