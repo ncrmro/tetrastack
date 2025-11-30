@@ -124,7 +124,7 @@ export function BrowserDatabaseExample() {
     if (!db) return;
 
     const data = db.export();
-    // @ts-expect-error - Type compatibility issue in POC example
+    // @ts-expect-error - Uint8Array type from db.export() is not directly compatible with Blob constructor in TypeScript
     const blob = new Blob([data], { type: 'application/x-sqlite3' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
