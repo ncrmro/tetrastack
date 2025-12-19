@@ -1,21 +1,16 @@
 // Shared types and constants for agents - safe for client-side import
 
-export interface MealGenerationOptions {
+export interface TaskGenerationOptions {
   simplified?: boolean;
-  vegan?: boolean;
-  vegetarian?: boolean;
-  glutenFree?: boolean;
-  resolveRecipesNow?: boolean;
-  resolveFoodsNow?: boolean;
-  getOrCreateMeals?: boolean; // Enable meal database search/create
-  getOrCreateRecipes?: boolean; // Cascade to recipe agent
-  getOrCreateFoods?: boolean; // Cascade through meal → recipe → food agents
+  includeSubtasks?: boolean;
+  includeDependencies?: boolean;
+  getOrCreateTasks?: boolean; // Enable task database search/create
+  getOrCreateProjects?: boolean; // Cascade to project agent
 }
 
-export const MealGenerationSteps = {
+export const TaskGenerationSteps = {
   RESEARCH: 'research',
   SELECT: 'select',
   GENERATE: 'generate',
-  FOODS: 'foods',
   COMPLETE: 'complete',
 } as const;

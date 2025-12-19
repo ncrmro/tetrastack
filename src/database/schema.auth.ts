@@ -7,41 +7,26 @@ import {
 import type { AdapterAccountType } from 'next-auth/adapters';
 
 /**
- * Dietary preferences structure stored in users.data
+ * User preferences structure stored in users.data
  *
- * Defines what foods/recipes/meals to filter out based on:
- * - Diet type presets (vegan, vegetarian)
- * - Specific excluded tags (allergens, specific meat types)
- * - Toggle to enable/disable filtering
+ * Defines user-specific settings and preferences.
+ * This type can be extended as new preference categories are added.
  */
-export type DietaryPreferences = {
+export type UserPreferences = {
   /**
-   * Preset diet type (mutually exclusive)
-   *
-   * - 'vegan': Excludes all animal:* and animal:product tags
-   * - 'vegetarian': Excludes animal:meat and animal:meat:* tags
-   * - 'none': No preset, only use excludedTags
+   * Theme preference for the UI
    */
-  dietType?: 'vegan' | 'vegetarian' | 'none';
+  theme?: 'light' | 'dark' | 'system';
 
   /**
-   * Specific tags to exclude (in addition to diet type)
-   *
-   * Examples:
-   * - ['allergen:peanut', 'allergen:gluten'] - exclude peanuts and gluten
-   * - ['animal:meat:pork'] - exclude pork specifically
-   *
-   * These are additive with dietType exclusions
+   * Whether to show completed tasks by default
    */
-  excludedTags?: string[];
+  showCompletedTasks?: boolean;
 
   /**
-   * Whether filtering is currently enabled
-   *
-   * Allows users to temporarily disable filters without
-   * losing their configured preferences
+   * Default view for project lists
    */
-  filterEnabled?: boolean;
+  defaultProjectView?: 'list' | 'board' | 'calendar';
 };
 
 export const users = sqliteTable('user', {
@@ -64,19 +49,16 @@ export const users = sqliteTable('user', {
    * schema migrations for each new preference type.
    *
    * Example usage:
-   * - dietaryPreferences: DietaryPreferences
-   *   - Diet type (vegan, vegetarian, none)
-   *   - Excluded tags (allergens, specific ingredients)
-   *   - Filter enabled/disabled toggle
-   * - Theme preferences
+   * - preferences: UserPreferences
+   *   - Theme (light, dark, system)
+   *   - Default views and display settings
    * - Notification settings
-   * - Display preferences
    * - Feature flags
    */
   data: text('data', {
     mode: 'json',
   }).$type<{
-    dietaryPreferences?: DietaryPreferences;
+    preferences?: UserPreferences;
   }>(),
 });
 

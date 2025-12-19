@@ -66,7 +66,7 @@
     "AUTH_REDIRECT_PROXY_URL": "https://tetrastack.example/api/auth", // OAuth callback URL for production
 
     // Database configuration (public URL, requires TURSO_AUTH_TOKEN secret)
-    "TURSO_DATABASE_URL": "libsql://meze-production-ncrmro.aws-us-east-2.turso.io",
+    "TURSO_DATABASE_URL": "libsql://tetrastack-production-{user}.turso.io",
 
     // OAuth providers (requires corresponding *_SECRET in Cloudflare secrets)
     "AUTH_GOOGLE_ID": "example.apps.googleusercontent.com", // → Needs: AUTH_GOOGLE_SECRET (wrangler secret)

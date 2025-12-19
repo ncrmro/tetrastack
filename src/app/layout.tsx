@@ -5,9 +5,9 @@ import AuthProvider from '../components/AuthProvider';
 import PostHogIdentifier from '../components/posthog-identifier';
 
 export const metadata: Metadata = {
-  title: 'Meze - Transform Your Meal Prep',
+  title: 'Tetrastack - Project Management',
   description:
-    'A comprehensive meal prepping platform that makes nutrition and meal planning effortless, leading to healthier living, better aesthetics, and often reduced food costs.',
+    'A comprehensive project management platform for teams to collaborate on projects and tasks.',
 };
 
 export default function RootLayout({

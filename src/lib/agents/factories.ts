@@ -8,14 +8,14 @@ import { like, or, asc } from 'drizzle-orm';
  *
  * @example
  * ```typescript
- * const searchFoods = createSearchTool({
- *   entityName: 'food',
- *   table: foods,
+ * const searchProjects = createSearchTool({
+ *   entityName: 'project',
+ *   table: projects,
  * });
  * ```
  */
 export function createSearchTool(config: {
-  entityName: string; // 'food', 'recipe', 'meal'
+  entityName: string; // 'project', 'task', 'team'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: any; // Drizzle SQLite table
   limit?: number; // default: 50
@@ -71,8 +71,8 @@ export function createSearchTool(config: {
  * @example
  * ```typescript
  * const OUTPUT_SCHEMA = createAgentOutputSchema(
- *   'food',
- *   insertFoodSchema.omit({ createdBy: true }).extend({ nutrients: nutrientsSchema })
+ *   'project',
+ *   insertProjectSchema.omit({ createdBy: true }).extend({ tags: tagsSchema })
  * );
  * ```
  */
@@ -112,12 +112,12 @@ export function createAgentOutputSchema(
  * @example
  * ```typescript
  * const SYSTEM_PROMPT = createSystemPrompt({
- *   role: 'nutrition expert',
- *   task: 'create food entries',
- *   entityName: 'food',
+ *   role: 'project management expert',
+ *   task: 'create project entries',
+ *   entityName: 'project',
  *   guidelines: [
- *     'Use BASE FOOD NAMES ONLY without preparation adjectives',
- *     'Base nutritional values on USDA FoodData Central',
+ *     'Use clear, concise project names',
+ *     'Include measurable objectives',
  *   ],
  *   criticalRules: [
  *     'ALWAYS search before creating to avoid duplicates',
@@ -126,9 +126,9 @@ export function createAgentOutputSchema(
  * ```
  */
 export function createSystemPrompt(config: {
-  role: string; // "nutrition expert", "culinary expert", "meal planning expert"
-  task: string; // "create food entries", "create recipes", "create meal plans"
-  entityName: string; // "food", "recipe", "meal"
+  role: string; // "project manager", "task coordinator", "team lead"
+  task: string; // "create project entries", "create tasks", "assign team members"
+  entityName: string; // "project", "task", "team"
   guidelines?: string[]; // Optional specific guidelines
   criticalRules?: string[]; // Optional critical rules (MUST/NEVER statements)
 }): string {
@@ -156,7 +156,7 @@ export function createSystemPrompt(config: {
 4. You MUST ALWAYS return a terse conversational explanation in its own key outside of the result`;
 
   const parts = [
-    `You are a ${role} helping users ${task} for a meal planning app.`,
+    `You are a ${role} helping users ${task} for a project management app.`,
     '',
     'Your task is to either find existing items in the database or generate new ones as needed. The schema provides detailed field descriptions and validation rules for all properties.',
     '',

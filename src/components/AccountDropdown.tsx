@@ -54,26 +54,6 @@ export default function AccountDropdown({
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem asChild>
-          <Link
-            href="/nutrition"
-            className="flex items-center space-x-2 w-full"
-          >
-            <span className="w-4 h-4 text-center">📊</span>
-            <span>Nutrition</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link
-            href="/household"
-            className="flex items-center space-x-2 w-full"
-          >
-            <span className="w-4 h-4 text-center">🏠</span>
-            <span>Household</span>
-          </Link>
-        </DropdownMenuItem>
-
         {isAdmin && (
           <DropdownMenuItem asChild>
             <Link

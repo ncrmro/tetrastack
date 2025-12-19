@@ -1,0 +1,408 @@
+#!/usr/bin/env python3
+"""
+Tetrastack Template Sync Utility
+
+Sync reusable components between this template and projects that use it.
+
+Usage:
+    From template:
+        bin/tetrastack list                    # List syncable items
+        bin/tetrastack push <target-dir>       # Sync items to target project
+
+    From project (with .tetrastack.yml):
+        bin/tetrastack list                    # List syncable items
+        bin/tetrastack pull                    # Pull updates from template
+        bin/tetrastack push                    # Push changes back to template
+
+Safety:
+    - Refuses to run if git tree is dirty in source or target
+    - Use git add/commit before syncing
+
+Config file (.tetrastack.yml):
+    template_path: ../tetrastack
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+
+# Syncable items from template
+SYNCABLE_ITEMS = [
+    'bin/claude',
+    'bin/worktree',
+    'src/lib/jobs',
+    'src/lib/models',
+]
+
+def get_project_root():
+    """Get the project root directory."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(script_dir)
+
+def load_config(directory):
+    """Load .tetrastack.yml config if it exists."""
+    config_path = os.path.join(directory, '.tetrastack.yml')
+    if os.path.exists(config_path):
+        config = {}
+        current_list_key = None
+        with open(config_path, 'r') as f:
+            for line in f:
+                stripped = line.strip()
+
+                # Skip comments and empty lines
+                if not stripped or stripped.startswith('#'):
+                    continue
+
+                # Handle list items (lines starting with -)
+                if stripped.startswith('-'):
+                    if current_list_key:
+                        value = stripped[1:].strip()
+                        # Expand ~ in paths
+                        if '~' in value:
+                            value = os.path.expanduser(value)
+                        config[current_list_key].append(value)
+                    continue
+
+                # Handle key:value pairs
+                if ':' in stripped:
+                    key, value = stripped.split(':', 1)
+                    key = key.strip()
+                    value = value.strip()
+
+                    # If value is empty, this might be a list key
+                    if not value:
+                        current_list_key = key
+                        config[key] = []
+                    else:
+                        current_list_key = None
+                        # Expand ~ in paths
+                        if '~' in value:
+                            value = os.path.expanduser(value)
+                        config[key] = value
+        return config
+    return None
+
+def select_projects(candidates):
+    """Interactively select one or more projects from a list of candidates."""
+    if not candidates:
+        return []
+
+    # Filter out non-existent directories and warn
+    valid_candidates = []
+    for candidate in candidates:
+        abs_path = os.path.abspath(candidate)
+        if os.path.isdir(abs_path):
+            valid_candidates.append(abs_path)
+        else:
+            print(f"⚠ Warning: Directory does not exist: {candidate}")
+
+    if not valid_candidates:
+        print("Error: No valid project directories found")
+        return []
+
+    # If only one valid candidate, use it automatically
+    if len(valid_candidates) == 1:
+        print(f"Using project: {valid_candidates[0]}")
+        return valid_candidates
+
+    # Display menu
+    print("\nSelect project(s):")
+    for i, project in enumerate(valid_candidates, 1):
+        print(f"  {i}. {project}")
+
+    # Get user selection
+    try:
+        selection = input("\nEnter selection(s) (e.g., 1 or 1 2 or 'all'): ").strip()
+
+        if selection.lower() == 'all':
+            return valid_candidates
+
+        # Parse space-separated numbers
+        selected_indices = [int(s) - 1 for s in selection.split()]
+
+        # Validate indices
+        selected_projects = []
+        for idx in selected_indices:
+            if 0 <= idx < len(valid_candidates):
+                selected_projects.append(valid_candidates[idx])
+            else:
+                print(f"⚠ Warning: Invalid selection {idx + 1}, skipping")
+
+        return selected_projects
+    except (ValueError, KeyboardInterrupt):
+        print("\nSelection cancelled")
+        return []
+
+def is_template_repo(directory):
+    """Check if directory is the template repo (has SYNCABLE_ITEMS)."""
+    for item in SYNCABLE_ITEMS:
+        if os.path.exists(os.path.join(directory, item)):
+            return True
+    return False
+
+def create_config(target_dir, template_path):
+    """Create .tetrastack.yml in target directory."""
+    config_path = os.path.join(target_dir, '.tetrastack.yml')
+    rel_path = os.path.relpath(template_path, target_dir)
+
+    with open(config_path, 'w') as f:
+        f.write(f"template_path: {rel_path}\n")
+
+    print(f"✓ Created .tetrastack.yml with template_path: {rel_path}")
+
+def git_tree_is_clean(directory):
+    """Check if git working tree is clean."""
+    try:
+        result = subprocess.run(
+            ['git', 'status', '--porcelain'],
+            cwd=directory,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return len(result.stdout.strip()) == 0
+    except subprocess.CalledProcessError:
+        return False
+
+def list_items():
+    """List all syncable items."""
+    print("Syncable items from Tetrastack template:")
+    for item in SYNCABLE_ITEMS:
+        print(f"  - {item}")
+
+def sync_items(source_root, target_root, items):
+    """Sync items from source to target using rsync."""
+    for item in items:
+        source_path = os.path.join(source_root, item)
+        target_path = os.path.join(target_root, item)
+
+        if not os.path.exists(source_path):
+            print(f"⚠ Skipping {item} (not found in source)")
+            continue
+
+        # Create parent directory if needed
+        target_parent = os.path.dirname(target_path)
+        os.makedirs(target_parent, exist_ok=True)
+
+        # Use rsync for efficient syncing
+        try:
+            subprocess.run(
+                ['rsync', '-av', '--delete', f'{source_path}/', f'{target_path}/'] if os.path.isdir(source_path)
+                else ['rsync', '-av', source_path, target_path],
+                check=True,
+                capture_output=True
+            )
+            print(f"✓ Synced {item}")
+        except subprocess.CalledProcessError as e:
+            print(f"✗ Failed to sync {item}: {e}")
+            sys.exit(1)
+
+def push_command(target_dir=None):
+    """Push items from template to target project, or from project to template."""
+    current_root = get_project_root()
+    config = load_config(current_root)
+
+    # From project to template
+    if config and 'template_path' in config:
+        if target_dir:
+            print("Error: Running from project; target_dir should not be specified")
+            sys.exit(1)
+
+        template_root = os.path.abspath(os.path.join(current_root, config['template_path']))
+
+        if not os.path.isdir(template_root):
+            print(f"Error: Template directory does not exist: {template_root}")
+            sys.exit(1)
+
+        # Check git status
+        if not git_tree_is_clean(current_root):
+            print("Error: Project git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        if not git_tree_is_clean(template_root):
+            print("Error: Template git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        print(f"Pushing items to template at {template_root}")
+        sync_items(current_root, template_root, SYNCABLE_ITEMS)
+        print("✓ Push complete")
+
+    # From template to project(s)
+    else:
+        # Check if we have a projects list and no explicit target
+        if not target_dir and config and 'projects' in config:
+            # Interactive selection from projects list
+            selected_projects = select_projects(config['projects'])
+
+            if not selected_projects:
+                print("No projects selected")
+                sys.exit(1)
+
+            # Check template git status once
+            if not git_tree_is_clean(current_root):
+                print("Error: Template git tree is dirty. Commit or stash changes first.")
+                sys.exit(1)
+
+            # Sync to each selected project
+            for target_root in selected_projects:
+                # Check target git status
+                if not git_tree_is_clean(target_root):
+                    print(f"Error: Target git tree is dirty: {target_root}")
+                    print("Commit or stash changes first.")
+                    sys.exit(1)
+
+                print(f"\nPushing items to {target_root}")
+                sync_items(current_root, target_root, SYNCABLE_ITEMS)
+
+                # Create config in target if it doesn't exist
+                if not load_config(target_root):
+                    create_config(target_root, current_root)
+
+            print("\n✓ Push complete")
+            return
+
+        # Single target specified via command line
+        if not target_dir:
+            print("Error: Running from template; target_dir must be specified or configure projects in .tetrastack.yml")
+            sys.exit(1)
+
+        target_root = os.path.abspath(target_dir)
+
+        if not os.path.isdir(target_root):
+            print(f"Error: Target directory does not exist: {target_root}")
+            sys.exit(1)
+
+        # Check git status
+        if not git_tree_is_clean(current_root):
+            print("Error: Template git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        if not git_tree_is_clean(target_root):
+            print("Error: Target git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        print(f"Pushing items to {target_root}")
+        sync_items(current_root, target_root, SYNCABLE_ITEMS)
+
+        # Create config in target if it doesn't exist
+        if not load_config(target_root):
+            create_config(target_root, current_root)
+
+        print("✓ Push complete")
+
+def pull_command(target_dir=None):
+    """Pull items from template to project, or from project to template."""
+    current_root = get_project_root()
+    config = load_config(current_root)
+
+    # From project: pull from template
+    if config and 'template_path' in config:
+        if target_dir:
+            print("Error: Running from project; target_dir should not be specified")
+            sys.exit(1)
+
+        template_root = os.path.abspath(os.path.join(current_root, config['template_path']))
+
+        if not os.path.isdir(template_root):
+            print(f"Error: Template directory does not exist: {template_root}")
+            sys.exit(1)
+
+        # Check git status
+        if not git_tree_is_clean(current_root):
+            print("Error: Project git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        if not git_tree_is_clean(template_root):
+            print("Error: Template git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        print(f"Pulling items from template at {template_root}")
+        sync_items(template_root, current_root, SYNCABLE_ITEMS)
+        print("✓ Pull complete")
+
+    # From template: pull from project(s) (reverse of push)
+    else:
+        # Check if we have a projects list and no explicit target
+        if not target_dir and config and 'projects' in config:
+            # Interactive selection from projects list
+            selected_projects = select_projects(config['projects'])
+
+            if not selected_projects:
+                print("No projects selected")
+                sys.exit(1)
+
+            # Check template git status once
+            if not git_tree_is_clean(current_root):
+                print("Error: Template git tree is dirty. Commit or stash changes first.")
+                sys.exit(1)
+
+            # Pull from each selected project
+            for target_root in selected_projects:
+                # Check target git status
+                if not git_tree_is_clean(target_root):
+                    print(f"Error: Target git tree is dirty: {target_root}")
+                    print("Commit or stash changes first.")
+                    sys.exit(1)
+
+                print(f"\nPulling items from {target_root}")
+                sync_items(target_root, current_root, SYNCABLE_ITEMS)
+
+            print("\n✓ Pull complete")
+            return
+
+        # Single target specified via command line
+        if not target_dir:
+            print("Error: Running from template; target_dir must be specified or configure projects in .tetrastack.yml")
+            sys.exit(1)
+
+        target_root = os.path.abspath(target_dir)
+
+        if not os.path.isdir(target_root):
+            print(f"Error: Target directory does not exist: {target_root}")
+            sys.exit(1)
+
+        # Check git status
+        if not git_tree_is_clean(current_root):
+            print("Error: Template git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        if not git_tree_is_clean(target_root):
+            print("Error: Target git tree is dirty. Commit or stash changes first.")
+            sys.exit(1)
+
+        print(f"Pulling items from {target_root}")
+        sync_items(target_root, current_root, SYNCABLE_ITEMS)
+        print("✓ Pull complete")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Sync reusable components between Tetrastack template and projects',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+
+    subparsers.add_parser('list', help='List syncable items')
+
+    push_parser = subparsers.add_parser('push', help='Push items (to project from template, or to template from project)')
+    push_parser.add_argument('target_dir', nargs='?', help='Target directory (required when running from template)')
+
+    pull_parser = subparsers.add_parser('pull', help='Pull items (from template to project, or from project to template)')
+    pull_parser.add_argument('target_dir', nargs='?', help='Target directory (required when running from template)')
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.command == 'list':
+        list_items()
+    elif args.command == 'push':
+        push_command(args.target_dir if hasattr(args, 'target_dir') else None)
+    elif args.command == 'pull':
+        pull_command(args.target_dir if hasattr(args, 'target_dir') else None)
+
+if __name__ == '__main__':
+    main()

@@ -45,10 +45,10 @@ See `tests/AGENTS.md` for comprehensive testing documentation including:
 
 Tests should **always use existing factories** with **as few custom parameters as possible**:
 
-- ✅ **Good**: `await foodFactory.create()` - Uses all defaults
-- ✅ **Good**: `await foodFactory.processed().fat().create()` - Uses traits for variation
-- ⚠️ **Use sparingly**: `await foodFactory.create({ name: 'Specific Food' })` - Only when testing requires a specific value
-- ❌ **Avoid**: `await foodFactory.create({ name: 'X', type: 'Y', category: 'Z', ... })` - Defeats the purpose of factories
+- ✅ **Good**: `await teamFactory.create()` - Uses all defaults
+- ✅ **Good**: `await projectFactory.active().highPriority().create()` - Uses traits for variation
+- ⚠️ **Use sparingly**: `await projectFactory.create({ title: 'Specific Project' })` - Only when testing requires a specific value
+- ❌ **Avoid**: `await projectFactory.create({ title: 'X', status: 'Y', priority: 'Z', ... })` - Defeats the purpose of factories
 
 **Why?** Factories provide sensible defaults and realistic test data. Overriding many parameters makes tests brittle, harder to maintain, and obscures the actual test logic. Use traits for common variations instead of custom parameters.
 
@@ -144,29 +144,28 @@ tests/
 
 ### Database Architecture
 
-- **Core entities**: users, households, foods, recipes, meals, nutrients
-- **Schema organization**: Eight domain-specific schema files in `src/lib/db/schema.*.ts`
+- **Core entities**: users, teams, teamMemberships, projects, tasks, tags
+- **Schema organization**: Domain-specific schema files in `src/database/schema.*.ts`
 - **Migration management**: Use `make migration-reconcile` to resolve conflicts
-- See `src/lib/db/AGENTS.md` for detailed schema documentation and Drizzle patterns
+- See `src/database/AGENTS.md` for detailed schema documentation and Drizzle patterns
 
-## Business Domain (Meze - Meal Prep Platform)
+## Business Domain (Tetrastack - Project Management Platform)
 
-Meze is a comprehensive meal preparation platform with six integrated phases:
+Tetrastack is a project management platform that enables teams to collaborate on projects and tasks:
 
-1. **PLAN**: Nutrition goals, meal planning, household coordination
-2. **ORDER**: Smart grocery lists, quantity calculations
-3. **PREP**: Step-by-step instructions, task coordination
-4. **COOK**: Cooking instructions and timing
-5. **STORE**: Food storage optimization
-6. **CLEAN**: Cleanup coordination
+### Core Concepts
+
+- **Teams (Organizations)**: Groups of users collaborating together with role-based membership (admin/member)
+- **Projects**: Work items tracked within teams with status, priority, and tags
+- **Tasks**: Individual work items within projects with assignments and due dates
 
 ### Key Features
 
-- Multi-member household meal planning
-- Personalized nutrition tracking
-- AI-powered recipe/meal generation
-- Smart grocery list generation
-- Admin interface for managing foods/recipes/meals
+- Multi-member team collaboration
+- Project tracking with status (planning, active, completed, archived) and priority levels
+- Task management with assignments and deadlines
+- Tagging system for organization
+- Admin interface for managing teams and projects
 
 ## Development Guidelines
 

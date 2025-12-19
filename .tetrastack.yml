@@ -1,0 +1,6 @@
+# Tetrastack Template Configuration
+# List of projects that use this template
+
+projects:
+  - ~/code/ncrmro/tetrastack
+  - ~/code/ncrmro/latinum-space
