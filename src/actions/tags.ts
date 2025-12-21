@@ -14,7 +14,7 @@ import { tags } from '@/database/schema.tags';
 import {
   verifyTeamMembership,
   verifyTagTeamMembership,
-} from '@/lib/auth-helpers';
+} from '@/lib/nextjs-admin';
 import type { InsertTag, SelectTag } from '@/database/schema.tags';
 import { insertTagSchema } from '@/database/schema.tags';
 

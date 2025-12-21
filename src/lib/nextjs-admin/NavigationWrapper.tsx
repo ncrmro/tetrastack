@@ -1,6 +1,6 @@
 import { auth } from '@/app/auth';
 import { signInAction, signOutAction } from '@/actions/auth';
-import Navigation from '@/lib/nextjs-admin/Navigation';
+import Navigation from './Navigation';
 
 export default async function NavigationWrapper() {
   const session = await auth();

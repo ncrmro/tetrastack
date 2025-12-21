@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import AccountDropdown from '@/lib/nextjs-admin/AccountDropdown';
+import AccountDropdown from './AccountDropdown';
 import { Session } from 'next-auth';
 import { Button } from '@/components/ui/button';
 import { Nav } from '@/components/ui/nav';
 
-interface NavigationProps {
+export interface NavigationProps {
   session: Session | null;
   isAdmin: boolean;
   signIn: () => Promise<void>;

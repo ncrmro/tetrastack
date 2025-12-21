@@ -8,7 +8,7 @@ import {
   updateComments,
   deleteComments,
 } from '@/models/comments';
-import { verifyCommentOwnership } from '@/lib/auth-helpers';
+import { verifyCommentOwnership } from '@/lib/nextjs-admin';
 import type { InsertComment, SelectComment } from '@/database/schema.tasks';
 import { insertCommentSchema, comments } from '@/database/schema.tasks';
 import { eq } from 'drizzle-orm';
