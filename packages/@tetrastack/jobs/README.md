@@ -240,6 +240,62 @@ await backend.execute(claimedJobs[0]);
 
 ## Database Schema
 
+The package includes complete Drizzle ORM schema definitions for SQLite.
+
+### Integrating with Your App
+
+#### Option 1: Import schema into your Drizzle config
+
+```typescript
+// drizzle.config.ts
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  schema: [
+    './src/database/schema.ts', // Your app's schema
+    './node_modules/@tetrastack/server-jobs/src/schema/index.ts', // Jobs schema
+  ],
+  out: './drizzle',
+  dialect: 'sqlite',
+});
+```
+
+#### Option 2: Re-export in your schema file
+
+```typescript
+// src/database/schema.ts
+export * from '@tetrastack/server-jobs/schema';
+export * from './schema.users';
+export * from './schema.projects';
+// ... your other schemas
+```
+
+#### Option 3: Use the combined schema object
+
+```typescript
+// drizzle.config.ts
+import { schema as jobsSchema } from '@tetrastack/server-jobs/schema';
+import * as appSchema from './src/database/schema';
+
+export default defineConfig({
+  schema: { ...appSchema, ...jobsSchema },
+  out: './drizzle',
+  dialect: 'sqlite',
+});
+```
+
+### Generate Migrations
+
+After integrating the schema, generate migrations:
+
+```bash
+# Generate migration for jobs tables
+npx drizzle-kit generate
+
+# Apply migrations
+npx drizzle-kit migrate
+```
+
 ### Jobs Table
 
 Stores individual job executions with status tracking:
@@ -509,6 +565,277 @@ describe('Job System', () => {
 4. **Check logs** for progress updates
 
 5. **Inspect database** to verify persistence
+
+### Testing with Cloudflare Locally
+
+Before deploying to production, test your job worker using Wrangler's local development mode. This simulates the Cloudflare Workers environment including cron triggers.
+
+#### 1. Create a Worker Entry Point
+
+Create `worker/scheduled.ts` for job processing:
+
+```typescript
+import { createCronHandler, createJobRegistry } from '@tetrastack/server-jobs';
+import { CloudflareWorkerBackend } from '@tetrastack/server-jobs/cloudflare';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
+import { TestJob } from '../src/jobs/test-job';
+
+// Database factory for Cloudflare environment
+function createDatabase(env: {
+  TURSO_DATABASE_URL: string;
+  TURSO_AUTH_TOKEN: string;
+}) {
+  const client = createClient({
+    url: env.TURSO_DATABASE_URL,
+    authToken: env.TURSO_AUTH_TOKEN,
+  });
+  return drizzle(client);
+}
+
+// Register jobs
+const registry = createJobRegistry().register(TestJob);
+
+// Export scheduled handler
+export default {
+  async scheduled(
+    event: ScheduledEvent,
+    env: Record<string, unknown>,
+    ctx: ExecutionContext,
+  ) {
+    const db = createDatabase(
+      env as { TURSO_DATABASE_URL: string; TURSO_AUTH_TOKEN: string },
+    );
+
+    const backend = new CloudflareWorkerBackend({
+      database: db,
+      jobRegistry: registry,
+      maxConcurrency: 5,
+      lockTimeoutMs: 5 * 60 * 1000,
+    });
+
+    await backend.initialize();
+    ctx.waitUntil(backend.handleCron());
+  },
+
+  // Optional: HTTP endpoint to manually trigger jobs
+  async fetch(
+    request: Request,
+    env: Record<string, unknown>,
+    ctx: ExecutionContext,
+  ) {
+    const url = new URL(request.url);
+
+    // Manual trigger endpoint
+    if (request.method === 'POST' && url.pathname === '/_jobs/trigger') {
+      const db = createDatabase(
+        env as { TURSO_DATABASE_URL: string; TURSO_AUTH_TOKEN: string },
+      );
+
+      const backend = new CloudflareWorkerBackend({
+        database: db,
+        jobRegistry: registry,
+        maxConcurrency: 5,
+        lockTimeoutMs: 5 * 60 * 1000,
+      });
+
+      await backend.initialize();
+      await backend.handleCron();
+
+      return new Response(JSON.stringify({ status: 'triggered' }), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Job status endpoint
+    if (request.method === 'GET' && url.pathname === '/_jobs/status') {
+      const db = createDatabase(
+        env as { TURSO_DATABASE_URL: string; TURSO_AUTH_TOKEN: string },
+      );
+
+      // Query recent jobs
+      const recentJobs = await db.execute(
+        'SELECT id, jobName, status, progress, createdAt FROM jobs ORDER BY createdAt DESC LIMIT 10',
+      );
+
+      return new Response(JSON.stringify({ jobs: recentJobs.rows }), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response('Not Found', { status: 404 });
+  },
+};
+```
+
+#### 2. Create Local wrangler.toml
+
+Create `wrangler.toml` for local testing:
+
+```toml
+name = "tetrastack-jobs-worker"
+main = "worker/scheduled.ts"
+compatibility_date = "2024-01-01"
+
+# Cron triggers
+[triggers]
+crons = ["* * * * *"]  # Every minute
+
+# Local development variables
+[vars]
+TURSO_DATABASE_URL = "http://127.0.0.1:8080"  # Local Turso
+
+# For local dev with .dev.vars file
+# Create .dev.vars with:
+# TURSO_DATABASE_URL=http://127.0.0.1:8080
+# TURSO_AUTH_TOKEN=your-local-token
+```
+
+#### 3. Start Local Development
+
+```bash
+# Terminal 1: Start database
+make up
+
+# Terminal 2: Start Wrangler dev server
+wrangler dev worker/scheduled.ts --local
+
+# You should see:
+# ⎔ Starting local server...
+# Ready on http://localhost:8787
+```
+
+#### 4. Test Cron Trigger Manually
+
+Since local development doesn't automatically run cron triggers, use the HTTP endpoint:
+
+```bash
+# Trigger job processing manually
+curl -X POST http://localhost:8787/_jobs/trigger
+
+# Check job status
+curl http://localhost:8787/_jobs/status
+```
+
+#### 5. Queue a Job and Process It
+
+```bash
+# In another terminal, queue a job
+npx tsx -e "
+import { TestJob } from './src/jobs/test-job';
+import { db } from './src/database';
+
+TestJob.setDatabase(db);
+
+async function main() {
+  const jobId = await TestJob.later({ message: 'Test from CLI' });
+  console.log('Queued job:', jobId);
+}
+main();
+"
+
+# Then trigger processing
+curl -X POST http://localhost:8787/_jobs/trigger
+
+# Check it was processed
+curl http://localhost:8787/_jobs/status | jq
+```
+
+#### 6. Simulate Cron with Watch Mode
+
+For continuous local testing, use a watch script:
+
+```bash
+# Create scripts/watch-jobs.sh
+#!/bin/bash
+echo "Polling jobs every 10 seconds (Ctrl+C to stop)..."
+while true; do
+  echo "--- $(date) ---"
+  curl -s -X POST http://localhost:8787/_jobs/trigger
+  sleep 10
+done
+```
+
+Run it:
+
+```bash
+chmod +x scripts/watch-jobs.sh
+./scripts/watch-jobs.sh
+```
+
+#### 7. View Worker Logs
+
+```bash
+# Wrangler dev shows logs in the terminal
+# Or use the Cloudflare dashboard for deployed workers
+wrangler tail  # For deployed workers
+```
+
+### Testing Cron Triggers in CI
+
+For CI/CD pipelines, use the InMemoryBackend with simulated cron events:
+
+```typescript
+import { describe, it, expect, beforeEach } from 'vitest';
+import { createJobRegistry } from '@tetrastack/server-jobs';
+import { InMemoryBackend } from '@tetrastack/server-jobs/memory';
+import { TestJob } from './test-job';
+
+describe('Cron Job Processing', () => {
+  let backend: InMemoryBackend;
+  let registry: ReturnType<typeof createJobRegistry>;
+
+  beforeEach(() => {
+    registry = createJobRegistry().register(TestJob);
+    backend = new InMemoryBackend({
+      database: {}, // Mock
+      jobRegistry: registry,
+    });
+  });
+
+  it('should process queued jobs on cron trigger', async () => {
+    await backend.initialize();
+
+    // Queue some jobs
+    backend.addJob({ jobName: 'TestJob', params: { message: 'Job 1' } });
+    backend.addJob({ jobName: 'TestJob', params: { message: 'Job 2' } });
+
+    // Simulate cron trigger
+    const { claimedJobs } = await backend.pollAndClaim(10);
+    expect(claimedJobs).toHaveLength(2);
+
+    // Process all claimed jobs
+    const results = await Promise.all(
+      claimedJobs.map((job) => backend.execute(job)),
+    );
+
+    expect(results.every((r) => r.success)).toBe(true);
+  });
+
+  it('should respect maxConcurrency limit', async () => {
+    const limitedBackend = new InMemoryBackend({
+      database: {},
+      jobRegistry: registry,
+      maxConcurrency: 2,
+    });
+
+    await limitedBackend.initialize();
+
+    // Queue 5 jobs
+    for (let i = 0; i < 5; i++) {
+      limitedBackend.addJob({
+        jobName: 'TestJob',
+        params: { message: `Job ${i}` },
+      });
+    }
+
+    // Should only claim 2
+    const { claimedJobs, availableCount } = await limitedBackend.pollAndClaim();
+    expect(claimedJobs).toHaveLength(2);
+    expect(availableCount).toBe(3);
+  });
+});
+```
 
 ## Deployment
 
