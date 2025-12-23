@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
-interface AccountDropdownProps {
+export interface AccountDropdownProps {
   session: Session;
   isAdmin: boolean;
   signOut: () => Promise<void>;
