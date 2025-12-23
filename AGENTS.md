@@ -140,7 +140,16 @@ tests/
 ├── agents/              # Agent integration tests
 └── factories/           # Test data factories
     └── AGENTS.md        # Factory pattern documentation
+
+specs/
+├── AGENTS.md            # Specification process documentation
+└── ###-feature-slug/    # Individual feature specs
 ```
+
+### Active Specs
+
+<!-- Add specs here as they are created -->
+<!-- Example: - [001-user-auth](specs/001-user-auth/) - User authentication -->
 
 ### Database Architecture
 
