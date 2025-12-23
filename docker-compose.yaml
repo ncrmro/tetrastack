@@ -64,6 +64,8 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH_URL=http://web:${WEB_PORT:-3000}
       - AUTH_TRUST_HOST=true
+      # Enable E2E coverage collection (V8 format, compatible with Vitest)
+      - E2E_COVERAGE=${E2E_COVERAGE:-0}
     healthcheck:
       test:
         [
@@ -98,6 +100,8 @@ services:
       # E2E tests in Docker use HTTP connection (shares db with web service)
       # For local E2E without Docker, uses DATABASE_URL from .env (file-based)
       - DATABASE_URL=http://db:${DB_PORT:-8080}
+      # Enable V8 coverage collection (compatible with Vitest)
+      - E2E_COVERAGE=${E2E_COVERAGE:-0}
     command: node_modules/.bin/playwright test
     depends_on:
       web:

@@ -15,6 +15,7 @@ import {
 import { generateUserCredentials } from '../helpers';
 import { SignInPage } from '../page-objects/SignInPage';
 import { BasePage } from '../page-objects/BasePage';
+import { startCoverage, saveCoverage } from '../coverage-helper';
 
 // Base URL helper - uses PLAYWRIGHT_BASE_URL or constructs from WEB_PORT
 export const getBaseUrl = () => {
@@ -282,10 +283,11 @@ export const test = base.extend<BaseFixtures>({
   },
 
   // Authenticated regular user (sign-in only)
-  authenticatedUser: async ({ browser, baseTestData }, use) => {
+  authenticatedUser: async ({ browser, baseTestData }, use, testInfo) => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
+    await startCoverage(page);
     await authenticateUser(page, baseTestData.user.credentials);
 
     await use({
@@ -293,14 +295,16 @@ export const test = base.extend<BaseFixtures>({
       data: baseTestData,
     });
 
+    await saveCoverage(page, testInfo.title);
     await context.close();
   },
 
   // Authenticated admin user (sign-in only)
-  authenticatedAdmin: async ({ browser, baseAdminTestData }, use) => {
+  authenticatedAdmin: async ({ browser, baseAdminTestData }, use, testInfo) => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
+    await startCoverage(page);
     await authenticateUser(page, baseAdminTestData.user.credentials);
 
     await use({
@@ -308,13 +312,16 @@ export const test = base.extend<BaseFixtures>({
       data: baseAdminTestData,
     });
 
+    await saveCoverage(page, testInfo.title);
     await context.close();
   },
 
   // Regular user with team (sign-in + team membership)
-  userWithTeam: async ({ browser, baseTestData }, use) => {
+  userWithTeam: async ({ browser, baseTestData }, use, testInfo) => {
     const context = await browser.newContext();
     const page = await context.newPage();
+
+    await startCoverage(page);
 
     // Create user and team in database
     const user = await createTestUser(baseTestData.user.credentials);
@@ -328,13 +335,16 @@ export const test = base.extend<BaseFixtures>({
       teamId,
     });
 
+    await saveCoverage(page, testInfo.title);
     await context.close();
   },
 
   // Admin user with team (sign-in + team membership as admin)
-  adminWithTeam: async ({ browser, baseAdminTestData }, use) => {
+  adminWithTeam: async ({ browser, baseAdminTestData }, use, testInfo) => {
     const context = await browser.newContext();
     const page = await context.newPage();
+
+    await startCoverage(page);
 
     // Create admin user and team in database
     const user = await createTestUser(baseAdminTestData.user.credentials);
@@ -348,19 +358,23 @@ export const test = base.extend<BaseFixtures>({
       teamId,
     });
 
+    await saveCoverage(page, testInfo.title);
     await context.close();
   },
 
   // Unauthenticated context (clean slate)
-  unauthenticatedUser: async ({ browser, baseTestData }, use) => {
+  unauthenticatedUser: async ({ browser, baseTestData }, use, testInfo) => {
     const context = await browser.newContext();
     const page = await context.newPage();
+
+    await startCoverage(page);
 
     await use({
       page,
       data: baseTestData,
     });
 
+    await saveCoverage(page, testInfo.title);
     await context.close();
   },
 });

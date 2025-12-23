@@ -83,5 +83,13 @@ ci: ## Run full CI pipeline: lint and all tests including e2e
 e2e: ## Run e2e tests in Docker
 	$(DC) --profile e2e run --rm e2e
 
+e2e-coverage: ## Run e2e tests with coverage in Docker
+	E2E_COVERAGE=1 $(DC) --profile e2e run --rm e2e
+
 coverage: ## Run tests with coverage report
 	$(DC) run --rm web npm run coverage
+
+coverage-all: ## Run all tests with coverage including e2e
+	$(DC) run --rm web npm run coverage
+	E2E_COVERAGE=1 $(DC) --profile e2e run --rm e2e
+	$(DC) run --rm --no-deps web node scripts/merge-v8-coverage.js
