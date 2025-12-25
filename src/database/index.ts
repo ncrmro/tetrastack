@@ -43,7 +43,7 @@ export function createDatabaseClient() {
   if (process.env.DATABASE_URL === ':memory:') {
     // Use dynamic import in Node.js environment (test mode)
     // This keeps @libsql/client/node out of Cloudflare Workers bundle
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+
     const { createClient: createNodeClient } = require('@libsql/client/node');
     const client = createNodeClient({
       url: ':memory:',
@@ -87,7 +87,7 @@ export type Database = typeof db;
  * const result = await db.insert(users).values(data).returning();
  * const rows = getResultArray(result);
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function getResultArray(result: any[] | { rows: any[] }): any[] {
   return Array.isArray(result) ? result : result.rows;
 }

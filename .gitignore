@@ -45,6 +45,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+packages/@tetrastack/*/dist/
 
 # OpenNext
 /.open-next

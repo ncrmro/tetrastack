@@ -674,7 +674,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    * 3. Map Anthropic batch object to BatchInfo
    * 4. Return BatchInfo
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async createBatch(_requests: BatchRequest[]): Promise<BatchInfo> {
     throw new Error('Not implemented - createBatch requires Anthropic SDK');
     // const anthropicRequests = requests.map((req) =>
@@ -701,7 +701,7 @@ class AnthropicBatchProvider implements IBatchProvider {
   /**
    * TODO: Implement Anthropic status check
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async checkStatus(_batchId: string): Promise<BatchInfo> {
     throw new Error('Not implemented - checkStatus requires Anthropic SDK');
     // const batch = await anthropic.messages.batches.retrieve(batchId);
@@ -728,7 +728,7 @@ class AnthropicBatchProvider implements IBatchProvider {
    * TODO: Implement Anthropic results retrieval
    * Stream results from the results_url endpoint
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async *retrieveResults(_batchId: string): AsyncGenerator<BatchResult> {
     throw new Error('Not implemented - retrieveResults requires Anthropic SDK');
     // for await (const result of anthropic.messages.batches.results(batchId)) {
@@ -739,7 +739,7 @@ class AnthropicBatchProvider implements IBatchProvider {
   /**
    * TODO: Implement Anthropic batch cancellation
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async cancelBatch(_batchId: string): Promise<BatchInfo> {
     throw new Error('Not implemented - cancelBatch requires Anthropic SDK');
     // const batch = await anthropic.messages.batches.cancel(batchId);
@@ -819,7 +819,7 @@ class AnthropicBatchProvider implements IBatchProvider {
   /**
    * TODO: Implement Anthropic list batches
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async *listBatches(_limit: number = 10): AsyncGenerator<BatchInfo> {
     throw new Error('Not implemented - listBatches requires Anthropic SDK');
     // for await (const batch of anthropic.messages.batches.list({

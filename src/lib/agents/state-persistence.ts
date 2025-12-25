@@ -69,7 +69,7 @@ export function serializeAgentState<T extends BaseAgent>(
  */
 export function deserializeAgentState<T extends BaseAgent>(
   state: AgentState,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   AgentClass: any,
 ): T {
   return AgentClass.fromJSON(state) as T;

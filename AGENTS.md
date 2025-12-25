@@ -240,6 +240,26 @@ See `src/lib/models/AGENTS.md` for complete documentation.
 - **ESLint**: Pre-commit checks only (no auto-fix); use `make format` to auto-fix ESLint issues
 - **Before committing**: If ESLint errors exist, run `make format` to fix them before committing
 
+### TypeScript Monorepo Configuration
+
+The project uses npm workspaces with shared packages in `packages/@tetrastack/*`. Key configuration:
+
+- **All tsconfigs use `moduleResolution: "bundler"`**: Required for hoisted dependencies in npm workspaces
+- **`npm run typecheck`**: Checks root app AND all packages (not just root)
+- **No emit**: All packages use `noEmit: true` - Next.js handles compilation
+
+**Typecheck runs**:
+
+1. Root tsconfig (main app)
+2. `packages/@tetrastack/backend`
+3. `packages/@tetrastack/react-glass`
+4. `packages/@tetrastack/react-glass-graphs`
+
+**IMPORTANT**: When adding a new package to `packages/@tetrastack/`, you must:
+
+1. Create a `tsconfig.json` with `moduleResolution: "bundler"` and `noEmit: true`
+2. Add the package to the `typecheck` script in root `package.json`
+
 ### Styling & UI
 
 - **Consult `src/app/globals.css`** for theme system before writing any CSS/Tailwind

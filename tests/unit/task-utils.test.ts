@@ -14,7 +14,6 @@ describe('Task Utilities', () => {
 
     it('identifies valid task statuses', () => {
       const isValidStatus = (status: string) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(TASK_STATUS).includes(status as any);
 
       expect(isValidStatus('todo')).toBe(true);
@@ -37,7 +36,6 @@ describe('Task Utilities', () => {
 
     it('identifies valid task priorities', () => {
       const isValidPriority = (priority: string) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(TASK_PRIORITY).includes(priority as any);
 
       expect(isValidPriority('low')).toBe(true);

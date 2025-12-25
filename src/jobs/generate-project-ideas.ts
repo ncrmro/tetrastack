@@ -157,7 +157,6 @@ export class GenerateProjectIdeasJob extends Job<
 
     // Step 3: Create all projects in bulk
     const projectsToCreate = planData.projects.map((p) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { suggestedTags, tasks, ...projectData } = p;
       return {
         ...projectData,

@@ -16,9 +16,6 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
-  docs: {
-    autodocs: 'tag',
-  },
   staticDirs: ['../public'],
   async viteFinal(config) {
     config.plugins = config.plugins || [];
