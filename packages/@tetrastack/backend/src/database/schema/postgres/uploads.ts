@@ -6,6 +6,7 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { uuidv7 } from '../../../utils/uuidv7';
 
 export const uploads = pgTable('uploads', {
@@ -25,3 +26,7 @@ export const uploads = pgTable('uploads', {
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
   deletedAt: timestamp('deleted_at', { mode: 'date' }), // Soft delete
 });
+
+// Zod schemas for validation
+export const insertUploadSchema = createInsertSchema(uploads);
+export const selectUploadSchema = createSelectSchema(uploads);

@@ -32,12 +32,14 @@ Both dialects:
 - Use UUIDv7 for all primary keys
 - Have identical table and column names
 - Are compatible with the Auth.js DrizzleAdapter
+- Export drizzle-zod schemas for type-safe validation
 
 #### Exports
 
 - **Auth Tables** - User, Account, Session, and VerificationToken tables compatible with Auth.js
 - **Uploads Table** - File upload metadata storage
 - **Schema utilities** - Common column definitions and patterns
+- **Zod Schemas** - Insert and select validation schemas for each table (e.g., `insertUserSchema`, `selectUserSchema`)
 
 The consumer application is responsible for initializing the Drizzle client and importing the appropriate dialect schemas.
 
@@ -338,11 +340,15 @@ const objects = await uploads.list({ prefix: 'uploads/user-123/' });
 ## Dependencies
 
 - `drizzle-orm` - Database ORM
+- `drizzle-zod` - Zod schema generation from Drizzle tables
+- `zod` - Runtime type validation
 - `next-auth` - Authentication (Auth.js v5)
 - `@aws-sdk/client-s3` - S3-compatible API for R2
 - `@aws-sdk/s3-request-presigner` - Presigned URL generation
 - `uuidv7` - UUIDv7 generation (or custom implementation)
 - `concurrently` - Run multiple processes in development
+
+> **Important**: Consumer applications should remove duplicate versions of these dependencies from their root `package.json` to avoid version conflicts. This package provides all necessary dependencies with compatible versions.
 
 ---
 

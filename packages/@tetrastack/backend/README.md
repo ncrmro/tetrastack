@@ -4,7 +4,8 @@ Shared backend infrastructure for Tetrastack applications, providing database sc
 
 ## Features
 
-- **Database**: Drizzle ORM schemas for SQLite (libSQL/Turso).
+- **Database**: Drizzle ORM schemas for SQLite (libSQL/Turso) and PostgreSQL.
+- **Validation**: Drizzle-Zod schemas for type-safe validation of database operations.
 - **Authentication**: NextAuth.js v5 configuration and utilities.
 - **Storage**: R2 upload management with presigned URLs.
 - **Utils**: UUIDv7 generation, slugification, and more.
@@ -14,6 +15,47 @@ Shared backend infrastructure for Tetrastack applications, providing database sc
 ```bash
 pnpm add @tetrastack/backend
 ```
+
+> **Important**: When using this package, remove any duplicate dependencies (`drizzle-orm`, `drizzle-zod`, `zod`, `next-auth`, etc.) from your project's root `package.json` to avoid version conflicts. This package provides all necessary dependencies.
+
+## TypeScript Configuration
+
+This package uses TypeScript project references for proper monorepo type-checking.
+
+### Root tsconfig.json
+
+```jsonc
+{
+  "compilerOptions": {
+    // ... your existing options
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "packages"],
+  "references": [{ "path": "./packages/@tetrastack/backend" }],
+}
+```
+
+### Building
+
+With project references, use `tsc --build` to compile all referenced projects:
+
+```bash
+# Build all referenced projects
+tsc --build
+
+# Build with watch mode
+tsc --build --watch
+
+# Clean build artifacts
+tsc --build --clean
+```
+
+### Benefits
+
+- **Incremental builds**: Only recompiles changed projects
+- **Proper dependency graph**: TypeScript understands project relationships
+- **Declaration files**: Generates `.d.ts` files for consumption
+- **No path mapping needed**: References handle resolution automatically
 
 ## Database Schema
 
@@ -34,6 +76,34 @@ export const schema = {
   uploads,
 };
 ```
+
+### Zod Validation Schemas
+
+Each table exports corresponding Zod schemas for type-safe validation:
+
+```typescript
+import {
+  insertUserSchema,
+  selectUserSchema,
+  insertUploadSchema,
+  selectUploadSchema,
+} from '@tetrastack/backend/database';
+
+// Validate insert data
+const validatedUser = insertUserSchema.parse(userData);
+
+// Infer types from schemas
+type InsertUser = z.infer<typeof insertUserSchema>;
+type SelectUser = z.infer<typeof selectUserSchema>;
+```
+
+Available schemas for each table:
+
+- `insertUserSchema` / `selectUserSchema`
+- `insertAccountSchema` / `selectAccountSchema`
+- `insertSessionSchema` / `selectSessionSchema`
+- `insertVerificationTokenSchema` / `selectVerificationTokenSchema`
+- `insertUploadSchema` / `selectUploadSchema`
 
 ## Authentication
 

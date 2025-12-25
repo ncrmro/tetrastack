@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { uuidv7 } from '../../../utils/uuidv7';
 
 export const uploads = sqliteTable('uploads', {
@@ -23,3 +24,7 @@ export const uploads = sqliteTable('uploads', {
     .default(sql`CURRENT_TIMESTAMP`),
   deletedAt: text('deleted_at'), // Soft delete
 });
+
+// Zod schemas for validation
+export const insertUploadSchema = createInsertSchema(uploads);
+export const selectUploadSchema = createSelectSchema(uploads);
