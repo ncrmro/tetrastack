@@ -33,12 +33,13 @@
     "test:agents": "AGENTS_TEST=1 vitest run tests/agents",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "generate-meal": "tsx scripts/generate-meal.ts"
+    "generate-meal": "tsx scripts/generate-meal.ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.23",
     "@ai-sdk/react": "^2.0.28",
-    "@auth/drizzle-adapter": "^1.10.0",
     "@heroicons/react": "^2.2.0",
     "@libsql/client": "^0.15.10",
     "@opennextjs/cloudflare": "^1.3.0",
@@ -59,7 +60,6 @@
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "15.3.5",
-    "next-auth": "5.0.0-beta.29",
     "openai": "^6.7.0",
     "postcss": "^8.5.6",
     "posthog-js": "^1.258.6",
@@ -102,6 +102,17 @@
     "tw-animate-css": "^1.3.5",
     "typescript": "^5",
     "vitest": "^3.2.4",
-    "wrangler": "^4.25.1"
+    "wrangler": "^4.25.1",
+    "storybook": "^10.1.10",
+    "@storybook/nextjs-vite": "^10.1.10",
+    "@chromatic-com/storybook": "^4.1.3",
+    "@storybook/addon-vitest": "^10.1.10",
+    "@storybook/addon-a11y": "^10.1.10",
+    "@storybook/addon-docs": "^10.1.10",
+    "@storybook/addon-onboarding": "^10.1.10",
+    "vite": "^7.3.0",
+    "eslint-plugin-storybook": "^10.1.10",
+    "playwright": "^1.57.0",
+    "@vitest/browser": "^3.2.4"
   }
 }

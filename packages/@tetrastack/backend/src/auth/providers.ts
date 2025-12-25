@@ -28,6 +28,7 @@ export const providers = [
               id: 'admin-dev-id',
               name: 'Admin User',
               email: 'admin@example.com',
+              admin: true,
             };
           }
           if (password === 'password') {
@@ -36,6 +37,7 @@ export const providers = [
               id: 'user-dev-id',
               name: 'Regular User',
               email: 'user@example.com',
+              admin: false,
             };
           }
 
@@ -45,6 +47,7 @@ export const providers = [
               id: 'admin-dev-id',
               name: 'Admin User',
               email: 'admin@example.com',
+              admin: true,
             };
           }
         }
@@ -58,6 +61,7 @@ export const providers = [
               id: 'user-dev-id',
               name: 'Regular User',
               email: 'user@example.com',
+              admin: false,
             };
           }
         }

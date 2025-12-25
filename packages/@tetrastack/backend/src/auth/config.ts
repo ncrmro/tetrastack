@@ -1,5 +1,4 @@
 import NextAuth, { NextAuthConfig } from 'next-auth';
-import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { sqlite } from '../database';
 import { providers } from './providers';
 import { uuidv7 } from '../utils';
@@ -8,9 +7,6 @@ import type { Provider } from 'next-auth/providers';
 
 const { users } = sqlite;
 
-/** Type for database instances compatible with DrizzleAdapter */
-type DrizzleDatabase = Parameters<typeof DrizzleAdapter>[0];
-
 /** User type returned from database queries */
 interface DbUser {
   id: string;
@@ -18,11 +14,30 @@ interface DbUser {
   name: string | null;
 }
 
+/** Database interface with query and insert methods needed for auth */
+interface AuthDatabase {
+  query: {
+    users: {
+      findFirst: (opts: {
+        where: ReturnType<typeof eq>;
+      }) => Promise<DbUser | undefined>;
+    };
+  };
+  insert: (table: typeof users) => {
+    values: (data: {
+      id: string;
+      email: string;
+      name: string | null | undefined;
+    }) => { returning: () => Promise<DbUser[]> };
+  };
+}
+
 /**
  * Configuration options for createAuth
+ * Generic TDatabase allows any Drizzle database instance to be passed.
  */
-export interface CreateAuthConfig {
-  database?: DrizzleDatabase;
+export interface CreateAuthConfig<TDatabase = unknown> {
+  database?: TDatabase;
   providers?: Provider[];
   callbacks?: NextAuthConfig['callbacks'];
 }
@@ -30,30 +45,13 @@ export interface CreateAuthConfig {
 /**
  * Creates auth configuration for Node.js mode (with database)
  */
-const createAuthConfigNode = (
-  database: DrizzleDatabase,
+const createAuthConfigNode = <TDatabase extends AuthDatabase>(
+  database: TDatabase,
   customProviders?: Provider[],
 ): NextAuthConfig => {
-  // Cast to access query and insert methods - DrizzleAdapter union type is too broad
-  const db = database as DrizzleDatabase & {
-    query: {
-      users: {
-        findFirst: (opts: {
-          where: ReturnType<typeof eq>;
-        }) => Promise<DbUser | undefined>;
-      };
-    };
-    insert: (table: typeof users) => {
-      values: (data: {
-        id: string;
-        email: string;
-        name: string | null | undefined;
-      }) => { returning: () => Promise<DbUser[]> };
-    };
-  };
+  const db = database;
 
   return {
-    adapter: DrizzleAdapter(database),
     providers: customProviders ?? providers,
     session: {
       strategy: 'jwt',
@@ -149,8 +147,8 @@ const createAuthConfigEdge = (
  * export const { auth } = createAuth();
  * ```
  */
-export function createAuth(
-  config?: CreateAuthConfig,
+export function createAuth<TDatabase extends AuthDatabase>(
+  config?: CreateAuthConfig<TDatabase>,
 ): ReturnType<typeof NextAuth> {
   if (config?.database) {
     const nodeConfig = createAuthConfigNode(config.database, config.providers);
@@ -181,7 +179,9 @@ export function createAuth(
 /**
  * Creates auth configuration based on mode
  */
-export const createAuthConfig = (config?: CreateAuthConfig): NextAuthConfig => {
+export const createAuthConfig = <TDatabase extends AuthDatabase>(
+  config?: CreateAuthConfig<TDatabase>,
+): NextAuthConfig => {
   if (config?.database) {
     return createAuthConfigNode(config.database, config.providers);
   }
