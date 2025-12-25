@@ -43,7 +43,7 @@ export type {
 export async function getTasks(params: {
   ids?: string[];
   projectIds?: string[];
-  assigneeIds?: number[];
+  assigneeIds?: string[];
   status?: TaskStatus[];
   priority?: TaskPriority[];
 }): ActionResult<SelectTask[]> {
@@ -81,7 +81,7 @@ export async function createTask(data: InsertTask): ActionResult<SelectTask> {
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      session.user.id,
       validationResult.data.projectId,
     );
     if (!isMember) {
@@ -116,7 +116,7 @@ export async function createTasks(
     }
 
     const hasAccess = await verifyBulkTeamAccess(
-      parseInt(session.user.id),
+      session.user.id,
       validation.data,
       (task) => task.projectId,
       verifyProjectTeamMembership,
@@ -158,10 +158,7 @@ export async function updateTask(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isMember = await verifyTaskTeamMembership(
-      parseInt(session.user.id),
-      id,
-    );
+    const isMember = await verifyTaskTeamMembership(session.user.id, id);
     if (!isMember) {
       return {
         success: false,
@@ -187,10 +184,7 @@ export async function deleteTask(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isMember = await verifyTaskTeamMembership(
-      parseInt(session.user.id),
-      id,
-    );
+    const isMember = await verifyTaskTeamMembership(session.user.id, id);
     if (!isMember) {
       return {
         success: false,

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
 
   // Get user's teams
   const userTeams = await User.getUserTeams(userId);

@@ -1,1 +1,1 @@
-export { default as Incrementor } from '@/lib/glass-components/GlassIncrementor';
+export { GlassIncrementor as Incrementor } from '@tetrastack/react-glass';

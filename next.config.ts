@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    '@tetrastack/backend',
+    '@tetrastack/react-glass',
+    '@tetrastack/react-glass-graphs',
+  ],
   eslint: {
     dirs: ['src', 'tests', 'scripts'],
   },

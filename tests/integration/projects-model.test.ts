@@ -21,7 +21,12 @@ import {
   removeProjectTags,
 } from '@/models/projects';
 import { eq } from 'drizzle-orm';
-import { projectFactory, tagFactory, teamFactory } from '../factories';
+import {
+  projectFactory,
+  tagFactory,
+  teamFactory,
+  userFactory,
+} from '../factories';
 
 describe('getProjects', () => {
   it('should get projects by IDs using WHERE IN', async () => {
@@ -111,6 +116,7 @@ describe('getProjects', () => {
 describe('insertProjects', () => {
   it('should create a single project with auto-generated slug', async () => {
     const team = await teamFactory.create();
+    const user = await userFactory.create();
 
     const result = await insertProjects([
       {
@@ -119,7 +125,7 @@ describe('insertProjects', () => {
         teamId: team.id,
         status: PROJECT_STATUS.PLANNING,
         priority: PROJECT_PRIORITY.HIGH,
-        createdBy: 1,
+        createdBy: user.id,
       },
     ]);
 
@@ -131,11 +137,12 @@ describe('insertProjects', () => {
 
   it('should create multiple projects in bulk', async () => {
     const team = await teamFactory.create();
+    const user = await userFactory.create();
 
     const result = await insertProjects([
-      { title: 'Project 1', teamId: team.id, createdBy: 1 },
-      { title: 'Project 2', teamId: team.id, createdBy: 1 },
-      { title: 'Project 3', teamId: team.id, createdBy: 1 },
+      { title: 'Project 1', teamId: team.id, createdBy: user.id },
+      { title: 'Project 2', teamId: team.id, createdBy: user.id },
+      { title: 'Project 3', teamId: team.id, createdBy: user.id },
     ]);
 
     expect(result).toHaveLength(3);
@@ -146,11 +153,12 @@ describe('insertProjects', () => {
 
   it('should generate unique slugs for duplicate titles', async () => {
     const team = await teamFactory.create();
+    const user = await userFactory.create();
 
     const result = await insertProjects([
-      { title: 'Website Redesign', teamId: team.id, createdBy: 1 },
-      { title: 'Website Redesign', teamId: team.id, createdBy: 1 },
-      { title: 'Website Redesign', teamId: team.id, createdBy: 1 },
+      { title: 'Website Redesign', teamId: team.id, createdBy: user.id },
+      { title: 'Website Redesign', teamId: team.id, createdBy: user.id },
+      { title: 'Website Redesign', teamId: team.id, createdBy: user.id },
     ]);
 
     expect(result).toHaveLength(3);
@@ -372,7 +380,7 @@ describe('removeProjectTags', () => {
 describe('Edge cases', () => {
   it('should handle empty title validation at database level', async () => {
     await expect(
-      insertProjects([{ title: '', teamId: 'team-id', createdBy: 1 }]),
+      insertProjects([{ title: '', teamId: 'team-id', createdBy: 'user-id' }]),
     ).rejects.toThrow();
   });
 });

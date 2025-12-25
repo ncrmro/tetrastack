@@ -28,12 +28,12 @@ export const {
  *
  * @example
  * // Get by assignee
- * await getTasks({ assigneeIds: [1, 2] })
+ * await getTasks({ assigneeIds: ['user-1', 'user-2'] })
  */
 export async function getTasks(params: {
   ids?: string[];
   projectIds?: string[];
-  assigneeIds?: number[];
+  assigneeIds?: string[];
   status?: TaskStatus[];
   priority?: TaskPriority[];
 }) {

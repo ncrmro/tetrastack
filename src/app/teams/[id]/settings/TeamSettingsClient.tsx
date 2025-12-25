@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 type MembershipWithUser = SelectTeamMembership & {
   user: {
-    id: number;
+    id: string;
     name: string | null;
     email: string | null;
   };
@@ -24,7 +24,7 @@ type MembershipWithUser = SelectTeamMembership & {
 interface TeamSettingsClientProps {
   team: SelectTeam;
   memberships: MembershipWithUser[];
-  currentUserId: number;
+  currentUserId: string;
 }
 
 export default function TeamSettingsClient({
@@ -39,7 +39,7 @@ export default function TeamSettingsClient({
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [memberships, setMemberships] = useState(initialMemberships);
-  const [removingUserId, setRemovingUserId] = useState<number | null>(null);
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ export default function TeamSettingsClient({
     setIsSubmitting(false);
   };
 
-  const handleRemoveMember = async (userId: number) => {
+  const handleRemoveMember = async (userId: string) => {
     if (userId === currentUserId) {
       setError('You cannot remove yourself from the team');
       return;

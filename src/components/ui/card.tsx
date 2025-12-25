@@ -7,7 +7,7 @@ export {
   GlassCardDescription as CardDescription,
   GlassCardContent as CardContent,
   GlassCardFooter as CardFooter,
-} from '@/lib/glass-components/GlassCard';
+} from '@tetrastack/react-glass';
 
 // CardAction is a simple wrapper for action buttons/elements in the card header
 export type CardActionProps = React.ComponentProps<'div'>;

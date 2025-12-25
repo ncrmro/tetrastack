@@ -11,10 +11,10 @@ interface CommentThreadProps {
   taskId: string;
   comments: Array<
     SelectComment & {
-      user: { id: number; name: string | null };
+      user: { id: string; name: string | null };
     }
   >;
-  currentUserId: number;
+  currentUserId: string;
 }
 
 export function CommentThread({

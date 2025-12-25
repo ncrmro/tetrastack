@@ -1,3 +1,4 @@
+import { uuidv7 } from '@tetrastack/backend/utils';
 import {
   integer,
   sqliteTable,
@@ -30,7 +31,9 @@ export type UserPreferences = {
 };
 
 export const users = sqliteTable('user', {
-  id: integer('id').primaryKey(),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   name: text('name'),
   email: text('email').unique(),
   emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
@@ -65,7 +68,7 @@ export const users = sqliteTable('user', {
 export const accounts = sqliteTable(
   'account',
   {
-    userId: integer('userId')
+    userId: text('userId')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     type: text('type').$type<AdapterAccountType>().notNull(),
@@ -88,7 +91,7 @@ export const accounts = sqliteTable(
 
 export const sessions = sqliteTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
-  userId: integer('userId')
+  userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
@@ -112,7 +115,7 @@ export const authenticators = sqliteTable(
   'authenticator',
   {
     credentialID: text('credentialID').notNull().unique(),
-    userId: integer('userId')
+    userId: text('userId')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     providerAccountId: text('providerAccountId').notNull(),

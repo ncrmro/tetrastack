@@ -31,7 +31,7 @@ async function main() {
   let teamId = parseArg('team-id', '');
   const theme = parseArg('theme', 'Generate innovative software project ideas');
   const count = parseInt(parseArg('count', '10'), 10);
-  const userId = parseInt(parseArg('user-id', '1'), 10);
+  const userId = parseArg('user-id', '');
 
   // If no team-id provided, fetch the first team from database (admin's team)
   if (!teamId) {
@@ -62,7 +62,7 @@ async function main() {
       teamId,
       theme,
       count,
-      userId,
+      userId: userId || undefined,
     });
 
     console.log('');

@@ -29,7 +29,7 @@ async function main() {
 
   const team = allTeams[0];
   console.log(`  Using team: "${team.name}" (${team.id.substring(0, 8)}...)`);
-  console.log('  Using user: Admin (ID: 1)');
+  console.log('  Using user: (none specified)');
   console.log('');
 
   // Step 2: Run the job
@@ -38,7 +38,7 @@ async function main() {
     '  Theme: Generate innovative software project ideas for a tech startup',
   );
   console.log('  Count: 5');
-  console.log('  User ID: 1 (admin)');
+  console.log('  User ID: (none specified)');
   console.log('');
 
   try {
@@ -46,7 +46,7 @@ async function main() {
       teamId: team.id,
       theme: 'Generate innovative software project ideas for a tech startup',
       count: 5,
-      userId: 1,
+      userId: undefined,
     });
 
     console.log('');

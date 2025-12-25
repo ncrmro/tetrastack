@@ -8,7 +8,7 @@ import { createDefaultTeam } from './teams';
  * Internal query function to get users with all relations
  * Used for type inference and by User.select()
  */
-async function getUsers(where?: { ids?: number[] }) {
+async function getUsers(where?: { ids?: string[] }) {
   const conditions = [];
 
   if (where?.ids) {
@@ -48,7 +48,7 @@ export class User {
    */
   static async select(params: {
     where: Partial<{
-      id: number[];
+      id: string[];
     }>;
   }): Promise<User[]> {
     const records = await getUsers({
@@ -67,7 +67,7 @@ export class User {
    * @param userId - The user ID to get teams for
    * @returns Promise with array of team and membership details
    */
-  static async getUserTeams(userId: number): Promise<
+  static async getUserTeams(userId: string): Promise<
     Array<{
       team: {
         id: string;

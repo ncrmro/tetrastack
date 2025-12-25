@@ -21,7 +21,7 @@ interface TaskPageProps {
 
 export default async function TaskPage({ params }: TaskPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
   const { id } = await params;
 
   // Get task details

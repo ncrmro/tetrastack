@@ -303,7 +303,7 @@ async function generateProjects(args: string[]) {
       (customParams.theme as string) ||
       'Generate innovative software project ideas',
     count: (customParams.count as number) || 10,
-    userId: (customParams.userId as number) || 1,
+    userId: (customParams.userId as string) || undefined,
   };
 
   console.log(`\n${colors.bold}Generating projects...${colors.reset}`);

@@ -19,7 +19,22 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@tetrastack/backend": ["./packages/@tetrastack/backend/src/index.ts"],
+      "@tetrastack/backend/*": ["./packages/@tetrastack/backend/src/*"],
+      "@tetrastack/react-glass": [
+        "./packages/@tetrastack/react-glass/index.ts"
+      ],
+      "@tetrastack/react-glass/utils": [
+        "./packages/@tetrastack/react-glass/src/lib/glass-components/utils.ts"
+      ],
+      "@tetrastack/react-glass/*": ["./packages/@tetrastack/react-glass/src/*"],
+      "@tetrastack/react-glass-graphs": [
+        "./packages/@tetrastack/react-glass-graphs/index.ts"
+      ],
+      "@tetrastack/react-glass-graphs/*": [
+        "./packages/@tetrastack/react-glass-graphs/*"
+      ]
     },
     "types": ["./cloudflare-env.d.ts", "node"]
   },

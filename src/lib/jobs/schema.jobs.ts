@@ -6,7 +6,7 @@ import {
   check,
 } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
-import { generateUuidV7 } from '@/lib/uuid';
+import { uuidv7 } from '@tetrastack/backend/utils';
 
 /**
  * Job status enum - defines all possible job states
@@ -34,7 +34,7 @@ export const jobs = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     jobName: text('job_name').notNull(),
     params: text('params', { mode: 'json' }), // JSON-encoded job parameters
     result: text('result', { mode: 'json' }), // JSON-encoded job result
@@ -84,7 +84,7 @@ export const cronJobs = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     jobName: text('job_name').notNull(), // Job class name to execute
     cronExpression: text('cron_expression').notNull(), // Standard cron syntax
     params: text('params', { mode: 'json' }), // Default parameters for the job

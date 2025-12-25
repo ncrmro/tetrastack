@@ -157,10 +157,7 @@ export async function updateProject(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
-      id,
-    );
+    const isMember = await verifyProjectTeamMembership(session.user.id, id);
     if (!isMember) {
       return {
         success: false,
@@ -189,7 +186,7 @@ export async function deleteProject(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyProjectTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyProjectTeamAdmin(session.user.id, id);
     if (!isAdmin) {
       return {
         success: false,
@@ -243,7 +240,7 @@ export async function addProjectTags(
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      session.user.id,
       projectId,
     );
     if (!isMember) {
@@ -275,7 +272,7 @@ export async function removeProjectTags(
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      session.user.id,
       projectId,
     );
     if (!isMember) {

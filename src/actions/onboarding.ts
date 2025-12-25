@@ -24,7 +24,7 @@ export async function completeOnboarding(): ActionResult<void> {
       .set({
         onboardingCompleted: true,
       })
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, session.user.id));
 
     return { success: true, data: undefined };
   } catch (err) {

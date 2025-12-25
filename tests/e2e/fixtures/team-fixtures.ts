@@ -62,8 +62,8 @@ export const test = base.extend<TeamFixtures>({
 export async function createTeamWithMembers(params: {
   name: string;
   description?: string;
-  memberUserIds: number[];
-  adminUserIds?: number[];
+  memberUserIds: string[];
+  adminUserIds?: string[];
 }): Promise<string> {
   const { name, description, memberUserIds, adminUserIds = [] } = params;
 
@@ -109,7 +109,7 @@ export async function createTeamWithMembers(params: {
 // Helper function to create multiple teams for testing
 export async function createMultipleTeams(params: {
   count: number;
-  baseUserId: number;
+  baseUserId: string;
 }): Promise<string[]> {
   const { count, baseUserId } = params;
 

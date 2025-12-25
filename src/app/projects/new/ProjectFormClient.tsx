@@ -42,7 +42,6 @@ export default function ProjectFormClient({
       description: description || null,
       status,
       priority,
-      createdBy: 1, // Will be set properly by the action
     });
 
     if (result.success) {

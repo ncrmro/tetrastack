@@ -23,7 +23,7 @@ export type { InsertComment, SelectComment } from '@/database/schema.tasks';
 export async function getComments(params: {
   ids?: string[];
   taskIds?: string[];
-  userIds?: number[];
+  userIds?: string[];
 }): ActionResult<SelectComment[]> {
   try {
     const session = await auth();
@@ -52,7 +52,7 @@ export async function createComment(
     }
 
     // Ensure the comment is created by the authenticated user
-    const commentData = { ...data, userId: parseInt(session.user.id) };
+    const commentData = { ...data, userId: session.user.id };
 
     // Validate input data
     const validationResult = insertCommentSchema.safeParse(commentData);
@@ -93,7 +93,7 @@ export async function updateComment(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isOwner = await verifyCommentOwnership(parseInt(session.user.id), id);
+    const isOwner = await verifyCommentOwnership(session.user.id, id);
     if (!isOwner) {
       return {
         success: false,
@@ -122,7 +122,7 @@ export async function deleteComment(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isOwner = await verifyCommentOwnership(parseInt(session.user.id), id);
+    const isOwner = await verifyCommentOwnership(session.user.id, id);
     if (!isOwner) {
       return {
         success: false,

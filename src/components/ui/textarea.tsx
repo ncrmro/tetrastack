@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '@/lib/glass-components/utils';
-import { GlassSurface } from '@/lib/glass-components/GlassSurface';
+import { GlassSurface } from '@tetrastack/react-glass';
+import { cn } from '@tetrastack/react-glass/utils';
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {

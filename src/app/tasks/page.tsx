@@ -18,7 +18,7 @@ interface TasksPageProps {
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
   const params = await searchParams;
 
   // Get user's teams

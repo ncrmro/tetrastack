@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
             {
               ...result.project,
               teamId,
-              createdBy: parseInt(session.user.id),
+              createdBy: session.user.id,
             },
           ]);
 

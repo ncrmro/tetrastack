@@ -20,7 +20,7 @@ export const generateProjectIdeasParamsSchema = z.object({
     .optional()
     .default('Generate innovative software project ideas'),
   count: z.number().int().positive().optional().default(10),
-  userId: z.number().int().positive().optional(),
+  userId: z.string().optional(),
 });
 
 export const generateProjectIdeasResultSchema = z.object({

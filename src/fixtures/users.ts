@@ -1,3 +1,5 @@
+import { uuidv7 } from '@tetrastack/backend/utils';
+
 /**
  * User fixtures for seeding and testing
  *
@@ -15,14 +17,14 @@
  */
 export const users = [
   {
-    id: 1,
+    id: uuidv7(),
     name: 'Admin User',
     email: 'admin@example.com',
     admin: true,
     password: 'password', // Login with "admin" or "admin-123" etc
   },
   {
-    id: 2,
+    id: uuidv7(),
     name: 'Bob Alice',
     email: 'bob@alice.com',
     admin: false,

@@ -1,14 +1,14 @@
 import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
 import { teams } from './schema.teams';
-import { generateUuidV7 } from '@/lib/uuid';
+import { uuidv7 } from '@tetrastack/backend/utils';
 
 export const tags = sqliteTable(
   'tags',
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     name: text('name').notNull(),
     color: text('color').notNull().default('#3b82f6'), // Default blue color
     teamId: text('team_id')

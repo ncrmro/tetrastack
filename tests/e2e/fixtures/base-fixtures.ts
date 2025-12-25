@@ -61,7 +61,7 @@ export interface AuthenticatedContext {
 export interface TeamContext {
   page: Page;
   data: BaseTestData;
-  userId: number;
+  userId: string;
   teamId: string;
 }
 
@@ -219,7 +219,7 @@ async function createUserWithTeam(
   user: TestUser,
   role: 'member' | 'admin' = 'admin',
 ): Promise<string> {
-  const userId = parseInt(user.id);
+  const userId = user.id;
 
   // Create a team for the user
   const [team] = await db
@@ -324,7 +324,7 @@ export const test = base.extend<BaseFixtures>({
     await use({
       page,
       data: baseTestData,
-      userId: parseInt(user.id),
+      userId: user.id,
       teamId,
     });
 
@@ -344,7 +344,7 @@ export const test = base.extend<BaseFixtures>({
     await use({
       page,
       data: baseAdminTestData,
-      userId: parseInt(user.id),
+      userId: user.id,
       teamId,
     });
 

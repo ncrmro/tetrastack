@@ -2,7 +2,7 @@ import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
 import { projects } from './schema.projects';
 import { users } from './schema.auth';
-import { generateUuidV7 } from '@/lib/uuid';
+import { uuidv7 } from '@tetrastack/backend/utils';
 
 /**
  * Task status enum - defines all possible task states
@@ -29,7 +29,7 @@ export const tasks = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     title: text('title').notNull(),
     description: text('description'),
     status: text('status', {
@@ -42,7 +42,7 @@ export const tasks = sqliteTable(
     })
       .notNull()
       .default(TASK_PRIORITY.MEDIUM),
-    assigneeId: integer('assignee_id').references(() => users.id, {
+    assigneeId: text('assignee_id').references(() => users.id, {
       onDelete: 'set null',
     }),
     projectId: text('project_id')
@@ -65,11 +65,11 @@ export const comments = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     taskId: text('task_id')
       .notNull()
       .references(() => tasks.id, { onDelete: 'cascade' }),
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     content: text('content').notNull(),

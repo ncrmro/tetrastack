@@ -115,14 +115,14 @@ export function validateBulkInput<T>(
  * }
  */
 export async function withAuth<T>(
-  handler: (userId: number) => Promise<T>,
+  handler: (userId: string) => Promise<T>,
 ): ActionResult<T> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
-    const result = await handler(parseInt(session.user.id));
+    const result = await handler(session.user.id);
     return { success: true, data: result };
   } catch (error) {
     const errorMessage =
@@ -159,7 +159,7 @@ export async function withAuthAndValidation<TInput, TOutput>(
   schema: ZodSchema<TInput>,
   data: unknown,
   entityName: string,
-  handler: (userId: number, validatedData: TInput) => Promise<TOutput>,
+  handler: (userId: string, validatedData: TInput) => Promise<TOutput>,
 ): ActionResult<TOutput> {
   return withAuth(async (userId) => {
     const validation = validateActionInput(schema, data, entityName);

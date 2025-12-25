@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { slugify } from '@tetrastack/backend/utils';
+import { generateUniqueSlug } from '@/utils/generateUniqueSlug';
 import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
 
 describe('Project Utilities', () => {

@@ -82,7 +82,7 @@ class TaskFactory extends Factory<InsertTask> {
   /**
    * Create an assigned task
    */
-  assigned(userId: number) {
+  assigned(userId: string) {
     return this.params({ assigneeId: userId });
   }
 

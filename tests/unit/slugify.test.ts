@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { slugify } from '@tetrastack/backend/utils';
+import { generateUniqueSlug } from '@/utils/generateUniqueSlug';
 
 describe('slugify', () => {
   it('converts basic strings to lowercase with hyphens', () => {
