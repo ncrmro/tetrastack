@@ -3,7 +3,7 @@
  * Items are the append-only event log within a thread.
  */
 
-import { eq, type SQL } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { createModelFactory, type DrizzleDb } from './factory';
 import {
   items,

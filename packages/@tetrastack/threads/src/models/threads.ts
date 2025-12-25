@@ -3,7 +3,7 @@
  * Provides CRUD operations for thread containers.
  */
 
-import { eq, type SQL } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { createModelFactory, type DrizzleDb } from './factory';
 import {
   threads,

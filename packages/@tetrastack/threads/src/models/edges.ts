@@ -3,7 +3,7 @@
  * Edges define DAG dependencies for complex agent workflows.
  */
 
-import { eq, type SQL } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { createModelFactory, type DrizzleDb } from './factory';
 import {
   edges,
