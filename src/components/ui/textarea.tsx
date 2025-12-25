@@ -2,8 +2,7 @@ import React from 'react';
 import { GlassSurface } from '@tetrastack/react-glass';
 import { cn } from '@tetrastack/react-glass/utils';
 
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   /**
    * Glass intensity - defaults to 'strong' for heavy blur
    */

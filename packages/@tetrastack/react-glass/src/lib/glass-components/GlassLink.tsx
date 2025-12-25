@@ -2,8 +2,7 @@ import React from 'react';
 import { cn } from './utils';
 import { GlassSurface } from './GlassSurface';
 
-export interface GlassLinkProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface GlassLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   /**
    * The variant of the link button
    * @default 'primary'

@@ -2,8 +2,7 @@ import type React from 'react';
 import { cn } from './utils';
 import { GlassSurface } from './GlassSurface';
 
-export interface GlassSelectProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface GlassSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   /**
    * Glass intensity - defaults to 'strong' for heavy blur
    */

@@ -2,8 +2,10 @@ import * as React from 'react';
 import { cn } from './utils';
 import { GlassSurface, GlassSurfaceProps } from './GlassSurface';
 
-export interface GlassCardProps
-  extends Omit<GlassSurfaceProps, 'bordered' | 'shadowed'> {
+export interface GlassCardProps extends Omit<
+  GlassSurfaceProps,
+  'bordered' | 'shadowed'
+> {
   /**
    * Enable glass-morphism effect (backdrop-filter blur + semi-transparent background)
    * Set to false to disable glass effect for performance when nesting components

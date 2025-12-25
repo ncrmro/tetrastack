@@ -2,8 +2,7 @@ import React from 'react';
 import { cn } from './utils';
 import { GlassSurface } from './GlassSurface';
 
-export interface GlassButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * The variant of the button
    * @default 'primary'
@@ -83,8 +82,7 @@ export function GlassButton({
 /**
  * GlassButton component as a link (anchor tag)
  */
-export interface GlassButtonLinkProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface GlassButtonLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'error';
   size?: 'small' | 'medium' | 'large';
 }

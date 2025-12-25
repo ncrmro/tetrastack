@@ -2,11 +2,10 @@ import * as React from 'react';
 import { cn } from './utils';
 import { GlassSurface, GlassSurfaceProps } from './GlassSurface';
 
-export interface GlassNavProps
-  extends Omit<
-    GlassSurfaceProps,
-    'bordered' | 'shadowed' | 'intensity' | 'variant'
-  > {
+export interface GlassNavProps extends Omit<
+  GlassSurfaceProps,
+  'bordered' | 'shadowed' | 'intensity' | 'variant'
+> {
   /**
    * Whether the nav is sticky at the top
    */
