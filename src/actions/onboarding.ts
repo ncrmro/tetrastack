@@ -18,13 +18,22 @@ export async function completeOnboarding(): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    // Update user's onboarding completion status
+    // Get current user to merge metadata
+    const [currentUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id));
+
+    // Update user's onboarding completion status in metadata
     await db
       .update(users)
       .set({
-        onboardingCompleted: true,
+        metadata: {
+          ...currentUser?.metadata,
+          onboardingCompleted: true,
+        },
       })
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, session.user.id));
 
     return { success: true, data: undefined };
   } catch (err) {

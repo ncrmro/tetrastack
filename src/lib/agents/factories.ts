@@ -16,7 +16,7 @@ import { like, or, asc } from 'drizzle-orm';
  */
 export function createSearchTool(config: {
   entityName: string; // 'project', 'task', 'team'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   table: any; // Drizzle SQLite table
   limit?: number; // default: 50
 }) {

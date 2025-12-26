@@ -43,7 +43,7 @@ describe('GenerateProjectIdeasJob', () => {
         teamId: testTeamId,
         theme: 'Generate innovative web development projects',
         count: 3,
-        userId: 1,
+        userId: undefined,
       });
 
       const duration = Date.now() - startTime;

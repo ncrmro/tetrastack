@@ -108,6 +108,6 @@ class TeamMembershipFactory extends Factory<InsertTeamMembership> {
 
 export const teamMembershipFactory = TeamMembershipFactory.define(() => ({
   teamId: '', // Must be provided
-  userId: 1, // Must be provided
+  userId: '', // Must be provided
   role: TEAM_ROLE.MEMBER,
 }));

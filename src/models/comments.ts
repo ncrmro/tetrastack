@@ -31,12 +31,12 @@ export const {
  *
  * @example
  * // Get by user
- * await getComments({ userIds: [1, 2] })
+ * await getComments({ userIds: ['user-1', 'user-2'] })
  */
 export async function getComments(params: {
   ids?: string[];
   taskIds?: string[];
-  userIds?: number[];
+  userIds?: string[];
 }) {
   const conditions = [];
 

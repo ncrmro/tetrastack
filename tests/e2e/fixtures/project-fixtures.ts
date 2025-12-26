@@ -72,7 +72,7 @@ export const test = base.extend<ProjectFixtures>({
 // Helper function to create a project with tasks
 export async function createProjectWithTasks(params: {
   teamId: string;
-  createdBy: number;
+  createdBy: string;
   projectData?: Partial<InsertProject>;
   taskCount?: number;
   taskData?: Partial<InsertTask>[];
@@ -105,7 +105,7 @@ export async function createProjectWithTasks(params: {
     description?: string | null;
     status?: string;
     priority?: string;
-    assigneeId?: number | null;
+    assigneeId?: string | null;
     dueDate?: Date | null;
   }> = [];
 
@@ -151,7 +151,7 @@ export async function createProjectWithTasks(params: {
 export async function createMultipleProjects(params: {
   count: number;
   teamId: string;
-  createdBy: number;
+  createdBy: string;
   withTasks?: boolean;
 }): Promise<string[]> {
   const { count, teamId, createdBy, withTasks = false } = params;

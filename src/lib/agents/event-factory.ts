@@ -140,11 +140,8 @@ export function createEventConstants<
 export function createEventBuilders<
   TEntity extends string,
   TResult = unknown,
-  TCustom extends Record<
-    string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (...args: any[]) => Record<string, any>
-  > = Record<string, never>,
+  TCustom extends Record<string, (...args: any[]) => Record<string, any>> =
+    Record<string, never>,
 >(config: {
   entity: TEntity;
   custom?: TCustom;

@@ -13,7 +13,7 @@ export default async function TeamSettingsPage({
   params,
 }: TeamSettingsPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
   const { id } = await params;
 
   // Get team details

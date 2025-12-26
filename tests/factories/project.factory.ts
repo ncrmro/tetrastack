@@ -21,7 +21,8 @@
  */
 
 import { Factory, db } from '@/lib/factories';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { slugify } from '@tetrastack/backend/utils';
+import { generateUniqueSlug } from '@/utils/generateUniqueSlug';
 import type { InsertProject } from '@/database/schema.projects';
 import {
   projects,

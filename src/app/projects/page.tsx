@@ -20,7 +20,7 @@ export default async function ProjectsPage({
   searchParams,
 }: ProjectsPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = session.user.id;
   const params = await searchParams;
 
   // Get user's teams

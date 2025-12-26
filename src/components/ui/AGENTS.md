@@ -8,7 +8,7 @@ The `src/components/ui/` directory serves as the **project-specific wrapper laye
 
 This directory contains two types of components:
 
-1. **Glass Component Wrappers** - Re-exports from `@/lib/glass-components` (our framework-agnostic glass-morphism design system)
+1. **Glass Component Wrappers** - Re-exports from `@tetrastack/react-glass` (our framework-agnostic glass-morphism design system)
 2. **shadcn/ui Components** - Components from the shadcn/ui library
 
 Both types are wrapped through this layer to:
@@ -24,7 +24,7 @@ Both types are wrapped through this layer to:
 
 ```tsx
 // ❌ BAD: Direct imports from design systems
-import { GlassButton } from '@/lib/glass-components';
+import { GlassButton } from '@tetrastack/react-glass';
 import { Dialog } from '@/components/ui/dialog'; // Wait, this is actually correct!
 
 // ✅ GOOD: Import through the ui/ wrapper layer
@@ -32,7 +32,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 ```
 
-**Exception**: Demo pages (`/glass-demo`, `/glass-example`) may import directly from `@/lib/glass-components` for educational purposes to showcase the raw design system.
+**Exception**: Demo pages (`/glass-demo`, `/glass-example`) may import directly from `@tetrastack/react-glass` for educational purposes to showcase the raw design system.
 
 ## Benefits of the Wrapper Layer
 
@@ -41,8 +41,7 @@ import { Dialog } from '@/components/ui/dialog';
 Replace the entire design system without touching application code:
 
 ```tsx
-// Before: Glass components
-export { GlassButton as Button } from '@/lib/glass-components';
+export { GlassButton as Button } from '@tetrastack/react-glass';
 
 // After: Switching to shadcn/ui (or any other system)
 export { Button } from '@/components/ui/button-shadcn';
@@ -55,7 +54,7 @@ Your application code never changes - it always imports from `@/components/ui/bu
 Override defaults for your project's needs:
 
 ```tsx
-import { GlassButton, type GlassButtonProps } from '@/lib/glass-components';
+import { GlassButton, type GlassButtonProps } from '@tetrastack/react-glass';
 
 // Set project-wide defaults
 export function Button({
@@ -138,9 +137,9 @@ export {
   GlassCardTitle as CardTitle,
   GlassCardDescription as CardDescription,
   GlassCardContent as CardContent,
-} from '@/lib/glass-components';
+} from '@tetrastack/react-glass';
 
-export type { GlassCardProps as CardProps } from '@/lib/glass-components';
+export type { GlassCardProps as CardProps } from '@tetrastack/react-glass';
 ```
 
 ### Pattern 2: Custom Defaults
@@ -148,8 +147,7 @@ export type { GlassCardProps as CardProps } from '@/lib/glass-components';
 When you want to set project-specific defaults:
 
 ```tsx
-// components/ui/button.tsx
-import { GlassButton, type GlassButtonProps } from '@/lib/glass-components';
+import { GlassButton, type GlassButtonProps } from '@tetrastack/react-glass';
 
 export function Button({ variant = 'primary', ...props }: GlassButtonProps) {
   return <GlassButton variant={variant} {...props} />;
@@ -164,7 +162,7 @@ When you need to add project-specific behavior:
 
 ```tsx
 // components/ui/input.tsx
-import { GlassInput, type GlassInputProps } from '@/lib/glass-components';
+import { GlassInput, type GlassInputProps } from '@tetrastack/react-glass';
 import { useFormValidation } from '@/lib/hooks/useFormValidation';
 
 export function Input(props: GlassInputProps) {
@@ -229,7 +227,7 @@ Current state (in progress):
 
 ### DON'T:
 
-- ❌ Import directly from `@/lib/glass-components` in application code
+- ❌ Import directly from `@tetrastack/react-glass` in application code
 - ❌ Import directly from shadcn source files
 - ❌ Add business logic to UI component wrappers
 - ❌ Mix design systems in the same component
@@ -254,8 +252,8 @@ export function GlassButton({ variant, children, ...props }) {
 
 ```tsx
 // src/components/ui/button.tsx
-export { GlassButton as Button } from '@/lib/glass-components';
-export type { GlassButtonProps as ButtonProps } from '@/lib/glass-components';
+export { GlassButton as Button } from '@tetrastack/react-glass';
+export type { GlassButtonProps as ButtonProps } from '@tetrastack/react-glass';
 ```
 
 **Step 3: Use in application**
@@ -286,7 +284,7 @@ When adding a new component to this directory, document it with:
 /**
  * [Component Name] - [Brief description]
  *
- * Wraps: [Source component, e.g., GlassButton from @/lib/glass-components]
+ * Wraps: [Source component, e.g., GlassButton from @tetrastack/react-glass]
  *
  * @example
  * ```tsx

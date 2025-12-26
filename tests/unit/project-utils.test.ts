@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { slugify, generateUniqueSlug } from '@tetrastack/backend/utils';
 import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
 
 describe('Project Utilities', () => {
@@ -49,7 +49,6 @@ describe('Project Utilities', () => {
 
     it('identifies valid project statuses', () => {
       const isValidStatus = (status: string) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(PROJECT_STATUS).includes(status as any);
 
       expect(isValidStatus('planning')).toBe(true);
@@ -73,7 +72,6 @@ describe('Project Utilities', () => {
 
     it('identifies valid project priorities', () => {
       const isValidPriority = (priority: string) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Object.values(PROJECT_PRIORITY).includes(priority as any);
 
       expect(isValidPriority('low')).toBe(true);

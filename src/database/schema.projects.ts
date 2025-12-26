@@ -8,7 +8,7 @@ import {
 import { relations, sql } from 'drizzle-orm';
 import { teams } from './schema.teams';
 import { users } from './schema.auth';
-import { generateUuidV7 } from '@/lib/uuid';
+import { uuidv7 } from '@tetrastack/backend/utils';
 
 /**
  * Project status enum - defines all possible project states
@@ -38,7 +38,7 @@ export const projects = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     title: text('title').notNull(),
     slug: text('slug').notNull().unique(),
     description: text('description'),
@@ -55,7 +55,7 @@ export const projects = sqliteTable(
     teamId: text('team_id')
       .notNull()
       .references(() => teams.id, { onDelete: 'cascade' }),
-    createdBy: integer('created_by').references(() => users.id),
+    createdBy: text('created_by').references(() => users.id),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .notNull()
       .$default(() => new Date()),

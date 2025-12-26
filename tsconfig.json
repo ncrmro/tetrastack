@@ -23,6 +23,16 @@
     },
     "types": ["./cloudflare-env.d.ts", "node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "worktree", "specs"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next", "worktree", "specs", "packages"],
+  "references": [
+    { "path": "./packages/@tetrastack/backend" },
+    { "path": "./packages/@tetrastack/react-glass" },
+    { "path": "./packages/@tetrastack/react-glass-graphs" }
+  ]
 }

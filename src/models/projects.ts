@@ -10,7 +10,7 @@ import type {
   ProjectPriority,
 } from '@/database/schema.projects';
 import { and, eq, inArray } from 'drizzle-orm';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { slugify, generateUniqueSlug } from '@tetrastack/backend/utils';
 import { createModelFactory } from '@/lib/models';
 
 // Get base CRUD functions from factory

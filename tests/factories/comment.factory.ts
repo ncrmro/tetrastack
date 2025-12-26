@@ -111,6 +111,6 @@ class CommentFactory extends Factory<InsertComment> {
 
 export const commentFactory = CommentFactory.define(() => ({
   taskId: '', // Auto-created if not provided
-  userId: 1, // Auto-created if not provided
+  userId: '', // Auto-created if not provided
   content: Factory.faker.lorem.paragraph(),
 }));

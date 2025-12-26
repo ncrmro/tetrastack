@@ -52,7 +52,7 @@ export const {
  * // Get teams by user membership
  * await getTeams({ userIds: [1, 2] })
  */
-export async function getTeams(params: { ids?: string[]; userIds?: number[] }) {
+export async function getTeams(params: { ids?: string[]; userIds?: string[] }) {
   const conditions = [];
 
   if (params.ids) {
@@ -90,7 +90,7 @@ export async function getTeams(params: { ids?: string[]; userIds?: number[] }) {
  */
 export async function getTeamMemberships(params: {
   teamIds?: string[];
-  userIds?: number[];
+  userIds?: string[];
 }) {
   const conditions = [];
 
@@ -120,7 +120,7 @@ export async function getTeamMemberships(params: {
  * @returns The created team
  */
 export async function createDefaultTeam(
-  userId: number,
+  userId: string,
   userName?: string | null,
 ) {
   const teamName = userName ? `${userName}'s Team` : 'My Team';

@@ -1,3 +1,6 @@
+import { uuidv7 } from '@tetrastack/backend/utils';
+import type { UserMetadata } from '../database/schema.auth';
+
 /**
  * User fixtures for seeding and testing
  *
@@ -13,19 +16,28 @@
  * - john.doe@example.com with "admin" or "password"
  * - jane.doe@example.com with "admin" or "password"
  */
-export const users = [
+export const users: Array<{
+  id: string;
+  name: string;
+  email: string;
+  metadata: UserMetadata;
+}> = [
   {
-    id: 1,
+    id: uuidv7(),
     name: 'Admin User',
     email: 'admin@example.com',
-    admin: true,
-    password: 'password', // Login with "admin" or "admin-123" etc
+    metadata: {
+      admin: true,
+      onboardingCompleted: false,
+    },
   },
   {
-    id: 2,
+    id: uuidv7(),
     name: 'Bob Alice',
     email: 'bob@alice.com',
-    admin: false,
-    password: 'password', // Login with "password" or "password-456" etc
+    metadata: {
+      admin: false,
+      onboardingCompleted: false,
+    },
   },
 ];

@@ -1,11 +1,11 @@
-import NextAuth, { DefaultSession } from 'next-auth';
+import { createAuth } from '@tetrastack/backend/auth';
+import type { DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { db } from '@/database';
 import { eq } from 'drizzle-orm';
 import { users } from '@/database/schema.auth';
 import PostHogClient from '@/lib/posthog-server';
 import { authConfig } from '@/lib/auth.config';
-import { User } from '@/models/user';
 
 // Redirect URL for authenticated users
 export const AUTHENTICATED_USER_REDIRECT_URL = '/dashboard';
@@ -13,17 +13,18 @@ export const AUTHENTICATED_USER_REDIRECT_URL = '/dashboard';
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string;
+      id: string; // Changed from number to string
       admin: boolean;
     } & DefaultSession['user'];
   }
 
   interface User {
+    id: string; // Changed from number to string
     admin: boolean;
   }
 
   interface JWT {
-    id: string;
+    id: string; // Changed from number to string
     admin: boolean;
   }
 }
@@ -56,9 +57,11 @@ function identifyUserWithPostHog(user: {
   }
 }
 
+const currentProviders = [...authConfig.providers];
+
 // Development credentials provider (requires database, cannot be in auth.config.ts)
 if (process.env.NODE_ENV === 'development') {
-  authConfig.providers.push(
+  currentProviders.push(
     Credentials({
       id: 'password',
       name: 'Password',
@@ -102,97 +105,13 @@ if (process.env.NODE_ENV === 'development') {
         // Convert integer ID to string for NextAuth compatibility
         return {
           ...user,
-          id: user.id.toString(),
-          admin: user.admin ?? false,
+          id: user.id, // Now it's already a string (UUID)
+          admin: user.metadata?.admin ?? false,
         };
       },
     }),
   );
 }
-
-/**
- * Pure JWT session strategy for all environments
- * Extends the edge-safe auth.config.ts with database-dependent callbacks
- */
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  ...authConfig,
-  adapter: undefined, // No adapter - pure JWT strategy
-  callbacks: {
-    /**
-     * JWT Callback
-     *
-     * Called whenever a JWT is created (at sign in) or updated (when session is accessed).
-     * We look up the user in the database and store their ID and admin status in the token.
-     */
-    async jwt({ token, user }) {
-      // On sign-in with Credentials provider, user object is fully populated
-      if (user && user.id) {
-        token.id = user.id;
-        token.admin = user.admin;
-        return token;
-      }
-
-      // For OAuth providers (Google, Mailgun) or token refresh, look up user by email
-      const { email, name, picture: image } = token;
-      if (!email) {
-        throw new Error('No email found during JWT callback');
-      }
-
-      const [existingUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-
-      if (existingUser) {
-        token.id = existingUser.id.toString();
-        token.admin = existingUser.admin ?? false;
-        return token;
-      }
-
-      // Create new user for OAuth sign-ins (production only)
-      const newUser = await User.createOAuthUser({
-        email,
-        name: name as string | null,
-        image: image as string | null,
-      });
-
-      token.id = newUser.id.toString();
-      token.admin = newUser.admin ?? false;
-      return token;
-    },
-
-    /**
-     * Session Callback
-     *
-     * Called whenever a session is checked (getSession, useSession, etc).
-     * Forward token data to the session object.
-     */
-    async session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.admin = token.admin as boolean;
-      return session;
-    },
-
-    /**
-     * SignIn Callback
-     *
-     * Called on successful sign in.
-     * Used for PostHog identification.
-     */
-    signIn({ user }) {
-      if (user && user.id) {
-        identifyUserWithPostHog({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          admin: user.admin,
-        });
-      }
-      return true;
-    },
-  },
-});
 
 /**
  * Wrapped auth function that throws if not authenticated
@@ -219,3 +138,26 @@ export async function authRedirect() {
   }
   return session;
 }
+
+/**
+ * Pure JWT session strategy for all environments
+ * Extends the edge-safe auth.config.ts with database-dependent callbacks
+ */
+export const { handlers, signIn, signOut, auth } = createAuth({
+  database: db,
+  providers: currentProviders,
+  callbacks: {
+    // Custom signIn callback for PostHog identification
+    signIn({ user }) {
+      if (user && user.id) {
+        identifyUserWithPostHog({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          admin: user.admin,
+        });
+      }
+      return true;
+    },
+  },
+});

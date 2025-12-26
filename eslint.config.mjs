@@ -1,16 +1,10 @@
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from 'eslint-plugin-storybook';
+import nextConfig from 'eslint-config-next';
+import eslintConfigPrettier from 'eslint-config-prettier';
 import drizzle from 'eslint-plugin-drizzle';
 import vitest from '@vitest/eslint-plugin';
 import playwright from 'eslint-plugin-playwright';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
 
 const eslintConfig = [
   {
@@ -30,7 +24,10 @@ const eslintConfig = [
       '*.d.ts',
     ],
   },
-  ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
+  // Next.js flat config (already in flat config format in v16+)
+  ...nextConfig,
+  // Prettier config (disables conflicting rules)
+  eslintConfigPrettier,
   {
     ignores: ['.next/**/*', 'src/components/onboarding/*', 'scripts/seed.ts'],
   },
@@ -80,6 +77,7 @@ const eslintConfig = [
       'playwright/no-wait-for-selector': 'error',
     },
   },
+  ...storybook.configs['flat/recommended'],
 ];
 
 export default eslintConfig;

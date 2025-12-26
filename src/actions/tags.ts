@@ -59,7 +59,7 @@ export async function createTag(data: InsertTag): ActionResult<SelectTag> {
     }
 
     const isMember = await verifyTeamMembership(
-      parseInt(session.user.id),
+      session.user.id,
       validation.data.teamId,
     );
     if (!isMember) {
@@ -99,10 +99,7 @@ export async function updateTag(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isMember = await verifyTagTeamMembership(
-      parseInt(session.user.id),
-      id,
-    );
+    const isMember = await verifyTagTeamMembership(session.user.id, id);
     if (!isMember) {
       return {
         success: false,

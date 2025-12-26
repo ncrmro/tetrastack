@@ -282,7 +282,7 @@ describe('Edge cases', () => {
         {
           content: 'Test comment',
           taskId: task.id,
-          userId: 99999, // Non-existent user
+          userId: 'non-existent-user-id', // Non-existent user
         },
       ]),
     ).rejects.toThrow();

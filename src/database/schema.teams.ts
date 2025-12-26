@@ -7,7 +7,7 @@ import {
 } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
 import { users } from './schema.auth';
-import { generateUuidV7 } from '@/lib/uuid';
+import { uuidv7 } from '@tetrastack/backend/utils';
 
 /**
  * Team role enum - defines membership roles and access control levels
@@ -23,7 +23,7 @@ export const teams = sqliteTable(
   {
     id: text('id')
       .primaryKey()
-      .$defaultFn(() => generateUuidV7()),
+      .$defaultFn(() => uuidv7()),
     name: text('name').notNull(),
     description: text('description'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
@@ -43,7 +43,7 @@ export const teamMemberships = sqliteTable(
     teamId: text('team_id')
       .notNull()
       .references(() => teams.id, { onDelete: 'cascade' }),
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     role: text('role', {

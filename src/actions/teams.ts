@@ -41,7 +41,7 @@ export type {
  */
 export async function getTeams(params: {
   ids?: string[];
-  userIds?: number[];
+  userIds?: string[];
 }): ActionResult<SelectTeam[]> {
   try {
     const session = await auth();
@@ -106,7 +106,7 @@ export async function updateTeam(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyTeamAdmin(session.user.id, id);
     if (!isAdmin) {
       return {
         success: false,
@@ -132,7 +132,7 @@ export async function deleteTeam(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyTeamAdmin(session.user.id, id);
     if (!isAdmin) {
       return {
         success: false,
@@ -153,7 +153,7 @@ export async function deleteTeam(id: string): ActionResult<void> {
  */
 export async function getTeamMemberships(params: {
   teamIds?: string[];
-  userIds?: number[];
+  userIds?: string[];
 }): ActionResult<SelectTeamMembership[]> {
   try {
     const session = await auth();
@@ -191,7 +191,7 @@ export async function addTeamMember(
     }
 
     const isAdmin = await verifyTeamAdmin(
-      parseInt(session.user.id),
+      session.user.id,
       validationResult.data.teamId,
     );
     if (!isAdmin) {
@@ -214,7 +214,7 @@ export async function addTeamMember(
  */
 export async function removeTeamMember(
   teamId: string,
-  userId: number,
+  userId: string,
 ): ActionResult<void> {
   try {
     const session = await auth();
@@ -222,7 +222,7 @@ export async function removeTeamMember(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), teamId);
+    const isAdmin = await verifyTeamAdmin(session.user.id, teamId);
     if (!isAdmin) {
       return {
         success: false,
