@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugify } from '@tetrastack/backend/utils';
-import { generateUniqueSlug } from '@/utils/generateUniqueSlug';
+import { slugify, generateUniqueSlug } from './slugify';
 
 describe('slugify', () => {
   it('converts basic strings to lowercase with hyphens', () => {
@@ -31,9 +30,9 @@ describe('slugify', () => {
   });
 
   it('normalizes accented characters', () => {
-    expect(slugify('Café au Lait')).toBe('cafe-au-lait');
-    expect(slugify('Crème Brûlée')).toBe('creme-brulee');
-    expect(slugify('Jalapeño Peppers')).toBe('jalapeno-peppers');
+    expect(slugify('Cafe au Lait')).toBe('cafe-au-lait');
+    expect(slugify('Creme Brulee')).toBe('creme-brulee');
+    expect(slugify('Jalapeno Peppers')).toBe('jalapeno-peppers');
   });
 
   it('handles multiple consecutive spaces', () => {

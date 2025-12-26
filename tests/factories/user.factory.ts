@@ -10,7 +10,7 @@
  * const adminUser = userFactory.build({
  *   name: 'John Admin',
  *   email: 'admin@example.com',
- *   admin: true,
+ *   metadata: { admin: true },
  * });
  *
  * // Use traits
@@ -26,7 +26,11 @@
  */
 
 import { Factory, db } from '@/lib/factories';
-import type { InsertUser, SelectUser } from '@/database/schema.auth';
+import type {
+  InsertUser,
+  SelectUser,
+  UserMetadata,
+} from '@/database/schema.auth';
 import { users } from '@/database/schema.auth';
 
 /**
@@ -37,21 +41,27 @@ class UserFactory extends Factory<InsertUser> {
    * Create an admin user
    */
   admin() {
-    return this.params({ admin: true });
+    return this.params({
+      metadata: { admin: true },
+    });
   }
 
   /**
    * Create a regular (non-admin) user
    */
   regularUser() {
-    return this.params({ admin: false });
+    return this.params({
+      metadata: { admin: false },
+    });
   }
 
   /**
    * Create a user with onboarding completed
    */
   onboarded() {
-    return this.params({ onboardingCompleted: true });
+    return this.params({
+      metadata: { onboardingCompleted: true },
+    });
   }
 
   /**
@@ -66,11 +76,7 @@ class UserFactory extends Factory<InsertUser> {
       email: built.email || '',
       emailVerified: built.emailVerified ?? null,
       image: built.image ?? null,
-      admin: built.admin ?? false,
-      onboardingCompleted: built.onboardingCompleted ?? false,
-      onboardingData:
-        (built.onboardingData as Record<string, unknown> | null) ?? null,
-      data: built.data ?? null,
+      metadata: built.metadata ?? null,
     };
     const [created] = await db.insert(users).values(insertData).returning();
     return created;
@@ -88,24 +94,20 @@ class UserFactory extends Factory<InsertUser> {
       email: built.email || '',
       emailVerified: built.emailVerified ?? null,
       image: built.image ?? null,
-      admin: built.admin ?? false,
-      onboardingCompleted: built.onboardingCompleted ?? false,
-      onboardingData:
-        (built.onboardingData as Record<string, unknown> | null) ?? null,
-      data: built.data ?? null,
+      metadata: built.metadata ?? null,
     }));
     return await db.insert(users).values(userList).returning();
   }
 }
 
 export const userFactory = UserFactory.define(() => ({
-  // Don't set id - let SQLite auto-increment handle it to avoid conflicts with seeded data
+  // Don't set id - let the database default handle it
   name: Factory.faker.person.fullName(),
   email: Factory.faker.internet.email(),
   emailVerified: null,
   image: null,
-  admin: false,
-  onboardingCompleted: false,
-  onboardingData: null,
-  data: null,
+  metadata: {
+    admin: false,
+    onboardingCompleted: false,
+  } as UserMetadata,
 }));

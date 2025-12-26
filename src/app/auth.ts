@@ -106,7 +106,7 @@ if (process.env.NODE_ENV === 'development') {
         return {
           ...user,
           id: user.id, // Now it's already a string (UUID)
-          admin: user.admin ?? false,
+          admin: user.metadata?.admin ?? false,
         };
       },
     }),

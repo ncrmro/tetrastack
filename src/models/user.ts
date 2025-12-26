@@ -133,9 +133,10 @@ export class User {
         email: data.email,
         name: data.name ?? null,
         image: data.image ?? null,
-        admin: false,
-        onboardingCompleted: true,
-        onboardingData: null,
+        metadata: {
+          admin: false,
+          onboardingCompleted: true,
+        },
       })
       .returning();
 
