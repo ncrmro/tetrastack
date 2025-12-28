@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding assistants when working with code in this repository.
 
 ## Development Server & Commands
 
@@ -105,7 +105,7 @@ The LSP tools understand TypeScript's type system, module resolution, and langua
 - **Backend**: Next.js API routes with server actions
 - **Database**: SQLite with Drizzle ORM (Turso in production)
 - **Auth**: NextAuth.js v5
-- **Testing**: Vitest (unit/integration), Playwright (E2E)
+- **Testing**: Vitest (unit/integration), Playwright (E2E), Storybook (component development/testing)
 - **Deployment**: Cloudflare Pages with OpenNext
 
 ### Core Directory Structure
@@ -116,7 +116,12 @@ The LSP tools understand TypeScript's type system, module resolution, and langua
 src/
 ├── app/                 # Next.js App Router pages
 │   ├── api/             # API routes
-│   ├── [feature]/       # Feature-based page organization
+│   │   ├── auth/        # Authentication endpoints
+│   │   ├── ai/          # AI-related endpoints
+│   │   └── health/      # Health check endpoints
+│   ├── [feature]/       # Feature-based route organization
+│   │   ├── page.tsx     # Route page (Server Component)
+│   │   └── _components/ # Route-specific components (Organisms)
 │   └── globals.css      # Theme system (always consult for styling)
 ├── lib/
 │   ├── db/              # Database schema and connection
@@ -129,7 +134,36 @@ src/
 │   └── AGENTS.md        # Actions layer patterns
 ├── agents/              # AI agents
 │   └── AGENTS.md        # Agent design principles
-└── components/          # Reusable components
+├── components/          # Reusable components (Atomic Design)
+│   ├── AGENTS.md        # Component architecture and Storybook guidelines
+│   ├── ui/              # Atoms (Design System Primitives)
+│   │   ├── AGENTS.md    # UI layer wrapper documentation
+│   │   ├── button.tsx
+│   │   └── button.stories.tsx
+│   ├── navigation/      # Molecules (Shared feature components)
+│   │   ├── MainNav.tsx
+│   │   └── MainNav.stories.tsx
+│   └── templates/       # Page Templates (for visual testing)
+│       ├── DashboardTemplate.tsx
+│       └── DashboardTemplate.stories.tsx
+└── stories/             # Storybook example stories and assets
+
+packages/
+└── @tetrastack/
+    └── react-glass/     # Glass morphism design system package
+        ├── .storybook/  # Package-specific Storybook config
+        ├── AGENTS.md    # Glass components documentation
+        ├── src/
+        │   └── lib/
+        │       └── glass-components/
+        │           ├── GlassButton.tsx
+        │           ├── GlassButton.stories.tsx
+        │           ├── GlassCard.tsx
+        │           ├── GlassCard.stories.tsx
+        │           └── [other glass components]
+        └── index.ts     # Package exports
+
+.storybook/              # Root Storybook configuration (imports package stories)
 
 tests/
 ├── AGENTS.md            # Testing architecture and guidelines
@@ -182,9 +216,20 @@ Tetrastack is a project management platform that enables teams to collaborate on
 
 - **Prefer server components** over client components
 - **Use server actions** (`src/actions/`) over API routes unless specifically needed
-- **Component organization**: Break apart components to avoid overly large files
+- **Component organization**: Break apart components to avoid overly large files. See `src/components/AGENTS.md` for Atomic Design hierarchy
 - **Admin system**: Generic CRUD operations handled by `src/lib/admin/`
 - **Avoid redirects in server actions**: Never use `redirect()` or `permanentRedirect()` in server actions as they throw errors that can confuse try/catch blocks. Return success/error objects instead and handle navigation in the client component.
+
+### Storybook & Component Development
+
+**IMPORTANT**: Storybook is a first-class citizen for design iteration and developer experience.
+
+- **Run Storybook**: `npm run storybook` (starts on port 6006)
+- **Component hierarchy**: Follow Atomic Design principles (Atoms → Molecules → Organisms → Templates)
+- **Story co-location**: Each component should have a `.stories.tsx` file alongside it
+- **Glass components**: The `@tetrastack/react-glass` package provides the design system primitives
+- **Component wrapping**: `src/components/ui/` wraps glass components for app-specific usage
+- **See documentation**: Read `src/components/AGENTS.md` before creating or modifying components
 
 ### Many-First Design Pattern
 

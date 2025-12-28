@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     dirs: ['src', 'tests', 'scripts'],
   },
   serverExternalPackages: ['@libsql/isomorphic-ws'],
+  transpilePackages: ['@tetrastack/react-glass'],
   images: {
     remotePatterns: [
       {

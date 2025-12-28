@@ -89,3 +89,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 tsconfig.tsbuildinfo
+
+*storybook.log
+storybook-static
+.direnv

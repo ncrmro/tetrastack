@@ -1,3 +1,0 @@
-# This file ensures the data/ directory is tracked by git
-# The directory is used for file-based SQLite databases during local development
-# Database files (local.db*) are ignored via .gitignore
