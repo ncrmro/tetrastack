@@ -634,6 +634,8 @@ class OpenAIBatchProvider implements IBatchProvider {
  * 4. Stream results from results_url
  */
 class AnthropicBatchProvider implements IBatchProvider {
+  private apiKey: string;
+
   constructor(apiKey: string = process.env.ANTHROPIC_API_KEY || '') {
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY environment variable is required');

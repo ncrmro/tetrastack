@@ -133,7 +133,7 @@ export abstract class BaseAgent<
       model?: LanguageModel,
     ) => T,
   ): AgentBuilder<T, TResult, TPersisted> {
-    return new AgentBuilder<T, TResult, TPersisted>(BaseAgent);
+    return new AgentBuilder<T, TResult, TPersisted>(this);
   }
 
   protected readonly agentName: string;
@@ -328,7 +328,7 @@ export abstract class BaseAgent<
     // Create agent instance with model from state
     const modelId = state.modelId;
     const model = openai(modelId);
-    const agent = new BaseAgent(undefined, model);
+    const agent = new this(undefined, model);
 
     // Restore state
     agent.result = state.result;

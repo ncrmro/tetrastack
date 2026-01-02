@@ -40,6 +40,9 @@
       "correctness": {
         "noEmptyPattern": "warn",
         "useYield": "warn"
+      },
+      "complexity": {
+        "noThisInStatic": "off"
       }
     }
   },
