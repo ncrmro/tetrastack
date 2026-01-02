@@ -1,13 +1,13 @@
+import { relations, sql } from 'drizzle-orm';
 import {
+  check,
   integer,
+  primaryKey,
   sqliteTable,
   text,
-  primaryKey,
-  check,
 } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { users } from './schema.auth';
 import { generateUuidV7 } from '@/lib/uuid';
+import { users } from './schema.auth';
 
 /**
  * Team role enum - defines membership roles and access control levels
@@ -83,8 +83,8 @@ export const teamMembershipsRelations = relations(
 
 // Schema generation and types
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import type { z } from 'zod';
 import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
 
 /**
  * Base team schema for insertions (auto-generated from Drizzle table)

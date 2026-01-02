@@ -20,9 +20,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
 import type { InsertTag } from '@/database/schema.tags';
 import { tags } from '@/database/schema.tags';
+import { db, Factory } from '@/lib/factories';
 
 /**
  * Tag factory with trait methods for common tag types.

@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -16,13 +16,6 @@ export class SignInPage extends BasePage {
   private readonly signInHeading = this.page.getByRole('heading', {
     name: /sign in/i,
   });
-  private readonly authProviders = this.page.locator(
-    '[data-testid="auth-providers"]',
-  );
-
-  constructor(page: Page) {
-    super(page);
-  }
 
   /**
    * Navigate to sign in page

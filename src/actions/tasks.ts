@@ -1,37 +1,36 @@
 'use server';
 
-import { auth } from '@/app/auth';
-import type { ActionResult } from '@/lib/actions';
-import { validateBulkInput } from '@/lib/actions';
-import type { ModelResult } from '@/lib/models';
-import {
-  getTasks as getTasksModel,
-  insertTasks,
-  updateTasks,
-  deleteTasks,
-  getTaskWithComments,
-} from '@/models/tasks';
 import { eq } from 'drizzle-orm';
-import { tasks } from '@/database/schema.tasks';
-import {
-  verifyProjectTeamMembership,
-  verifyTaskTeamMembership,
-  verifyBulkTeamAccess,
-} from '@/lib/auth-helpers';
+import { auth } from '@/app/auth';
 import type {
   InsertTask,
   SelectTask,
-  TaskStatus,
   TaskPriority,
+  TaskStatus,
 } from '@/database/schema.tasks';
-import { insertTaskSchema } from '@/database/schema.tasks';
+import { insertTaskSchema, tasks } from '@/database/schema.tasks';
+import type { ActionResult } from '@/lib/actions';
+import { validateBulkInput } from '@/lib/actions';
+import {
+  verifyBulkTeamAccess,
+  verifyProjectTeamMembership,
+  verifyTaskTeamMembership,
+} from '@/lib/auth-helpers';
+import type { ModelResult } from '@/lib/models';
+import {
+  deleteTasks,
+  getTasks as getTasksModel,
+  getTaskWithComments,
+  insertTasks,
+  updateTasks,
+} from '@/models/tasks';
 
 // Re-export types for React components
 export type {
   InsertTask,
   SelectTask,
-  TaskStatus,
   TaskPriority,
+  TaskStatus,
 } from '@/database/schema.tasks';
 // Note: TASK_STATUS and TASK_PRIORITY constants cannot be exported from 'use server' files
 // Import them directly from '@/database/schema.tasks' in components instead
@@ -81,7 +80,7 @@ export async function createTask(data: InsertTask): ActionResult<SelectTask> {
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       validationResult.data.projectId,
     );
     if (!isMember) {
@@ -116,7 +115,7 @@ export async function createTasks(
     }
 
     const hasAccess = await verifyBulkTeamAccess(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       validation.data,
       (task) => task.projectId,
       verifyProjectTeamMembership,
@@ -159,7 +158,7 @@ export async function updateTask(
     }
 
     const isMember = await verifyTaskTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       id,
     );
     if (!isMember) {
@@ -188,7 +187,7 @@ export async function deleteTask(id: string): ActionResult<void> {
     }
 
     const isMember = await verifyTaskTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       id,
     );
     if (!isMember) {

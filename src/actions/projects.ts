@@ -1,37 +1,36 @@
 'use server';
 
-import { auth } from '@/app/auth';
-import type { ActionResult } from '@/lib/actions';
-import type { ModelResult } from '@/lib/models';
-import {
-  getProjects as getProjectsModel,
-  insertProjects,
-  updateProjects,
-  deleteProjects,
-  getProjectWithTags,
-  addProjectTags as addProjectTagsModel,
-  removeProjectTags as removeProjectTagsModel,
-} from '@/models/projects';
 import { eq } from 'drizzle-orm';
-import { projects } from '@/database/schema.projects';
-import {
-  verifyProjectTeamMembership,
-  verifyProjectTeamAdmin,
-} from '@/lib/auth-helpers';
+import { auth } from '@/app/auth';
 import type {
   InsertProject,
-  SelectProject,
-  ProjectStatus,
   ProjectPriority,
+  ProjectStatus,
+  SelectProject,
 } from '@/database/schema.projects';
-import { insertProjectSchema } from '@/database/schema.projects';
+import { insertProjectSchema, projects } from '@/database/schema.projects';
+import type { ActionResult } from '@/lib/actions';
+import {
+  verifyProjectTeamAdmin,
+  verifyProjectTeamMembership,
+} from '@/lib/auth-helpers';
+import type { ModelResult } from '@/lib/models';
+import {
+  addProjectTags as addProjectTagsModel,
+  deleteProjects,
+  getProjects as getProjectsModel,
+  getProjectWithTags,
+  insertProjects,
+  removeProjectTags as removeProjectTagsModel,
+  updateProjects,
+} from '@/models/projects';
 
 // Re-export types for React components
 export type {
   InsertProject,
-  SelectProject,
-  ProjectStatus,
   ProjectPriority,
+  ProjectStatus,
+  SelectProject,
 } from '@/database/schema.projects';
 // Note: PROJECT_STATUS and PROJECT_PRIORITY constants cannot be exported from 'use server' files
 // Import them directly from '@/database/schema.projects' in components instead
@@ -158,7 +157,7 @@ export async function updateProject(
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       id,
     );
     if (!isMember) {
@@ -189,7 +188,10 @@ export async function deleteProject(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyProjectTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyProjectTeamAdmin(
+      parseInt(session.user.id, 10),
+      id,
+    );
     if (!isAdmin) {
       return {
         success: false,
@@ -243,7 +245,7 @@ export async function addProjectTags(
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       projectId,
     );
     if (!isMember) {
@@ -275,7 +277,7 @@ export async function removeProjectTags(
     }
 
     const isMember = await verifyProjectTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       projectId,
     );
     if (!isMember) {

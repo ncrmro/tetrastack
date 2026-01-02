@@ -1,7 +1,7 @@
-import { db } from '@/database';
-import { tasks, insertTaskSchema } from '@/database/schema.tasks';
-import type { TaskStatus, TaskPriority } from '@/database/schema.tasks';
 import { and, eq, inArray } from 'drizzle-orm';
+import { db } from '@/database';
+import type { TaskPriority, TaskStatus } from '@/database/schema.tasks';
+import { insertTaskSchema, tasks } from '@/database/schema.tasks';
 import { createModelFactory } from '@/lib/models';
 
 // Create and export CRUD functions using factory

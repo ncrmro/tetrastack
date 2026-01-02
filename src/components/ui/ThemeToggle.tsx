@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>();

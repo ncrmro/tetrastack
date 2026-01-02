@@ -1,5 +1,5 @@
-import { auth } from '@/app/auth';
 import { signInAction, signOutAction } from '@/actions/auth';
+import { auth } from '@/app/auth';
 import Navigation from './Navigation';
 
 export default async function NavigationWrapper() {

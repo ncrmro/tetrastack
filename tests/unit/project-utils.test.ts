@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
+import { describe, expect, it } from 'vitest';
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects';
+import { generateUniqueSlug, slugify } from '@/lib/slugify';
 
 describe('Project Utilities', () => {
   describe('Project slug generation', () => {

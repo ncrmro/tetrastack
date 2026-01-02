@@ -14,9 +14,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
 import type { InsertTeam, InsertTeamMembership } from '@/database/schema.teams';
-import { teams, teamMemberships, TEAM_ROLE } from '@/database/schema.teams';
+import { TEAM_ROLE, teamMemberships, teams } from '@/database/schema.teams';
+import { db, Factory } from '@/lib/factories';
 
 /**
  * Team factory with trait methods for common team types.

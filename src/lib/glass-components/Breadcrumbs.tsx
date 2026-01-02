@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { cn } from './utils';
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
+import type * as React from 'react';
+import { cn } from './utils';
 
 export interface BreadcrumbItem {
   /**

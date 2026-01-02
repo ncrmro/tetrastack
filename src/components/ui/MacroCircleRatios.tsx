@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
 import * as d3 from 'd3';
+import { useMemo, useRef } from 'react';
 
 interface MacroCircleRatiosProps {
   protein: number;

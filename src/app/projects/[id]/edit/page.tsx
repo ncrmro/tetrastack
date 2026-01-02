@@ -1,6 +1,6 @@
-import { authRedirect } from '../../../auth';
-import { getProjects } from '@/models/projects';
 import { notFound } from 'next/navigation';
+import { getProjects } from '@/models/projects';
+import { authRedirect } from '../../../auth';
 import ProjectEditClient from './ProjectEditClient';
 
 export const dynamic = 'force-dynamic';

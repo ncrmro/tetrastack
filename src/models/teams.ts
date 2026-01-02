@@ -1,12 +1,12 @@
+import { and, inArray } from 'drizzle-orm';
 import { db } from '@/database';
 import {
-  teams,
-  teamMemberships,
-  insertTeamSchema,
   insertTeamMembershipSchema,
+  insertTeamSchema,
   TEAM_ROLE,
+  teamMemberships,
+  teams,
 } from '@/database/schema.teams';
-import { and, inArray } from 'drizzle-orm';
 import { createModelFactory } from '@/lib/models';
 
 /**

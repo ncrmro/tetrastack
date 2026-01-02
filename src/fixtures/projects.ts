@@ -1,7 +1,7 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { slugify } from '@/lib/slugify';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
 import type { SelectProject } from '@/database/schema.projects';
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects';
+import { slugify } from '@/lib/slugify';
+import { generateUuidV7 } from '@/lib/uuid';
 import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams';
 
 export const PROJECT_WEBSITE_REDESIGN: SelectProject = {

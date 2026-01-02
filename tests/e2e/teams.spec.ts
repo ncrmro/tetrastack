@@ -1,11 +1,12 @@
-import { test, expect } from './fixtures/team-fixtures';
-import { TeamsPage } from './page-objects/TeamsPage';
-import {
-  createTeamWithMembers,
-  createMultipleTeams,
-} from './fixtures/team-fixtures';
-import { createProjectWithTasks } from './fixtures/project-fixtures';
 import { userFactory } from '../factories';
+import { createProjectWithTasks } from './fixtures/project-fixtures';
+import {
+  createMultipleTeams,
+  createTeamWithMembers,
+  expect,
+  test,
+} from './fixtures/team-fixtures';
+import { TeamsPage } from './page-objects/TeamsPage';
 
 test.describe('Teams', () => {
   test.describe('Teams List View', () => {
@@ -82,7 +83,7 @@ test.describe('Teams', () => {
 
       await test.step('Verify member count shows at least 1', async () => {
         const memberCount = await teamsPage.membersStat.textContent();
-        expect(parseInt(memberCount || '0')).toBeGreaterThanOrEqual(1);
+        expect(parseInt(memberCount || '0', 10)).toBeGreaterThanOrEqual(1);
       });
     });
 
@@ -124,7 +125,7 @@ test.describe('Teams', () => {
 
       await test.step('Verify project count in stats', async () => {
         const projectCount = await teamsPage.projectsStat.textContent();
-        expect(parseInt(projectCount || '0')).toBeGreaterThanOrEqual(2);
+        expect(parseInt(projectCount || '0', 10)).toBeGreaterThanOrEqual(2);
       });
     });
 
@@ -155,7 +156,7 @@ test.describe('Teams', () => {
 
       await test.step('Verify member count shows 3', async () => {
         const memberCount = await teamsPage.membersStat.textContent();
-        expect(parseInt(memberCount || '0')).toBe(3);
+        expect(parseInt(memberCount || '0', 10)).toBe(3);
       });
 
       await test.step('Verify members section shows members', async () => {
@@ -270,7 +271,7 @@ test.describe('Teams', () => {
 
       await test.step('Verify project count is at least 2', async () => {
         const projectText = await teamsPage.projectsStat.textContent();
-        const projectCount = parseInt(projectText || '0');
+        const projectCount = parseInt(projectText || '0', 10);
         expect(projectCount).toBeGreaterThanOrEqual(2);
       });
     });

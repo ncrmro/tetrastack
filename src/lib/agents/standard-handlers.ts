@@ -53,7 +53,7 @@ export function createStandardOnStepFinish(config: OnStepFinishConfig) {
         emit(eventBuilder.toolCall(toolCall.toolName, toolCall.input));
 
         // Tool result event - use 'output' property from StepResult
-        if (toolResults && toolResults[index]) {
+        if (toolResults?.[index]) {
           const toolResult = toolResults[index];
           emit(eventBuilder.toolResult(toolCall.toolName, toolResult.output));
         }

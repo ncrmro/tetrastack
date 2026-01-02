@@ -20,14 +20,14 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
 import type { InsertProject } from '@/database/schema.projects';
 import {
-  projects,
-  PROJECT_STATUS,
   PROJECT_PRIORITY,
+  PROJECT_STATUS,
+  projects,
 } from '@/database/schema.projects';
+import { db, Factory } from '@/lib/factories';
+import { generateUniqueSlug, slugify } from '@/lib/slugify';
 
 /**
  * Project factory with trait methods for common project states.

@@ -1,22 +1,21 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { auth } from '@/app/auth';
+import type { InsertTag, SelectTag } from '@/database/schema.tags';
+import { insertTagSchema, tags } from '@/database/schema.tags';
 import type { ActionResult } from '@/lib/actions';
 import { validateActionInput, withAuth } from '@/lib/actions';
 import {
+  verifyTagTeamMembership,
+  verifyTeamMembership,
+} from '@/lib/auth-helpers';
+import {
+  deleteTags,
   getTags as getTagsModel,
   insertTags,
   updateTags,
-  deleteTags,
 } from '@/models/tags';
-import { eq } from 'drizzle-orm';
-import { tags } from '@/database/schema.tags';
-import {
-  verifyTeamMembership,
-  verifyTagTeamMembership,
-} from '@/lib/auth-helpers';
-import type { InsertTag, SelectTag } from '@/database/schema.tags';
-import { insertTagSchema } from '@/database/schema.tags';
 
 // Re-export types for React components
 export type { InsertTag, SelectTag } from '@/database/schema.tags';
@@ -59,7 +58,7 @@ export async function createTag(data: InsertTag): ActionResult<SelectTag> {
     }
 
     const isMember = await verifyTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       validation.data.teamId,
     );
     if (!isMember) {
@@ -100,7 +99,7 @@ export async function updateTag(
     }
 
     const isMember = await verifyTagTeamMembership(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       id,
     );
     if (!isMember) {

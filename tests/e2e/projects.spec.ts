@@ -1,13 +1,14 @@
-import { test, expect } from './fixtures/project-fixtures';
-import { ProjectsPage } from './page-objects/ProjectsPage';
 import {
-  createProjectWithTasks,
-  createMultipleProjects,
-} from './fixtures/project-fixtures';
-import {
-  PROJECT_STATUS,
   PROJECT_PRIORITY,
+  PROJECT_STATUS,
 } from '../../src/database/schema.projects';
+import {
+  createMultipleProjects,
+  createProjectWithTasks,
+  expect,
+  test,
+} from './fixtures/project-fixtures';
+import { ProjectsPage } from './page-objects/ProjectsPage';
 
 test.describe('Projects', () => {
   test.describe('Projects List View', () => {

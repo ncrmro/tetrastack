@@ -7,7 +7,7 @@ export async function GET() {
     const result = await db.$client.execute('SELECT 1 as health_check');
 
     // Check if we got a valid response
-    if (result && result.rows && result.rows.length > 0) {
+    if (result?.rows && result.rows.length > 0) {
       return NextResponse.json(
         {
           status: 'ready',

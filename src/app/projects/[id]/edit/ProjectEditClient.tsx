@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { updateProject, type SelectProject } from '@/actions/projects';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import { enumToOptions } from '@/lib/enum-utils';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { type SelectProject, updateProject } from '@/actions/projects';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects';
+import { enumToOptions } from '@/lib/enum-utils';
 
 interface ProjectEditClientProps {
   project: SelectProject;

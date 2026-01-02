@@ -1,9 +1,8 @@
-import { NextRequest } from 'next/server';
-import { auth } from '@/app/auth';
+import type { NextRequest } from 'next/server';
 import { ProjectGeneratorAgent } from '@/agents/project-agents';
-import { insertProjects } from '@/models/projects';
+import { auth } from '@/app/auth';
+import { addProjectTags, insertProjects } from '@/models/projects';
 import { insertTags } from '@/models/tags';
-import { addProjectTags } from '@/models/projects';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -94,7 +93,7 @@ export async function POST(request: NextRequest) {
             {
               ...result.project,
               teamId,
-              createdBy: parseInt(session.user.id),
+              createdBy: parseInt(session.user.id, 10),
             },
           ]);
 

@@ -1,11 +1,10 @@
-import { describe, test, expect, beforeEach } from 'vitest';
-import { GenerateProjectIdeasJob } from '@/jobs/generate-project-ideas';
-import { db } from '@/database';
-import { teams } from '@/database/schema.teams';
-import { projects } from '@/database/schema.projects';
-import { tags } from '@/database/schema.tags';
-import { projectTags } from '@/database/schema.projects';
 import { sql } from 'drizzle-orm';
+import { beforeEach, describe, expect, test } from 'vitest';
+import { db } from '@/database';
+import { projects, projectTags } from '@/database/schema.projects';
+import { tags } from '@/database/schema.tags';
+import { teams } from '@/database/schema.teams';
+import { GenerateProjectIdeasJob } from '@/jobs/generate-project-ideas';
 
 // Only run these tests when AGENTS_TEST environment variable is set
 // These tests make real API calls to OpenAI and require valid API keys

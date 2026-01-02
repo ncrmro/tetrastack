@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
-  updateTeam,
   removeTeamMember,
   type SelectTeam,
   type SelectTeamMembership,
+  updateTeam,
 } from '@/actions/teams';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

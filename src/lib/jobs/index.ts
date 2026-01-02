@@ -38,10 +38,10 @@
  * ```
  */
 
-import { db, createDatabaseClient, getResultArray } from '@/database';
-import { jobs, JOB_STATUS } from '@/lib/jobs/schema.jobs';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { createDatabaseClient, db, getResultArray } from '@/database';
+import { JOB_STATUS, jobs } from '@/lib/jobs/schema.jobs';
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed';
 
@@ -80,7 +80,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
    */
   private static validateParams<T>(params: unknown, jobName: string): T {
     try {
-      return this.paramsSchema.parse(params) as T;
+      return Job.paramsSchema.parse(params) as T;
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new Error(
@@ -96,7 +96,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
    */
   private static validateResult<T>(result: unknown, jobName: string): T {
     try {
-      return this.resultSchema.parse(result) as T;
+      return Job.resultSchema.parse(result) as T;
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new Error(
@@ -148,12 +148,12 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     options: { persist?: boolean } = {},
   ): Promise<JobResult<TResult>> {
     const { persist = true } = options;
-    const instance = new (this as unknown as new () => Job<TParams, TResult>)();
-    const jobName = this.name;
+    const instance = new (Job as unknown as new () => Job<TParams, TResult>)();
+    const jobName = Job.name;
     const now = new Date();
 
     // Validate params
-    const validatedParams = this.validateParams<TParams>(params, jobName);
+    const validatedParams = Job.validateParams<TParams>(params, jobName);
 
     // If persist is false, execute directly without database
     if (!persist) {
@@ -166,7 +166,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
 
       try {
         const data = await instance.perform(validatedParams);
-        const validatedResult = this.validateResult<TResult>(data, jobName);
+        const validatedResult = Job.validateResult<TResult>(data, jobName);
 
         metadata.completedAt = new Date();
         metadata.status = 'completed';
@@ -210,7 +210,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
       const data = await instance.perform(validatedParams);
 
       // Validate result before storing
-      const validatedResult = this.validateResult<TResult>(data, jobName);
+      const validatedResult = Job.validateResult<TResult>(data, jobName);
 
       metadata.completedAt = new Date();
       metadata.status = 'completed';
@@ -263,10 +263,10 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     this: typeof Job<TParams, TResult>,
     params: TParams,
   ): Promise<string> {
-    const jobName = this.name;
+    const jobName = Job.name;
 
     // Validate params before storing
-    const validatedParams = this.validateParams<TParams>(params, jobName);
+    const validatedParams = Job.validateParams<TParams>(params, jobName);
 
     // Persist job to database
     const [job] = await db
@@ -298,9 +298,9 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     jobId: string,
     workerTimeoutMs: number = 5 * 60 * 1000, // 5 minutes default
   ): Promise<JobResult<TResult>> {
-    const instance = new (this as unknown as new () => Job<TParams, TResult>)();
+    const instance = new (Job as unknown as new () => Job<TParams, TResult>)();
     instance._currentJobId = jobId;
-    const jobName = this.name;
+    const jobName = Job.name;
 
     // Claim the job with worker lock
     const now = new Date();
@@ -325,7 +325,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     }
 
     // Validate params when retrieving from database
-    const validatedParams = this.validateParams<TParams>(
+    const validatedParams = Job.validateParams<TParams>(
       jobRecord.params,
       jobName,
     );
@@ -341,7 +341,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
       const data = await instance.perform(validatedParams);
 
       // Validate result before storing
-      const validatedResult = this.validateResult<TResult>(data, jobName);
+      const validatedResult = Job.validateResult<TResult>(data, jobName);
 
       metadata.completedAt = new Date();
       metadata.status = 'completed';
@@ -410,7 +410,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
     const errors: Error[] = [];
 
     // Get reference to the constructor with proper typing
-    const JobClass = this as unknown as {
+    const JobClass = Job as unknown as {
       now: (
         params: TParams,
         options?: { persist?: boolean },
@@ -449,7 +449,7 @@ export abstract class Job<TParams = unknown, TResult = unknown> {
    * Get job name (useful for logging and monitoring)
    */
   static getJobName(): string {
-    return this.name;
+    return Job.name;
   }
 }
 

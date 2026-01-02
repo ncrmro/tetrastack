@@ -24,8 +24,8 @@
  * ```
  */
 
-import { Factory as FisheryFactory } from 'fishery';
 import { faker as fakerInstance } from '@faker-js/faker';
+import { Factory as FisheryFactory } from 'fishery';
 import { db as database } from '@/database';
 
 /**

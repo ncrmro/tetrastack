@@ -1,17 +1,17 @@
-import { generateText, Output, stepCountIs } from 'ai';
-import type { LanguageModel } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import type { LanguageModel } from 'ai';
+import { generateText, Output, stepCountIs } from 'ai';
 import { z } from 'zod';
+import { insertTaskSchema, tasks } from '@/database/schema.tasks';
 import { BaseAgent } from '@/lib/agents/base-agent';
-import { createSystemPrompt, createSearchTool } from '@/lib/agents/factories';
 import {
-  createEventConstants,
   createEventBuilders,
-  ExtractEventUnion,
+  createEventConstants,
+  type ExtractEventUnion,
 } from '@/lib/agents/event-factory';
+import { createSearchTool, createSystemPrompt } from '@/lib/agents/factories';
 import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers';
-import { ChatMessage, ProgressCallback } from '@/lib/agents/types';
-import { tasks, insertTaskSchema } from '@/database/schema.tasks';
+import type { ChatMessage, ProgressCallback } from '@/lib/agents/types';
 
 export type TaskGenerationData = z.infer<typeof insertTaskSchema>;
 
@@ -278,7 +278,8 @@ export class BulkTaskGeneratorAgent extends BaseAgent<
     },
   });
 
-  static readonly SYSTEM_PROMPT = `You are a project management expert helping users break down features and goals into actionable tasks.
+  static readonly SYSTEM_PROMPT =
+    `You are a project management expert helping users break down features and goals into actionable tasks.
 
 Your task is to take a high-level feature, goal, or requirement and create a list of specific, actionable tasks:
 1. Break down the work into 3-20 distinct tasks

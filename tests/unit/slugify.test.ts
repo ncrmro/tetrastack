@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import { describe, expect, it } from 'vitest';
+import { generateUniqueSlug, slugify } from '@/lib/slugify';
 
 describe('slugify', () => {
   it('converts basic strings to lowercase with hyphens', () => {

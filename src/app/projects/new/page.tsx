@@ -1,6 +1,6 @@
-import { authRedirect } from '../../auth';
-import { User } from '@/models/user';
 import { notFound } from 'next/navigation';
+import { User } from '@/models/user';
+import { authRedirect } from '../../auth';
 import ProjectFormClient from './ProjectFormClient';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export default async function NewProjectPage({
   searchParams,
 }: NewProjectPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const params = await searchParams;
 
   // Get user's teams

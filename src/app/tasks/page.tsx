@@ -1,14 +1,14 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getTasks } from '@/models/tasks';
-import {
-  TASK_STATUS,
-  type TaskStatus,
-  type TaskPriority,
-} from '@/database/schema.tasks';
 import { TaskList } from '@/components/TaskList';
 import { ButtonLink } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  TASK_STATUS,
+  type TaskPriority,
+  type TaskStatus,
+} from '@/database/schema.tasks';
+import { getTasks } from '@/models/tasks';
+import { User } from '@/models/user';
+import { authRedirect } from '../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,7 @@ interface TasksPageProps {
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const params = await searchParams;
 
   // Get user's teams

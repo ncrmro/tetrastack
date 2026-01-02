@@ -15,14 +15,14 @@
  *   bin/jobs generate-projects --param theme="AI projects" --param count=5
  */
 
-import { db } from '@/database';
-import { jobs } from '@/lib/jobs/schema.jobs';
 import { desc, eq, sql } from 'drizzle-orm';
+import { db } from '@/database';
+import { teams } from '@/database/schema.teams';
 import {
   GenerateProjectIdeasJob,
   type GenerateProjectIdeasParams,
 } from '@/jobs/generate-project-ideas';
-import { teams } from '@/database/schema.teams';
+import { jobs } from '@/lib/jobs/schema.jobs';
 
 // ANSI color codes
 const colors = {
@@ -63,7 +63,7 @@ function formatDuration(
 
 function truncate(str: string, maxLen: number): string {
   if (str.length <= maxLen) return str;
-  return str.substring(0, maxLen - 3) + '...';
+  return `${str.substring(0, maxLen - 3)}...`;
 }
 
 async function listJobs() {
@@ -103,7 +103,7 @@ async function showStatus(jobId: string) {
     const allJobs = await db
       .select()
       .from(jobs)
-      .where(sql`${jobs.id} LIKE ${jobId + '%'}`)
+      .where(sql`${jobs.id} LIKE ${`${jobId}%`}`)
       .limit(2);
 
     if (allJobs.length === 0) {
@@ -234,7 +234,8 @@ function parseParams(args: string[]): Record<string, unknown> {
     let parsedValue: unknown = value;
     if (value === 'true') parsedValue = true;
     else if (value === 'false') parsedValue = false;
-    else if (!isNaN(Number(value)) && value !== '') parsedValue = Number(value);
+    else if (!Number.isNaN(Number(value)) && value !== '')
+      parsedValue = Number(value);
 
     // Set nested value
     let current: Record<string, unknown> = params;
@@ -263,7 +264,7 @@ function parseFlags(args: string[]): {
     } else if (arg.startsWith('--concurrency=')) {
       const concurrencyStr = arg.substring('--concurrency='.length);
       const concurrency = parseInt(concurrencyStr, 10);
-      if (isNaN(concurrency) || concurrency <= 0) {
+      if (Number.isNaN(concurrency) || concurrency <= 0) {
         console.error(
           `${colors.red}Error: --concurrency must be a positive integer${colors.reset}`,
         );

@@ -1,5 +1,5 @@
-import { generateUuidV7 } from '@/lib/uuid';
 import type { SelectTag } from '@/database/schema.tags';
+import { generateUuidV7 } from '@/lib/uuid';
 import { TEAM_ENGINEERING, TEAM_PRODUCT } from './teams';
 
 export const TAG_FRONTEND: SelectTag = {

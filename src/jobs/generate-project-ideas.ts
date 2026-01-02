@@ -5,12 +5,11 @@
  * Demonstrates the job system working with AI agents and database persistence.
  */
 
-import { Job } from '@/lib/jobs';
-import { ProjectPlannerAgent } from '@/agents/project-agents';
-import { insertProjects } from '@/models/projects';
-import { insertTags, getTags } from '@/models/tags';
-import { addProjectTags } from '@/models/projects';
 import { z } from 'zod';
+import { ProjectPlannerAgent } from '@/agents/project-agents';
+import { Job } from '@/lib/jobs';
+import { addProjectTags, insertProjects } from '@/models/projects';
+import { getTags, insertTags } from '@/models/tags';
 
 // Zod schemas for runtime validation
 export const generateProjectIdeasParamsSchema = z.object({

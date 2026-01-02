@@ -1,14 +1,14 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
-import { getProjects } from '@/models/projects';
-import type {
-  ProjectStatus,
-  ProjectPriority,
-} from '@/database/schema.projects';
 import { ProjectCard } from '@/components/ProjectCard';
 import { ProjectFilters } from '@/components/ProjectFilters';
 import { ButtonLink } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import type {
+  ProjectPriority,
+  ProjectStatus,
+} from '@/database/schema.projects';
+import { getProjects } from '@/models/projects';
+import { User } from '@/models/user';
+import { authRedirect } from '../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +20,7 @@ export default async function ProjectsPage({
   searchParams,
 }: ProjectsPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const params = await searchParams;
 
   // Get user's teams

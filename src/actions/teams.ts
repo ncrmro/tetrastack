@@ -1,36 +1,36 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { auth } from '@/app/auth';
-import type { ActionResult } from '@/lib/actions';
-import {
-  getTeams as getTeamsModel,
-  insertTeams,
-  updateTeams,
-  deleteTeams,
-  getTeamMemberships as getTeamMembershipsModel,
-  insertTeamMemberships,
-  deleteTeamMemberships,
-} from '@/models/teams';
-import { verifyTeamAdmin } from '@/lib/auth-helpers';
 import type {
   InsertTeam,
-  SelectTeam,
   InsertTeamMembership,
+  SelectTeam,
   SelectTeamMembership,
 } from '@/database/schema.teams';
 import {
-  insertTeamSchema,
   insertTeamMembershipSchema,
-  teams,
+  insertTeamSchema,
   teamMemberships,
+  teams,
 } from '@/database/schema.teams';
-import { eq } from 'drizzle-orm';
+import type { ActionResult } from '@/lib/actions';
+import { verifyTeamAdmin } from '@/lib/auth-helpers';
+import {
+  deleteTeamMemberships,
+  deleteTeams,
+  getTeamMemberships as getTeamMembershipsModel,
+  getTeams as getTeamsModel,
+  insertTeamMemberships,
+  insertTeams,
+  updateTeams,
+} from '@/models/teams';
 
 // Re-export types for React components
 export type {
   InsertTeam,
-  SelectTeam,
   InsertTeamMembership,
+  SelectTeam,
   SelectTeamMembership,
   TeamRole,
 } from '@/database/schema.teams';
@@ -106,7 +106,7 @@ export async function updateTeam(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id, 10), id);
     if (!isAdmin) {
       return {
         success: false,
@@ -132,7 +132,7 @@ export async function deleteTeam(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), id);
+    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id, 10), id);
     if (!isAdmin) {
       return {
         success: false,
@@ -191,7 +191,7 @@ export async function addTeamMember(
     }
 
     const isAdmin = await verifyTeamAdmin(
-      parseInt(session.user.id),
+      parseInt(session.user.id, 10),
       validationResult.data.teamId,
     );
     if (!isAdmin) {
@@ -222,7 +222,10 @@ export async function removeTeamMember(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isAdmin = await verifyTeamAdmin(parseInt(session.user.id), teamId);
+    const isAdmin = await verifyTeamAdmin(
+      parseInt(session.user.id, 10),
+      teamId,
+    );
     if (!isAdmin) {
       return {
         success: false,

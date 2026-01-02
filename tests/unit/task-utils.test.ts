@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { TASK_STATUS, TASK_PRIORITY } from '@/database/schema.tasks';
+import { describe, expect, it } from 'vitest';
+import { TASK_PRIORITY, TASK_STATUS } from '@/database/schema.tasks';
 
 describe('Task Utilities', () => {
   describe('Task status validation', () => {

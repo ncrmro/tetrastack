@@ -1,6 +1,6 @@
-import * as React from 'react';
+import type * as React from 'react';
+import { GlassSurface, type GlassSurfaceProps } from './GlassSurface';
 import { cn } from './utils';
-import { GlassSurface, GlassSurfaceProps } from './GlassSurface';
 
 export interface GlassCardProps
   extends Omit<GlassSurfaceProps, 'bordered' | 'shadowed'> {

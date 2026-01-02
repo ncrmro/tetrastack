@@ -1,6 +1,6 @@
+import { and, inArray } from 'drizzle-orm';
 import { db } from '@/database';
 import { comments, insertCommentSchema } from '@/database/schema.tasks';
-import { and, inArray } from 'drizzle-orm';
 import { createModelFactory } from '@/lib/models';
 
 /**

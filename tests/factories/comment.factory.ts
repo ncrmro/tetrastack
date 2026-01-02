@@ -21,9 +21,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
 import type { InsertComment } from '@/database/schema.tasks';
 import { comments } from '@/database/schema.tasks';
+import { db, Factory } from '@/lib/factories';
 
 /**
  * Comment factory with trait methods for common comment types.

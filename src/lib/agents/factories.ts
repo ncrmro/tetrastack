@@ -1,6 +1,6 @@
+import { asc, like, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/database';
-import { like, or, asc } from 'drizzle-orm';
 
 /**
  * Factory function to create standard search tools
@@ -50,7 +50,7 @@ export function createSearchTool(config: {
         console.debug(`✅ search${capitalize(entityName)}s result:`, {
           count: results.length,
         });
-        return { success: true, [entityName + 's']: results };
+        return { success: true, [`${entityName}s`]: results };
       } catch (error) {
         console.error(`search${capitalize(entityName)}s failed:`, error);
         const errorMessage =

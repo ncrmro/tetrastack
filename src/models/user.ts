@@ -1,7 +1,7 @@
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/database';
 import { users } from '@/database/schema.auth';
 import { teamMemberships, teams } from '@/database/schema.teams';
-import { inArray, and, eq } from 'drizzle-orm';
 import { createDefaultTeam } from './teams';
 
 /**

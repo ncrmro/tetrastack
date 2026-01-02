@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import NavigationWrapper from '../components/NavigationWrapper';
 import AuthProvider from '../components/AuthProvider';
+import NavigationWrapper from '../components/NavigationWrapper';
 import PostHogIdentifier from '../components/posthog-identifier';
 
 export const metadata: Metadata = {

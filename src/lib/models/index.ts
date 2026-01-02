@@ -1,7 +1,7 @@
-import { db } from '@/database';
 import { and, inArray, type SQL } from 'drizzle-orm';
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
-import { z } from 'zod';
+import type { z } from 'zod';
+import { db } from '@/database';
 
 /**
  * Model utility functions and types
@@ -110,7 +110,7 @@ export function createModelFactory<
 >(
   tableName: string,
   table: TTable,
-  idColumn: TTable[keyof TTable], // Accept any column from the table
+  _idColumn: TTable[keyof TTable], // Accept any column from the table
   insertSchema: z.ZodObject<z.ZodRawShape> & { _output: TInsert }, // Needs .partial() method
 ) {
   type TSelect = TTable['$inferSelect'];

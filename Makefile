@@ -27,7 +27,7 @@ lint: ## Run linting (Docker-based, no service dependencies)
 	$(DC) run --rm --no-deps web npm run lint
 	$(DC) run --rm --no-deps web npm run typecheck
 
-format: ## Format code with Prettier and ESLint --fix (Docker-based, no service dependencies)
+format: ## Format code with Biome (Docker-based, no service dependencies)
 	$(DC) run --rm --no-deps web npm run format
 
 install: ## Install npm packages (Docker-based, no service dependencies)

@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -54,10 +54,6 @@ export class HomePage extends BasePage {
   readonly techStackHeading = this.page.getByRole('heading', {
     name: /tech stack/i,
   });
-
-  constructor(page: Page) {
-    super(page);
-  }
 
   /**
    * Navigate to home page

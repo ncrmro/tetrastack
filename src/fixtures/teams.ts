@@ -1,6 +1,6 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { TEAM_ROLE } from '@/database/schema.teams';
 import type { SelectTeam, SelectTeamMembership } from '@/database/schema.teams';
+import { TEAM_ROLE } from '@/database/schema.teams';
+import { generateUuidV7 } from '@/lib/uuid';
 
 export interface TeamFixture extends SelectTeam {
   memberships: SelectTeamMembership[];

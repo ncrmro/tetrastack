@@ -1,8 +1,8 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
 import posthog from 'posthog-js';
+import { useEffect } from 'react';
 
 export default function PostHogIdentifier() {
   const { data: session, status } = useSession();

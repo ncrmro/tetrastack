@@ -1,8 +1,8 @@
-import { authRedirect } from '../../auth';
-import { User } from '@/models/user';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AIProjectGenerator } from '@/components/AIProjectGenerator';
-import Link from 'next/link';
+import { User } from '@/models/user';
+import { authRedirect } from '../../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +14,7 @@ export default async function GenerateProjectPage({
   searchParams,
 }: GenerateProjectPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const params = await searchParams;
 
   // Get user's teams
