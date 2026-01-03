@@ -3,11 +3,11 @@
  * Tests database persistence and query operations for team-scoped tags
  */
 
-import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/database';
 import { tags } from '@/database/schema.tags';
-import { getTags, insertTags, updateTags, deleteTags } from '@/models/tags';
-import { eq } from 'drizzle-orm';
+import { deleteTags, getTags, insertTags, updateTags } from '@/models/tags';
 import { tagFactory, teamFactory } from '../factories';
 
 describe('getTags', () => {

@@ -1,12 +1,12 @@
-import { authRedirect } from '../../auth';
-import { getTeams, getTeamMemberships } from '@/models/teams';
-import { getProjects } from '@/models/projects';
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { ProjectCard } from '@/components/ProjectCard';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ProjectCard } from '@/components/ProjectCard';
 import { ButtonLink } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { PROJECT_STATUS } from '@/database/schema.projects';
+import { getProjects } from '@/models/projects';
+import { getTeamMemberships, getTeams } from '@/models/teams';
+import { authRedirect } from '../../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ interface TeamPageProps {
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const { id } = await params;
 
   // Get team details

@@ -1,8 +1,8 @@
-import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
-import { projects } from './schema.projects';
-import { users } from './schema.auth';
+import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { generateUuidV7 } from '@/lib/uuid';
+import { users } from './schema.auth';
+import { projects } from './schema.projects';
 
 /**
  * Task status enum - defines all possible task states
@@ -110,8 +110,8 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 
 // Schema generation and types
 import { createSelectSchema } from 'drizzle-zod';
+import type { z } from 'zod';
 import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
 
 /**
  * Base task schema for insertions (auto-generated from Drizzle table)

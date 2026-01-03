@@ -1,17 +1,17 @@
-import { authRedirect } from '../auth';
-import { User } from '@/models/user';
+import { TeamCard } from '@/components/TeamCard';
+import { ButtonLink } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { PROJECT_STATUS } from '@/database/schema.projects';
 import { getProjects } from '@/models/projects';
 import { getTeamMemberships } from '@/models/teams';
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { ButtonLink } from '@/components/ui/button';
-import { TeamCard } from '@/components/TeamCard';
-import { Card, CardContent } from '@/components/ui/card';
+import { User } from '@/models/user';
+import { authRedirect } from '../auth';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TeamsPage() {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
 
   // Get user's teams
   const userTeams = await User.getUserTeams(userId);

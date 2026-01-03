@@ -1,6 +1,6 @@
+import { redirect } from 'next/navigation';
 import LandingPage from '../components/LandingPage';
 import { auth } from './auth';
-import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { SelectTask } from '@/database/schema.tasks';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import type { SelectTask } from '@/database/schema.tasks';
 
 interface AITaskGeneratorProps {
   projectId: string;

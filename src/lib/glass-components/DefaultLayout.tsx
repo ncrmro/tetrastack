@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cn } from './utils';
-import { Breadcrumbs, BreadcrumbItem } from './Breadcrumbs';
+import type * as React from 'react';
+import { type BreadcrumbItem, Breadcrumbs } from './Breadcrumbs';
 import { GlassCard } from './GlassCard';
+import { cn } from './utils';
 
 export interface DefaultLayoutProps extends React.ComponentProps<'div'> {
   /**

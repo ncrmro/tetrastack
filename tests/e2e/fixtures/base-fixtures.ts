@@ -1,20 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
+  type BrowserContext,
   test as base,
   type Page,
   type TestInfo,
-  type BrowserContext,
 } from '@playwright/test';
 import { encode } from 'next-auth/jwt';
 import { db, users } from '../../../src/database';
 import {
-  teams,
-  teamMemberships,
   TEAM_ROLE,
+  teamMemberships,
+  teams,
 } from '../../../src/database/schema.teams';
 import { generateUserCredentials } from '../helpers';
-import { SignInPage } from '../page-objects/SignInPage';
 import { BasePage } from '../page-objects/BasePage';
+import { SignInPage } from '../page-objects/SignInPage';
 
 // Base URL helper - uses PLAYWRIGHT_BASE_URL or constructs from WEB_PORT
 export const getBaseUrl = () => {
@@ -219,7 +219,7 @@ async function createUserWithTeam(
   user: TestUser,
   role: 'member' | 'admin' = 'admin',
 ): Promise<string> {
-  const userId = parseInt(user.id);
+  const userId = parseInt(user.id, 10);
 
   // Create a team for the user
   const [team] = await db
@@ -324,7 +324,7 @@ export const test = base.extend<BaseFixtures>({
     await use({
       page,
       data: baseTestData,
-      userId: parseInt(user.id),
+      userId: parseInt(user.id, 10),
       teamId,
     });
 
@@ -344,7 +344,7 @@ export const test = base.extend<BaseFixtures>({
     await use({
       page,
       data: baseAdminTestData,
-      userId: parseInt(user.id),
+      userId: parseInt(user.id, 10),
       teamId,
     });
 

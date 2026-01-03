@@ -1,10 +1,10 @@
-import NextAuth, { DefaultSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
+import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { db } from '@/database';
-import { eq } from 'drizzle-orm';
 import { users } from '@/database/schema.auth';
-import PostHogClient from '@/lib/posthog-server';
 import { authConfig } from '@/lib/auth.config';
+import PostHogClient from '@/lib/posthog-server';
 import { User } from '@/models/user';
 
 // Redirect URL for authenticated users
@@ -126,7 +126,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      */
     async jwt({ token, user }) {
       // On sign-in with Credentials provider, user object is fully populated
-      if (user && user.id) {
+      if (user?.id) {
         token.id = user.id;
         token.admin = user.admin;
         return token;
@@ -181,7 +181,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * Used for PostHog identification.
      */
     signIn({ user }) {
-      if (user && user.id) {
+      if (user?.id) {
         identifyUserWithPostHog({
           id: user.id,
           email: user.email,

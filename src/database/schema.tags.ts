@@ -1,7 +1,7 @@
-import { integer, sqliteTable, text, check } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
-import { teams } from './schema.teams';
+import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { generateUuidV7 } from '@/lib/uuid';
+import { teams } from './schema.teams';
 
 export const tags = sqliteTable(
   'tags',
@@ -35,8 +35,8 @@ export const tagsRelations = relations(tags, ({ one }) => ({
 
 // Schema generation and types
 import { createSelectSchema } from 'drizzle-zod';
+import type { z } from 'zod';
 import { createAutoInsertSchema } from '@/lib/db/schema-helpers';
-import { z } from 'zod';
 
 /**
  * Base tag schema for insertions (auto-generated from Drizzle table)

@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/base-fixtures';
+import { expect, test } from './fixtures/base-fixtures';
 import { ProjectsPage } from './page-objects/ProjectsPage';
 
 test.describe('AI Project Generation', () => {

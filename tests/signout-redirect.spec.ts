@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { generateUserCredentials } from './e2e/helpers';
 import { BasePage } from './e2e/page-objects/BasePage';
 import { SignInPage } from './e2e/page-objects/SignInPage';

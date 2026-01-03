@@ -1,17 +1,17 @@
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/database';
-import {
-  projects,
-  projectTags,
-  insertProjectSchema,
-} from '@/database/schema.projects';
 import type {
   InsertProject,
-  ProjectStatus,
   ProjectPriority,
+  ProjectStatus,
 } from '@/database/schema.projects';
-import { and, eq, inArray } from 'drizzle-orm';
-import { slugify, generateUniqueSlug } from '@/lib/slugify';
+import {
+  insertProjectSchema,
+  projects,
+  projectTags,
+} from '@/database/schema.projects';
 import { createModelFactory } from '@/lib/models';
+import { generateUniqueSlug, slugify } from '@/lib/slugify';
 
 // Get base CRUD functions from factory
 const {

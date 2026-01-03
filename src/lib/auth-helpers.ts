@@ -1,9 +1,9 @@
-import { db } from '@/database';
-import { teamMemberships, TEAM_ROLE } from '@/database/schema.teams';
-import { projects } from '@/database/schema.projects';
-import { tasks, comments } from '@/database/schema.tasks';
-import { tags } from '@/database/schema.tags';
 import { and, eq } from 'drizzle-orm';
+import { db } from '@/database';
+import { projects } from '@/database/schema.projects';
+import { tags } from '@/database/schema.tags';
+import { comments, tasks } from '@/database/schema.tasks';
+import { TEAM_ROLE, teamMemberships } from '@/database/schema.teams';
 
 /**
  * Verify if a user is a member of a team

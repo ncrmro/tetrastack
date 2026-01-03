@@ -1,13 +1,13 @@
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  TASK_STATUS,
   type SelectTask,
+  TASK_STATUS,
   type TaskPriority,
   type TaskStatus,
 } from '@/database/schema.tasks';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { StatusBadge } from './StatusBadge';
 import { PriorityIndicator } from './PriorityIndicator';
+import { StatusBadge } from './StatusBadge';
 
 interface TaskCardProps {
   task: SelectTask & {

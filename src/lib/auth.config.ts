@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from 'next-auth';
+import type { Provider } from 'next-auth/providers';
 import Google from 'next-auth/providers/google';
-import { Provider } from 'next-auth/providers';
 
 /**
  * Edge-compatible auth configuration for middleware

@@ -1,22 +1,22 @@
-import { generateText, Output, stepCountIs } from 'ai';
-import type { LanguageModel } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import type { LanguageModel } from 'ai';
+import { generateText, Output, stepCountIs } from 'ai';
 import { z } from 'zod';
-import { BaseAgent } from '@/lib/agents/base-agent';
-import { createSystemPrompt, createSearchTool } from '@/lib/agents/factories';
 import {
-  createEventConstants,
-  createEventBuilders,
-  ExtractEventUnion,
-} from '@/lib/agents/event-factory';
-import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers';
-import { ChatMessage, ProgressCallback } from '@/lib/agents/types';
-import {
-  projects,
   insertProjectSchema,
-  PROJECT_STATUS,
   PROJECT_PRIORITY,
+  PROJECT_STATUS,
+  projects,
 } from '@/database/schema.projects';
+import { BaseAgent } from '@/lib/agents/base-agent';
+import {
+  createEventBuilders,
+  createEventConstants,
+  type ExtractEventUnion,
+} from '@/lib/agents/event-factory';
+import { createSearchTool, createSystemPrompt } from '@/lib/agents/factories';
+import { createStandardOnStepFinish } from '@/lib/agents/standard-handlers';
+import type { ChatMessage, ProgressCallback } from '@/lib/agents/types';
 
 /**
  * Schema for AI-generated project with suggested tags
@@ -337,7 +337,8 @@ export class ProjectPlannerAgent extends BaseAgent<
     },
   });
 
-  static readonly SYSTEM_PROMPT = `You are a strategic project planning expert helping users break down complex initiatives into manageable projects and tasks.
+  static readonly SYSTEM_PROMPT =
+    `You are a strategic project planning expert helping users break down complex initiatives into manageable projects and tasks.
 
 Your task is to take a high-level goal or initiative and create a comprehensive project plan with:
 1. Multiple related projects that together accomplish the goal
@@ -363,7 +364,8 @@ Critical Rules:
 - Suggest relevant tags (e.g., "frontend", "backend", "infrastructure", "ux")
 - Tasks should be ordered by logical execution sequence`;
 
-  static readonly PROMPT = `The user described their initiative: "{USER_MESSAGE}"
+  static readonly PROMPT =
+    `The user described their initiative: "{USER_MESSAGE}"
 
 Create a comprehensive project plan with multiple projects and initial tasks.`;
 

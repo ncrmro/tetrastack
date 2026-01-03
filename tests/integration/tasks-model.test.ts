@@ -3,21 +3,21 @@
  * Tests database persistence and query operations for tasks
  */
 
-import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/database';
-import { tasks, TASK_STATUS, TASK_PRIORITY } from '@/database/schema.tasks';
+import { TASK_PRIORITY, TASK_STATUS, tasks } from '@/database/schema.tasks';
 import {
+  deleteTasks,
   getTasks,
+  getTaskWithComments,
   insertTasks,
   updateTasks,
-  deleteTasks,
-  getTaskWithComments,
 } from '@/models/tasks';
-import { eq } from 'drizzle-orm';
 import {
-  taskFactory,
   commentFactory,
   projectFactory,
+  taskFactory,
   teamFactory,
   userFactory,
 } from '../factories';

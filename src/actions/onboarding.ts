@@ -1,10 +1,10 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { auth } from '@/app/auth';
-import type { ActionResult } from '@/lib/actions';
 import { db } from '@/database';
 import { users } from '@/database/schema.auth';
-import { eq } from 'drizzle-orm';
+import type { ActionResult } from '@/lib/actions';
 
 /**
  * Complete user onboarding
@@ -24,7 +24,7 @@ export async function completeOnboarding(): ActionResult<void> {
       .set({
         onboardingCompleted: true,
       })
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, parseInt(session.user.id, 10)));
 
     return { success: true, data: undefined };
   } catch (err) {

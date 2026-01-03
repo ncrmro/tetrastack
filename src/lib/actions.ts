@@ -122,7 +122,7 @@ export async function withAuth<T>(
     if (!session?.user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
-    const result = await handler(parseInt(session.user.id));
+    const result = await handler(parseInt(session.user.id, 10));
     return { success: true, data: result };
   } catch (error) {
     const errorMessage =

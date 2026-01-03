@@ -1,4 +1,4 @@
-import { TestInfo } from '@playwright/test';
+import type { TestInfo } from '@playwright/test';
 
 /**
  * Generate unique user credentials for E2E tests based on worker index and timestamp

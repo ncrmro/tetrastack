@@ -1,6 +1,6 @@
-import React from 'react';
-import { cn } from './utils';
+import type React from 'react';
 import { GlassSurface } from './GlassSurface';
+import { cn } from './utils';
 
 export interface GlassInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

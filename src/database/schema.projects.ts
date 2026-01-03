@@ -1,14 +1,14 @@
+import { relations, sql } from 'drizzle-orm';
 import {
+  check,
   integer,
+  primaryKey,
   sqliteTable,
   text,
-  primaryKey,
-  check,
 } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
-import { teams } from './schema.teams';
-import { users } from './schema.auth';
 import { generateUuidV7 } from '@/lib/uuid';
+import { users } from './schema.auth';
+import { teams } from './schema.teams';
 
 /**
  * Project status enum - defines all possible project states
@@ -113,7 +113,7 @@ export const projectTagsRelations = relations(projectTags, ({ one }) => ({
 
 // Schema generation and types
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 /**
  * Base project schema for insertions (auto-generated from Drizzle table)

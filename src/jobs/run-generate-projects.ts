@@ -15,9 +15,9 @@
  *   --count       10
  */
 
-import { GenerateProjectIdeasJob } from './generate-project-ideas';
 import { db } from '@/database';
 import { teams } from '@/database/schema.teams';
+import { GenerateProjectIdeasJob } from './generate-project-ideas';
 
 async function main() {
   const args = process.argv.slice(2);

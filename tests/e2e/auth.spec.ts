@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/base-fixtures';
+import { expect, test } from './fixtures/base-fixtures';
 import { generateUserCredentials } from './helpers';
 import { BasePage } from './page-objects/BasePage';
 import { HomePage } from './page-objects/HomePage';

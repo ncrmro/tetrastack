@@ -1,17 +1,17 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { auth } from '@/app/auth';
+import type { InsertComment, SelectComment } from '@/database/schema.tasks';
+import { comments, insertCommentSchema } from '@/database/schema.tasks';
 import type { ActionResult } from '@/lib/actions';
+import { verifyCommentOwnership } from '@/lib/auth-helpers';
 import {
+  deleteComments,
   getComments as getCommentsModel,
   insertComments,
   updateComments,
-  deleteComments,
 } from '@/models/comments';
-import { verifyCommentOwnership } from '@/lib/auth-helpers';
-import type { InsertComment, SelectComment } from '@/database/schema.tasks';
-import { insertCommentSchema, comments } from '@/database/schema.tasks';
-import { eq } from 'drizzle-orm';
 
 // Re-export types for React components
 export type { InsertComment, SelectComment } from '@/database/schema.tasks';
@@ -52,7 +52,7 @@ export async function createComment(
     }
 
     // Ensure the comment is created by the authenticated user
-    const commentData = { ...data, userId: parseInt(session.user.id) };
+    const commentData = { ...data, userId: parseInt(session.user.id, 10) };
 
     // Validate input data
     const validationResult = insertCommentSchema.safeParse(commentData);
@@ -93,7 +93,10 @@ export async function updateComment(
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isOwner = await verifyCommentOwnership(parseInt(session.user.id), id);
+    const isOwner = await verifyCommentOwnership(
+      parseInt(session.user.id, 10),
+      id,
+    );
     if (!isOwner) {
       return {
         success: false,
@@ -122,7 +125,10 @@ export async function deleteComment(id: string): ActionResult<void> {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const isOwner = await verifyCommentOwnership(parseInt(session.user.id), id);
+    const isOwner = await verifyCommentOwnership(
+      parseInt(session.user.id, 10),
+      id,
+    );
     if (!isOwner) {
       return {
         success: false,

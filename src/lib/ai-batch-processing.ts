@@ -179,11 +179,11 @@
  * No other code changes needed!
  */
 
-import { z } from 'zod';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import OpenAI from 'openai';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import { z } from 'zod';
 
 /**
  * Supported batch processing providers
@@ -644,29 +644,6 @@ class AnthropicBatchProvider implements IBatchProvider {
   }
 
   /**
-   * Convert BatchRequest to Anthropic batch format
-   */
-  private buildAnthropicRequest(
-    request: BatchRequest,
-  ): Record<string, unknown> {
-    const messages = request.messages;
-
-    return {
-      custom_id: request.customId,
-      params: {
-        model: request.model,
-        max_tokens: request.maxTokens,
-        system: request.systemPrompt,
-        messages,
-        ...(request.temperature !== undefined && {
-          temperature: request.temperature,
-        }),
-        ...(request.topP !== undefined && { top_p: request.topP }),
-      },
-    };
-  }
-
-  /**
    * TODO: Implement Anthropic batch creation
    * Steps:
    * 1. Convert requests to Anthropic format
@@ -744,76 +721,6 @@ class AnthropicBatchProvider implements IBatchProvider {
     throw new Error('Not implemented - cancelBatch requires Anthropic SDK');
     // const batch = await anthropic.messages.batches.cancel(batchId);
     // return this.mapAnthropicBatch(batch);
-  }
-
-  /**
-   * Map Anthropic status to normalized BatchStatus
-   */
-  private mapAnthropicStatus(anthropicStatus: string): BatchStatus {
-    switch (anthropicStatus) {
-      case 'in_progress':
-        return BATCH_STATUS.PROCESSING;
-      case 'ended':
-        return BATCH_STATUS.COMPLETED;
-      default:
-        return BATCH_STATUS.PROCESSING;
-    }
-  }
-
-  /**
-   * Map Anthropic result format to normalized BatchResult
-   */
-  private mapAnthropicResult(result: Record<string, unknown>): BatchResult {
-    // Type assertions needed for dynamic JSON parsing from Anthropic Batch API
-    // Anthropic returns batch results with required 'result' field containing type and optional message/error
-    const customId = result.custom_id as string;
-    const resultData = result.result as {
-      type: string;
-      message?: unknown;
-      error?: { type?: string; message?: string };
-    };
-
-    const baseResult = {
-      customId,
-      rawResponse: result,
-    };
-
-    switch (resultData.type) {
-      case 'succeeded':
-        return {
-          ...baseResult,
-          status: 'succeeded' as const,
-          content: resultData.message,
-        };
-      case 'errored':
-        return {
-          ...baseResult,
-          status: 'errored' as const,
-          error: {
-            type: resultData.error?.type || 'unknown_error',
-            message: resultData.error?.message || 'Unknown error',
-          },
-        };
-      case 'expired':
-        return {
-          ...baseResult,
-          status: 'expired' as const,
-        };
-      case 'cancelled':
-        return {
-          ...baseResult,
-          status: 'cancelled' as const,
-        };
-      default:
-        return {
-          ...baseResult,
-          status: 'errored' as const,
-          error: {
-            type: 'unknown_result_type',
-            message: `Unknown result type: ${resultData.type}`,
-          },
-        };
-    }
   }
 
   /**

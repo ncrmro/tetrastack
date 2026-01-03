@@ -20,9 +20,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
 import type { InsertTask } from '@/database/schema.tasks';
-import { tasks, TASK_STATUS, TASK_PRIORITY } from '@/database/schema.tasks';
+import { TASK_PRIORITY, TASK_STATUS, tasks } from '@/database/schema.tasks';
+import { db, Factory } from '@/lib/factories';
 
 /**
  * Task factory with trait methods for common task states.

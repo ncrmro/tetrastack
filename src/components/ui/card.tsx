@@ -1,12 +1,12 @@
-import * as React from 'react';
+import type * as React from 'react';
 
 export {
   GlassCard as Card,
+  GlassCardContent as CardContent,
+  GlassCardDescription as CardDescription,
+  GlassCardFooter as CardFooter,
   GlassCardHeader as CardHeader,
   GlassCardTitle as CardTitle,
-  GlassCardDescription as CardDescription,
-  GlassCardContent as CardContent,
-  GlassCardFooter as CardFooter,
 } from '@/lib/glass-components/GlassCard';
 
 // CardAction is a simple wrapper for action buttons/elements in the card header

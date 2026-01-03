@@ -1,0 +1,5 @@
+# Biome ignore file
+# Files that Biome should not format or lint
+
+# CSS with Tailwind directives (not compatible with Biome CSS parser)
+src/app/globals.css

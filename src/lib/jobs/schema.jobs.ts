@@ -1,11 +1,11 @@
+import { relations, sql } from 'drizzle-orm';
 import {
+  check,
+  index,
   integer,
   sqliteTable,
   text,
-  index,
-  check,
 } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
 import { generateUuidV7 } from '@/lib/uuid';
 
 /**
@@ -118,7 +118,7 @@ export const cronJobsRelations = relations(cronJobs, () => ({}));
 
 // Schema generation and types
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 /**
  * Base job schema for insertions (auto-generated from Drizzle table)

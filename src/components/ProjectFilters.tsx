@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
-import { enumToOptions } from '@/lib/enum-utils';
 import { Select } from '@/components/ui/select';
+import { PROJECT_PRIORITY, PROJECT_STATUS } from '@/database/schema.projects';
+import { enumToOptions } from '@/lib/enum-utils';
 
 interface Team {
   id: string;

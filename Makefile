@@ -24,10 +24,11 @@ down: ## Stop all services
 	$(DC) down --remove-orphans
 
 lint: ## Run linting (Docker-based, no service dependencies)
+	$(DC) run --rm --no-deps web npx biome check --diagnostic-level=error .
 	$(DC) run --rm --no-deps web npm run lint
 	$(DC) run --rm --no-deps web npm run typecheck
 
-format: ## Format code with Prettier and ESLint --fix (Docker-based, no service dependencies)
+format: ## Format code with Biome (Docker-based, no service dependencies)
 	$(DC) run --rm --no-deps web npm run format
 
 install: ## Install npm packages (Docker-based, no service dependencies)
@@ -70,6 +71,7 @@ migration-reconcile: ## Reset drizzle folder from main branch and regenerate mig
 # CI pipeline: lint + all tests (Docker-based)
 ci: ## Run full CI pipeline: lint and all tests including e2e
 	@echo "Running linting..."
+	@$(DC) run --rm --no-deps web npx biome check --diagnostic-level=error .
 	@$(DC) run --rm --no-deps web npm run lint
 	@$(DC) run --rm --no-deps web npm run typecheck
 	@echo "Running unit tests..."

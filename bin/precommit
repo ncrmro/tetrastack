@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# =============================================================================
+# Central Pre-commit Hook Script
+# =============================================================================
+#
+# FUNCTIONAL SPECIFICATION (sync with docs/conventions/development-workflow.md)
+#
+# Purpose:
+#   Provide unified code quality checks across all development entry points
+#   (Git commits, Claude Code sessions, Gemini CLI sessions).
+#
+# Requirements:
+#   1. Run code formatting and linting
+#   2. Run static type checking
+#   3. Run unit tests
+#   4. Exit with non-zero status if any check fails
+#   5. Resolve symlinks to work when called via symlink
+#
+# Entry Points (all symlink to this script):
+#   - Git pre-commit: .husky/pre-commit
+#   - Claude stop:    .claude/hooks/pre-commit-on-stop.sh
+#   - Gemini stop:    .gemini/hooks/pre-commit-on-stop.sh
+#
+# =============================================================================
+
+set -e
+
+# Resolve symlinks to find the real script location
+SCRIPT_PATH="$(readlink -f "$0")"
+cd "$(dirname "$SCRIPT_PATH")/.." || exit 1
+
+echo "Running pre-commit checks..."
+
+# Run Biome for formatting and linting
+echo "Checking code with Biome..."
+node_modules/.bin/biome check --write --diagnostic-level=error .
+
+# Run TypeScript type checking
+echo "Type checking with TypeScript..."
+node_modules/.bin/tsc --noEmit
+
+# Run unit tests
+echo "Running unit tests..."
+npm run test:unit
+
+echo "✓ All pre-commit checks passed!"

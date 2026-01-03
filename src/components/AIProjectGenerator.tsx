@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { SelectProject } from '@/database/schema.projects';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import type { SelectProject } from '@/database/schema.projects';
 
 interface AIProjectGeneratorProps {
   teamId: string;
@@ -166,7 +166,7 @@ export function AIProjectGenerator({
                 </p>
               )}
               <button
-                onClick={() => router.push(`/projects/${result.project!.slug}`)}
+                onClick={() => router.push(`/projects/${result.project?.slug}`)}
                 className="text-sm font-medium text-primary hover:underline"
               >
                 View Project →

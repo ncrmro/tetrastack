@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server';
-import { auth } from '@/app/auth';
+import type { NextRequest } from 'next/server';
 import { BulkTaskGeneratorAgent } from '@/agents/task-agents';
+import { auth } from '@/app/auth';
 import { insertTasks } from '@/models/tasks';
 
 export const runtime = 'nodejs';

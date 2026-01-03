@@ -3,20 +3,20 @@
  * Tests database persistence and query operations for task comments
  */
 
-import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/database';
 import { comments } from '@/database/schema.tasks';
 import {
+  deleteComments,
   getComments,
   insertComments,
   updateComments,
-  deleteComments,
 } from '@/models/comments';
-import { eq } from 'drizzle-orm';
 import {
   commentFactory,
-  taskFactory,
   projectFactory,
+  taskFactory,
   teamFactory,
   userFactory,
 } from '../factories';

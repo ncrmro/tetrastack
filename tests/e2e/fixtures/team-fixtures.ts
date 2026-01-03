@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { test as base, expect } from './base-fixtures';
+
+import { TEAM_ROLE } from '../../../src/database/schema.teams';
+import { insertTeamMemberships, insertTeams } from '../../../src/models/teams';
 import { BasePage } from '../page-objects/BasePage';
 import type { TeamContext } from './base-fixtures';
-import { insertTeams, insertTeamMemberships } from '../../../src/models/teams';
-import { TEAM_ROLE } from '../../../src/database/schema.teams';
+import { test as base, expect } from './base-fixtures';
 
 // Team specific context with navigation helpers
 export interface TeamPageContext extends TeamContext {

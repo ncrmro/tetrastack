@@ -1,6 +1,6 @@
 import type { LanguageModel } from 'ai';
 import type { BaseAgent } from './base-agent';
-import type { ProgressCallback, ChatMessage } from './types';
+import type { ChatMessage, ProgressCallback } from './types';
 
 /**
  * Configuration object for agent construction

@@ -3,24 +3,24 @@
  * Tests database persistence, slug generation, and tag management for projects
  */
 
-import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/database';
 import {
+  PROJECT_PRIORITY,
+  PROJECT_STATUS,
   projects,
   projectTags,
-  PROJECT_STATUS,
-  PROJECT_PRIORITY,
 } from '@/database/schema.projects';
 import {
-  getProjects,
-  insertProjects,
-  updateProjects,
-  deleteProjects,
-  getProjectWithTags,
   addProjectTags,
+  deleteProjects,
+  getProjects,
+  getProjectWithTags,
+  insertProjects,
   removeProjectTags,
+  updateProjects,
 } from '@/models/projects';
-import { eq } from 'drizzle-orm';
 import { projectFactory, tagFactory, teamFactory } from '../factories';
 
 describe('getProjects', () => {

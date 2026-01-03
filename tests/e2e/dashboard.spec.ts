@@ -1,6 +1,6 @@
-import { test, expect } from './fixtures/base-fixtures';
-import { DashboardPage } from './page-objects/DashboardPage';
+import { expect, test } from './fixtures/base-fixtures';
 import { createProjectWithTasks } from './fixtures/project-fixtures';
+import { DashboardPage } from './page-objects/DashboardPage';
 
 test.describe('Dashboard', () => {
   test.describe('Empty State', () => {

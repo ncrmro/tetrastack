@@ -1,8 +1,8 @@
 import {
   integer,
+  primaryKey,
   sqliteTable,
   text,
-  primaryKey,
 } from 'drizzle-orm/sqlite-core';
 import type { AdapterAccountType } from 'next-auth/adapters';
 
@@ -133,7 +133,7 @@ export const authenticators = sqliteTable(
 
 // Schema generation and types
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 /**
  * User schema for insertions (auto-generated from Drizzle table)

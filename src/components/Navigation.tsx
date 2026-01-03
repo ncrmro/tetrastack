@@ -1,13 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import ThemeToggle from '@/components/ui/ThemeToggle';
+import Link from 'next/link';
+import type { Session } from 'next-auth';
+import { useState } from 'react';
 import AccountDropdown from '@/components/AccountDropdown';
-import { Session } from 'next-auth';
 import { Button } from '@/components/ui/button';
 import { Nav } from '@/components/ui/nav';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface NavigationProps {
   session: Session | null;

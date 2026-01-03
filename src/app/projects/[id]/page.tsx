@@ -1,18 +1,18 @@
-import { authRedirect } from '../../auth';
-import { getProjects, getProjectWithTags } from '@/models/projects';
-import { getTasks } from '@/models/tasks';
-import { TaskList } from '@/components/TaskList';
-import { StatusBadge } from '@/components/StatusBadge';
-import { PriorityIndicator } from '@/components/PriorityIndicator';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import {
-  type ProjectStatus,
-  type ProjectPriority,
-} from '@/database/schema.projects';
-import { TASK_STATUS } from '@/database/schema.tasks';
+import { PriorityIndicator } from '@/components/PriorityIndicator';
+import { StatusBadge } from '@/components/StatusBadge';
+import { TaskList } from '@/components/TaskList';
 import { ButtonLink } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import type {
+  ProjectPriority,
+  ProjectStatus,
+} from '@/database/schema.projects';
+import { TASK_STATUS } from '@/database/schema.tasks';
+import { getProjects, getProjectWithTags } from '@/models/projects';
+import { getTasks } from '@/models/tasks';
+import { authRedirect } from '../../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,7 +87,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   key={projectTag.tag.id}
                   className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium"
                   style={{
-                    backgroundColor: projectTag.tag.color + '30',
+                    backgroundColor: `${projectTag.tag.color}30`,
                     color: projectTag.tag.color,
                   }}
                 >

@@ -1,6 +1,6 @@
-import { authRedirect } from '../../../auth';
-import { getTeams, getTeamMemberships } from '@/models/teams';
 import { notFound } from 'next/navigation';
+import { getTeamMemberships, getTeams } from '@/models/teams';
+import { authRedirect } from '../../../auth';
 import TeamSettingsClient from './TeamSettingsClient';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export default async function TeamSettingsPage({
   params,
 }: TeamSettingsPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const { id } = await params;
 
   // Get team details

@@ -1,7 +1,7 @@
 'use client';
 
-import type { SelectTeam } from '@/database/schema.teams';
 import { Select } from '@/components/ui/select';
+import type { SelectTeam } from '@/database/schema.teams';
 
 interface TeamSelectorProps {
   teams: SelectTeam[];

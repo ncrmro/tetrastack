@@ -1,8 +1,8 @@
 import { openai } from '@ai-sdk/openai';
 import type { LanguageModel } from 'ai';
-import { ProgressCallback, ChatMessage, AgentState } from './types';
 import { AgentBuilder } from './builder';
 import type { createEventBuilders } from './event-factory';
+import type { AgentState, ChatMessage, ProgressCallback } from './types';
 
 /**
  * Standard discriminated union workflow for agents that search existing items
@@ -128,7 +128,10 @@ export abstract class BaseAgent<
     TResult = unknown,
     TPersisted = unknown,
   >(
-    this: new (progressCallback?: ProgressCallback, model?: LanguageModel) => T,
+    this: new (
+      progressCallback?: ProgressCallback,
+      model?: LanguageModel,
+    ) => T,
   ): AgentBuilder<T, TResult, TPersisted> {
     return new AgentBuilder<T, TResult, TPersisted>(this);
   }
@@ -316,7 +319,10 @@ export abstract class BaseAgent<
    * Note: Subclasses must implement this to properly recreate the agent instance
    */
   static fromJSON<T extends BaseAgent>(
-    this: new (progressCallback?: ProgressCallback, model?: LanguageModel) => T,
+    this: new (
+      progressCallback?: ProgressCallback,
+      model?: LanguageModel,
+    ) => T,
     state: AgentState,
   ): T {
     // Create agent instance with model from state

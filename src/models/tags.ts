@@ -1,5 +1,5 @@
-import { tags, insertTagSchema } from '@/database/schema.tags';
 import { inArray } from 'drizzle-orm';
+import { insertTagSchema, tags } from '@/database/schema.tags';
 import { createModelFactory } from '@/lib/models';
 
 /**

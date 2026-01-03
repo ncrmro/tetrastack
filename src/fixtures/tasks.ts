@@ -1,11 +1,11 @@
-import { generateUuidV7 } from '@/lib/uuid';
-import { TASK_STATUS, TASK_PRIORITY } from '@/database/schema.tasks';
 import type { SelectTask } from '@/database/schema.tasks';
+import { TASK_PRIORITY, TASK_STATUS } from '@/database/schema.tasks';
+import { generateUuidV7 } from '@/lib/uuid';
 import {
   PROJECT_API_V2,
-  PROJECT_WEBSITE_REDESIGN,
   PROJECT_CUSTOMER_PORTAL,
   PROJECT_MOBILE_APP,
+  PROJECT_WEBSITE_REDESIGN,
 } from './projects';
 
 // API v2 Tasks

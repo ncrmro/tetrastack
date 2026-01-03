@@ -1,19 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { test as base, expect } from './base-fixtures';
-import { BasePage } from '../page-objects/BasePage';
-import type { TeamContext } from './base-fixtures';
-import { insertProjects } from '../../../src/models/projects';
-import { insertTasks } from '../../../src/models/tasks';
+
 import {
-  PROJECT_STATUS,
-  PROJECT_PRIORITY,
   type InsertProject,
+  PROJECT_PRIORITY,
+  PROJECT_STATUS,
 } from '../../../src/database/schema.projects';
 import {
-  TASK_STATUS,
-  TASK_PRIORITY,
   type InsertTask,
+  TASK_PRIORITY,
+  TASK_STATUS,
 } from '../../../src/database/schema.tasks';
+import { insertProjects } from '../../../src/models/projects';
+import { insertTasks } from '../../../src/models/tasks';
+import { BasePage } from '../page-objects/BasePage';
+import type { TeamContext } from './base-fixtures';
+import { test as base, expect } from './base-fixtures';
 
 // Project specific context with navigation helpers
 export interface ProjectPageContext extends TeamContext {

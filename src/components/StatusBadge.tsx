@@ -1,7 +1,7 @@
-import { PROJECT_STATUS } from '@/database/schema.projects';
-import { TASK_STATUS } from '@/database/schema.tasks';
 import type { ProjectStatus } from '@/database/schema.projects';
+import { PROJECT_STATUS } from '@/database/schema.projects';
 import type { TaskStatus } from '@/database/schema.tasks';
+import { TASK_STATUS } from '@/database/schema.tasks';
 
 type Status = ProjectStatus | TaskStatus;
 

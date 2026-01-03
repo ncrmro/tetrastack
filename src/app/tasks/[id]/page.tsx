@@ -1,17 +1,17 @@
-import { authRedirect } from '../../auth';
-import { getTasks, getTaskWithComments } from '@/models/tasks';
-import { getProjects } from '@/models/projects';
-import { StatusBadge } from '@/components/StatusBadge';
-import { PriorityIndicator } from '@/components/PriorityIndicator';
-import { CommentThread } from '@/components/CommentThread';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { CommentThread } from '@/components/CommentThread';
+import { PriorityIndicator } from '@/components/PriorityIndicator';
+import { StatusBadge } from '@/components/StatusBadge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   TASK_STATUS,
-  type TaskStatus,
   type TaskPriority,
+  type TaskStatus,
 } from '@/database/schema.tasks';
-import { Card, CardContent } from '@/components/ui/card';
+import { getProjects } from '@/models/projects';
+import { getTasks, getTaskWithComments } from '@/models/tasks';
+import { authRedirect } from '../../auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,7 @@ interface TaskPageProps {
 
 export default async function TaskPage({ params }: TaskPageProps) {
   const session = await authRedirect();
-  const userId = parseInt(session.user.id);
+  const userId = parseInt(session.user.id, 10);
   const { id } = await params;
 
   // Get task details

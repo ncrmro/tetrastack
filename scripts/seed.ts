@@ -1,19 +1,19 @@
 import { db } from '../src/database';
 import {
-  users,
-  teams,
-  teamMemberships,
-  projects,
-  tasks,
-  tags,
-  projectTags,
   comments,
+  projects,
+  projectTags,
+  tags,
+  tasks,
+  teamMemberships,
+  teams,
+  users,
 } from '../src/database/schema';
 import {
-  teams as fixtureTeams,
   projects as fixtureProjects,
-  tasks as fixtureTasks,
   tags as fixtureTags,
+  tasks as fixtureTasks,
+  teams as fixtureTeams,
   users as fixtureUsers,
 } from '../src/fixtures';
 

@@ -13,9 +13,9 @@
  * ```
  */
 
-export { userFactory } from './user.factory';
-export { teamFactory, teamMembershipFactory } from './team.factory';
-export { tagFactory } from './tag.factory';
-export { projectFactory } from './project.factory';
-export { taskFactory } from './task.factory';
 export { commentFactory } from './comment.factory';
+export { projectFactory } from './project.factory';
+export { tagFactory } from './tag.factory';
+export { taskFactory } from './task.factory';
+export { teamFactory, teamMembershipFactory } from './team.factory';
+export { userFactory } from './user.factory';

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import type { SelectComment } from '@/database/schema.tasks';
+import { useState, useTransition } from 'react';
 import { createComment } from '@/actions/comments';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import type { SelectComment } from '@/database/schema.tasks';
 
 interface CommentThreadProps {
   taskId: string;

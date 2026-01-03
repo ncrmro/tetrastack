@@ -1,8 +1,11 @@
-import { test, expect } from './fixtures/project-fixtures';
-import { TasksPage } from './page-objects/TasksPage';
-import { createProjectWithTasks } from './fixtures/project-fixtures';
-import { TASK_STATUS, TASK_PRIORITY } from '../../src/database/schema.tasks';
+import { TASK_PRIORITY, TASK_STATUS } from '../../src/database/schema.tasks';
 import { insertComments } from '../../src/models/comments';
+import {
+  createProjectWithTasks,
+  expect,
+  test,
+} from './fixtures/project-fixtures';
+import { TasksPage } from './page-objects/TasksPage';
 
 test.describe('Tasks', () => {
   test.describe('Tasks List View', () => {

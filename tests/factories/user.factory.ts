@@ -25,9 +25,9 @@
  * ```
  */
 
-import { Factory, db } from '@/lib/factories';
 import type { InsertUser, SelectUser } from '@/database/schema.auth';
 import { users } from '@/database/schema.auth';
+import { db, Factory } from '@/lib/factories';
 
 /**
  * User factory with trait methods for common user types.

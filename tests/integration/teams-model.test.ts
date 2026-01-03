@@ -3,19 +3,19 @@
  * Tests database persistence and query operations for teams and memberships
  */
 
-import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/database';
-import { teams, teamMemberships } from '@/database/schema.teams';
+import { teamMemberships, teams } from '@/database/schema.teams';
 import {
-  getTeams,
-  insertTeams,
-  updateTeams,
+  deleteTeamMemberships,
   deleteTeams,
   getTeamMemberships,
+  getTeams,
   insertTeamMemberships,
-  deleteTeamMemberships,
+  insertTeams,
+  updateTeams,
 } from '@/models/teams';
-import { eq } from 'drizzle-orm';
 import { teamFactory, teamMembershipFactory, userFactory } from '../factories';
 
 describe('getTeams', () => {
