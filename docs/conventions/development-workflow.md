@@ -91,6 +91,18 @@ npm run test:unit
 1. **Before Git commits**: Automatically via Husky hook
 2. **When stopping Claude Code**: Automatically via Claude settings
 3. **When stopping Gemini CLI**: Automatically via Gemini settings
+4. **In CI/CD pipelines**: Runs in GitHub Actions workflows
+
+### CI Integration
+
+The GitHub Actions CI workflow (`.github/workflows/web.tests.yml`) runs the same code quality checks:
+
+1. **Biome check**: `npx biome check --diagnostic-level=error .` - Checks formatting and linting without modifying files
+2. **ESLint**: `npm run lint` - Runs additional linting checks
+3. **TypeScript**: `npm run typecheck` - Validates type correctness
+4. **Tests**: Runs unit, integration, and E2E tests
+
+The Makefile `lint` and `ci` targets also include these checks for Docker-based development.
 
 ### What Happens on Failure
 
