@@ -8,56 +8,69 @@ help: ## List all available commands
 
 .DEFAULT_GOAL := help
 
+# Local development variables
+WEB_PORT ?= $(shell grep WEB_PORT .env 2>/dev/null | cut -d '=' -f2 || echo 3000)
+DB_PORT ?= $(shell grep DB_PORT .env 2>/dev/null | cut -d '=' -f2 || echo 8080)
+
 build: ## Build all services without dependencies
-	$(DC) run --env NODE_ENV=production --rm --no-deps web npm run build
+	npm run build
 
-up: ## Start all services in detached mode, run migrations, and follow logs
-	$(DC) up -d db app-init
-	$(DC) up db-init
-	$(DC) up -d web
-	@echo ""
-	@echo "✓ Services started successfully!"
-	@PORT=$$(grep WEB_PORT .env 2>/dev/null | cut -d '=' -f2); echo "→ Web server: http://localhost:$${PORT:-3000}"
-	@echo ""
+up: ## Start local dev environment (Next.js + LibSQL) using concurrently
+	@echo "Starting local development environment..."
+	@mkdir -p data
+	@chmod +x ./scripts/migrate-with-wait.sh
+	@export DATABASE_URL="http://127.0.0.1:$(DB_PORT)" && \
+	concurrently \
+		--names "WEB,DATABASE,INIT" \
+		--prefix-colors "blue,green,yellow" \
+		--kill-others-on-fail \
+		"npm run dev -- --port $(WEB_PORT)" \
+		"sqld --http-listen-addr 127.0.0.1:$(DB_PORT) --db-path ./data/sqld.db" \
+		"./scripts/migrate-with-wait.sh"
 
-down: ## Stop all services
-	$(DC) down --remove-orphans
+down: ## Stop all services (helper to kill ports if needed)
+	@echo "Stopping services on ports $(WEB_PORT) and $(DB_PORT)..."
+	@lsof -ti :$(WEB_PORT) | xargs -r kill
+	@lsof -ti :$(DB_PORT) | xargs -r kill
 
-lint: ## Run linting (Docker-based, no service dependencies)
-	$(DC) run --rm --no-deps web npm run lint
-	$(DC) run --rm --no-deps web npm run typecheck
+lint: ## Run linting
+	npm run lint
+	npm run typecheck
 
-format: ## Format code with Prettier and ESLint --fix (Docker-based, no service dependencies)
-	$(DC) run --rm --no-deps web npm run format
+format: ## Format code with Prettier and ESLint --fix
+	npm run format
 
-install: ## Install npm packages (Docker-based, no service dependencies)
-	$(DC) run --rm --no-deps web npm install
+install: ## Install npm packages
+	npm install
 
-test-unit: ## Run unit tests (Docker-based, no service dependencies)
-	$(DC) run --rm --no-deps web npm run test:unit
+test-unit: ## Run unit tests
+	npm run test:unit
 
-test-integration: ## Run integration tests (Docker-based, starts db service)
-	$(DC) run --rm web npm run test:integration
+test-integration: ## Run integration tests
+	@export DATABASE_URL="http://127.0.0.1:$(DB_PORT)" && \
+	npm run test:integration
 
-test-components: ## Run component tests (Docker-based, no service dependencies)
-	$(DC) run --rm --no-deps web npm run test:components
+test-components: ## Run component tests
+	npm run test:components
 
-test-agents: ## Run agent tests (Docker-based, starts db service)
-	$(DC) run --rm web npm run test:agents
+test-agents: ## Run agent tests
+	@export DATABASE_URL="http://127.0.0.1:$(DB_PORT)" && \
+	npm run test:agents
 
-test-all: ## Run all tests including e2e (Docker-based)
-	$(DC) run --rm --no-deps web npm run test:unit
-	$(DC) run --rm web npm run test:integration
-	$(DC) run --rm --no-deps web npm run test:components
-	$(DC) --profile e2e run --rm e2e
+test-all: ## Run all tests
+	npm run test:unit
+	npm run test:integration
+	npm run test:components
+	npm run test:e2e
 
-migrate: ## Run database migrations in Docker
-	$(DC) up db-migrate
+migrate: ## Run database migrations
+	@export DATABASE_URL="http://127.0.0.1:$(DB_PORT)" && \
+	npm run db:migrate
 
 destroy: ## Clean all services and delete database files
-	$(DC) down --remove-orphans --volumes
-	rm -rf ./data/libsql/*
+	rm -rf ./data/sqld.db*
 	rm -rf .next
+	rm -rf node_modules
 
 migration-reconcile: ## Reset drizzle folder from main branch and regenerate migrations
 	## Can be used to regenerate migrations after rebasing on a branch with migration conflicts
@@ -67,21 +80,22 @@ migration-reconcile: ## Reset drizzle folder from main branch and regenerate mig
 	git checkout origin/main -- drizzle
 	npm run db:generate
 
-# CI pipeline: lint + all tests (Docker-based)
+# CI pipeline: lint + all tests
 ci: ## Run full CI pipeline: lint and all tests including e2e
 	@echo "Running linting..."
-	@$(DC) run --rm --no-deps web npm run lint
-	@$(DC) run --rm --no-deps web npm run typecheck
+	@npm run lint
+	@npm run typecheck
 	@echo "Running unit tests..."
-	@$(DC) run --rm --no-deps web npm run test:unit
+	@npm run test:unit
 	@echo "Running integration tests..."
-	@$(DC) run --rm web npm run test:integration
+	@npm run test:integration
 	@echo "Running e2e tests..."
-	@$(DC) --profile e2e run --rm e2e
+	@npm run test:e2e
 	@echo "✓ CI complete"
 
-e2e: ## Run e2e tests in Docker
-	$(DC) --profile e2e run --rm e2e
+e2e: ## Run e2e tests
+	@export DATABASE_URL="http://127.0.0.1:$(DB_PORT)" && \
+	npm run test:e2e
 
 coverage: ## Run tests with coverage report
-	$(DC) run --rm web npm run coverage
+	npm run coverage
