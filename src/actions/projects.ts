@@ -17,7 +17,7 @@ import { projects } from '@/database/schema.projects';
 import {
   verifyProjectTeamMembership,
   verifyProjectTeamAdmin,
-} from '@/lib/auth-helpers';
+} from '@/lib/nextjs-admin';
 import type {
   InsertProject,
   SelectProject,

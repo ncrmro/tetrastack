@@ -17,7 +17,7 @@ import {
   verifyProjectTeamMembership,
   verifyTaskTeamMembership,
   verifyBulkTeamAccess,
-} from '@/lib/auth-helpers';
+} from '@/lib/nextjs-admin';
 import type {
   InsertTask,
   SelectTask,

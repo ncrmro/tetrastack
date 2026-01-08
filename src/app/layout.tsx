@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import NavigationWrapper from '../components/NavigationWrapper';
+import { NavigationWrapper } from '@/lib/nextjs-admin';
 import AuthProvider from '../components/AuthProvider';
 import PostHogIdentifier from '../components/posthog-identifier';
 
