@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { updateProject, type SelectProject } from '@/actions/projects';
-import { PROJECT_STATUS, PROJECT_PRIORITY } from '@/database/schema.projects';
+import {
+  PROJECT_STATUS,
+  PROJECT_PRIORITY,
+  type ProjectStatus,
+  type ProjectPriority,
+} from '@/database/schema.projects';
 import { enumToOptions } from '@/lib/enum-utils';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -130,9 +135,7 @@ export default function ProjectEditClient({ project }: ProjectEditClientProps) {
                 <Select
                   id="status"
                   value={status}
-                  onChange={(e) =>
-                    setStatus(e.target.value as keyof typeof PROJECT_STATUS)
-                  }
+                  onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                 >
                   {enumToOptions(PROJECT_STATUS).map((option) => (
                     <option key={option.value} value={option.value}>
@@ -153,7 +156,7 @@ export default function ProjectEditClient({ project }: ProjectEditClientProps) {
                   id="priority"
                   value={priority}
                   onChange={(e) =>
-                    setPriority(e.target.value as keyof typeof PROJECT_PRIORITY)
+                    setPriority(e.target.value as ProjectPriority)
                   }
                 >
                   {enumToOptions(PROJECT_PRIORITY).map((option) => (

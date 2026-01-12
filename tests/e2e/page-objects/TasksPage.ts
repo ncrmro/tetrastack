@@ -100,10 +100,12 @@ export class TasksPage extends BasePage {
       'p.text-on-surface-variant.text-lg.whitespace-pre-wrap',
     );
 
-    // Task Metadata
-    this.metadataContainer = page.locator(
-      'div.bg-surface.rounded-lg.border.border-outline',
-    );
+    // Task Metadata - using Card component structure
+    this.metadataContainer = page
+      .locator('div')
+      .filter({ has: page.getByText('Status') })
+      .filter({ has: page.getByText('Priority') })
+      .first();
     this.statusBadge = page.locator('[data-testid="status-badge"]').first();
     this.priorityIndicator = page
       .locator('[data-testid="priority-indicator"]')
