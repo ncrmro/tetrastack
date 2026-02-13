@@ -75,20 +75,30 @@ export class TeamsPage extends BasePage {
     this.teamDescription = page.locator('p.text-on-surface-variant.max-w-3xl');
     this.settingsButton = page.getByRole('link', { name: /settings/i });
 
-    // Team Stats
+    // Team Stats - use grid structure instead of bg-surface class
+    // Stats are in a grid container after the header, look for text-3xl elements in cards
     this.membersStat = page
-      .locator('div.bg-surface')
-      .filter({ hasText: /members/i })
+      .locator('div.grid.gap-6')
+      .first()
+      .locator('div')
+      .filter({ hasText: /^members$/i })
+      .locator('..') // parent
       .locator('div.text-3xl')
       .first();
     this.projectsStat = page
-      .locator('div.bg-surface')
-      .filter({ hasText: /projects/i })
+      .locator('div.grid.gap-6')
+      .first()
+      .locator('div')
+      .filter({ hasText: /^projects$/i })
+      .locator('..') // parent
       .locator('div.text-3xl')
       .first();
     this.activeProjectsStat = page
-      .locator('div.bg-surface')
-      .filter({ hasText: /active projects/i })
+      .locator('div.grid.gap-6')
+      .first()
+      .locator('div')
+      .filter({ hasText: /^active projects$/i })
+      .locator('..') // parent
       .locator('div.text-3xl')
       .first();
 

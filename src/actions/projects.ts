@@ -17,6 +17,7 @@ import { projects } from '@/database/schema.projects';
 import {
   verifyProjectTeamMembership,
   verifyProjectTeamAdmin,
+  verifyTeamMembership,
 } from '@/lib/auth-helpers';
 import type {
   InsertProject,
@@ -66,21 +67,39 @@ export async function getProjects(params: {
  * Requires authentication
  */
 export async function createProject(
-  data: InsertProject,
+  data: Omit<InsertProject, 'createdBy'> & { createdBy?: number },
 ): ActionResult<SelectProject> {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Verify user is a member of the team
+    const isMember = await verifyTeamMembership(
+      parseInt(session.user.id),
+      data.teamId,
+    );
+    if (!isMember) {
+      return {
+        success: false,
+        error: 'Forbidden: Must be a team member to create project',
+      };
+    }
+
+    // Set createdBy from session
+    const projectData: InsertProject = {
+      ...data,
+      createdBy: parseInt(session.user.id),
+    };
+
     // Validate input data
-    const validationResult = insertProjectSchema.safeParse(data);
+    const validationResult = insertProjectSchema.safeParse(projectData);
     if (!validationResult.success) {
       return {
         success: false,
         error: `Invalid project data: ${validationResult.error.issues.map((e) => e.message).join(', ')}`,
       };
-    }
-
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: 'Unauthorized' };
     }
 
     const [project] = await insertProjects([validationResult.data]);
