@@ -1,7 +1,7 @@
 # DC normally is docker compose, but podman compose is used if available
 DC:=docker compose $(DC_ARGS)
 
-.PHONY: help build up down lint format migrate destroy migration-reconcile ci e2e coverage
+.PHONY: help build up down lint format migrate destroy migration-reconcile ci e2e coverage storybook
 
 help: ## List all available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -99,3 +99,6 @@ e2e: ## Run e2e tests
 
 coverage: ## Run tests with coverage report
 	npm run coverage
+
+storybook: ## Start Storybook dev server on port 6006
+	npm run storybook

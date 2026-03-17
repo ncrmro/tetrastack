@@ -1,0 +1,6 @@
+<script>
+  // Polyfill process.env for libraries that check it
+  window.process = window.process || {};
+  window.process.env = window.process.env || {};
+  window.process.env.NODE_ENV = 'development';
+</script>

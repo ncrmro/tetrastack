@@ -68,6 +68,12 @@ export type { GlassNavProps } from './GlassNav';
 export { GlassButton, GlassButtonLink } from './GlassButton';
 export type { GlassButtonProps, GlassButtonLinkProps } from './GlassButton';
 
+export { GlassInput } from './GlassInput';
+export type { GlassInputProps } from './GlassInput';
+
+export { GlassSelect } from './GlassSelect';
+export type { GlassSelectProps } from './GlassSelect';
+
 export { GlassLink } from './GlassLink';
 export type { GlassLinkProps } from './GlassLink';
 

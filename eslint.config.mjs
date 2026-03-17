@@ -26,6 +26,7 @@ const eslintConfig = [
       '.vercel/**',
       'playwright-report/**',
       'test-results/**',
+      'storybook-static/**',
       'next-env.d.ts',
       '*.d.ts',
     ],

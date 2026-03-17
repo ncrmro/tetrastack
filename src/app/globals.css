@@ -126,7 +126,39 @@ body {
   ); /* gray-900, gray-100 */
 }
 
-/* 
+/* Background component - theme-aware background gradients */
+.theme-background {
+  background-attachment: fixed;
+}
+
+/* Light mode - explicit class */
+.light .theme-background,
+html.light.theme-background {
+  background-image: linear-gradient(to bottom right, #f9fbfd, #f2f5f7);
+}
+
+/* Dark mode - explicit class */
+.dark .theme-background,
+html.dark.theme-background {
+  background-image: linear-gradient(to bottom right, #010408, #0e1115);
+}
+
+/* System preference fallbacks */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) .theme-background,
+  html.theme-background:not(.light) {
+    background-image: linear-gradient(to bottom right, #010408, #0e1115);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html:not(.dark) .theme-background,
+  html.theme-background:not(.dark) {
+    background-image: linear-gradient(to bottom right, #f9fbfd, #f2f5f7);
+  }
+}
+
+/*
   THEME USAGE GUIDE:
   
   Here's how to use this theme system in your application:

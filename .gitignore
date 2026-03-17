@@ -81,6 +81,9 @@ test-debug-*.png
 
 .eslintcache
 
+# storybook
+storybook-static/
+
 # worktrees
 /worktree/
 
