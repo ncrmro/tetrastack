@@ -11,7 +11,7 @@ import {
   insertTeamMemberships,
   deleteTeamMemberships,
 } from '@/models/teams';
-import { verifyTeamAdmin } from '@/lib/auth-helpers';
+import { verifyTeamAdmin } from '@/lib/nextjs-admin';
 import type {
   InsertTeam,
   SelectTeam,
