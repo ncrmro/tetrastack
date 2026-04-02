@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   eslint: {
     dirs: ['src', 'tests', 'scripts'],
   },
+  transpilePackages: ['@tetrastack/jobs'],
   serverExternalPackages: ['@libsql/isomorphic-ws'],
   images: {
     remotePatterns: [
